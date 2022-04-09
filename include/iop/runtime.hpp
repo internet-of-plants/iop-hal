@@ -1,4 +1,7 @@
-#include "driver/string.hpp"
+#ifndef IOP_DRIVER_RUNTIME_HPP
+#define IOP_DRIVER_RUNTIME_HPP
+
+#include "iop/string.hpp"
 
 namespace driver {
     /// Should be defined by the application
@@ -11,3 +14,5 @@ namespace driver {
     /// Event loop function, continuously scheduled for execution
     auto loop() noexcept -> void;
 }
+
+#endif

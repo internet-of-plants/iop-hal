@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_UPGRADE_HPP
 #define IOP_DRIVER_UPGRADE_HPP
 
-#include "driver/string.hpp"
+#include "iop/string.hpp"
 
 namespace iop {
     class Network;

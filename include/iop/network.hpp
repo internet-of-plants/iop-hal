@@ -1,9 +1,9 @@
 #ifndef IOP_DRIVER_NETWORK_HPP
 #define IOP_DRIVER_NETWORK_HPP
 
-#include "driver/response.hpp"
-#include "driver/wifi.hpp"
-#include "driver/log.hpp"
+#include "iop/response.hpp"
+#include "iop/wifi.hpp"
+#include "iop/log.hpp"
 
 #include <vector>
 

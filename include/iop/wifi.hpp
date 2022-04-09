@@ -1,9 +1,9 @@
 #ifndef IOP_DRIVER_WIFI
 #define IOP_DRIVER_WIFI
 
-#include "driver/string.hpp"
-#include "driver/client.hpp"
-#include "driver/upgrade.hpp"
+#include "iop/string.hpp"
+#include "iop/client.hpp"
+#include "iop/upgrade.hpp"
 #include <string>
 #include <array>
 #include <functional>

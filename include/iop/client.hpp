@@ -1,8 +1,8 @@
 #ifndef IOP_DRIVER_CLIENT_HPP
 #define IOP_DRIVER_CLIENT_HPP
 
-#include "driver/string.hpp"
-#include "driver/response.hpp"
+#include "iop/string.hpp"
+#include "iop/response.hpp"
 #include <functional>
 #include <string>
 #include <optional>

@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_DEVICE_HPP
 #define IOP_DRIVER_DEVICE_HPP
 
-#include "driver/string.hpp"
+#include "iop/string.hpp"
 #include <stdint.h>
 #include <array>
 
