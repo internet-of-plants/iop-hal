@@ -1,6 +1,6 @@
 
-#include "driver/wifi.hpp"
-#include "driver/log.hpp"
+#include "iop/wifi.hpp"
+#include "iop/log.hpp"
 
 namespace driver {
 Wifi::Wifi() noexcept {}

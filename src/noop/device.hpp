@@ -1,4 +1,4 @@
-#include "driver/device.hpp"
+#include "iop/device.hpp"
 
 namespace driver {
 auto Device::syncNTP() const noexcept -> void {}

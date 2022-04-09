@@ -1,5 +1,5 @@
 
-#include "driver/network.hpp"
+#include "iop/network.hpp"
 
 namespace iop {
 void Network::setup() const noexcept { IOP_TRACE(); }

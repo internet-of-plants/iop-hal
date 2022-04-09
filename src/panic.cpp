@@ -1,7 +1,7 @@
-#include "driver/panic.hpp"
-#include "driver/log.hpp"
-#include "driver/device.hpp"
-#include "driver/thread.hpp"
+#include "iop/panic.hpp"
+#include "iop/log.hpp"
+#include "iop/device.hpp"
+#include "iop/thread.hpp"
 
 // TODO: implement panic backend that reboots, we always panic on OOM, but because of heap fragmentation you generally would want to reboot to maximize uptime
 

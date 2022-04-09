@@ -1,6 +1,6 @@
-#include "driver/wifi.hpp"
-#include "driver/panic.hpp"
-#include "driver/thread.hpp"
+#include "iop/wifi.hpp"
+#include "iop/panic.hpp"
+#include "iop/thread.hpp"
 
 #include "WiFi.h"
 

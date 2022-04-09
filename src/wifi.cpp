@@ -1,11 +1,11 @@
 #ifdef IOP_POSIX
-#include "driver/posix/wifi.hpp"
+#include "iop/posix/wifi.hpp"
 #elif defined(IOP_ESP8266)
-#include "driver/esp8266/wifi.hpp"
+#include "iop/esp8266/wifi.hpp"
 #elif defined(IOP_ESP32)
-#include "driver/esp32/wifi.hpp"
+#include "iop/esp32/wifi.hpp"
 #elif defined(IOP_NOOP)
-#include "driver/noop/wifi.hpp"
+#include "iop/noop/wifi.hpp"
 #else
 #error "Target not supported"
 #endif

@@ -1,16 +1,16 @@
 #ifdef IOP_POSIX
-#include "driver/cpp17/string.hpp"
+#include "iop/cpp17/string.hpp"
 #elif defined(IOP_ESP8266)
-#include "driver/arduino/string.hpp"
+#include "iop/arduino/string.hpp"
 #elif defined(IOP_ESP32)
-#include "driver/arduino/string.hpp"
+#include "iop/arduino/string.hpp"
 #elif defined(IOP_NOOP)
-#include "driver/noop/string.hpp"
+#include "iop/noop/string.hpp"
 #else
 #error "Target not supported"
 #endif
 
-#include "driver/panic.hpp"
+#include "iop/panic.hpp"
 
 #include <vector>
 

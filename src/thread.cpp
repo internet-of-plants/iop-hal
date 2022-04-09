@@ -1,16 +1,16 @@
 #ifdef IOP_POSIX
-#include "driver/posix/thread.hpp"
+#include "iop/posix/thread.hpp"
 #elif defined(IOP_ESP8266)
-#include "driver/esp8266/thread.hpp"
+#include "iop/esp8266/thread.hpp"
 #elif defined(IOP_ESP32)
-#include "driver/esp32/thread.hpp"
+#include "iop/esp32/thread.hpp"
 #elif defined(IOP_NOOP)
-#include "driver/noop/thread.hpp"
+#include "iop/noop/thread.hpp"
 #else
 #error "Target not supported"
 #endif
 
-#include "driver/device.hpp"
+#include "iop/device.hpp"
 
 namespace driver {
     auto Thread::halt() const noexcept -> void {

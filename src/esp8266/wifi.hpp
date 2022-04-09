@@ -1,9 +1,9 @@
-#include "driver/wifi.hpp"
-#include "driver/panic.hpp"
-#include "driver/thread.hpp"
+#include "iop/wifi.hpp"
+#include "iop/panic.hpp"
+#include "iop/thread.hpp"
 
 #include "ESP8266WiFi.h"
-#include "driver/esp8266/generated/certificates.hpp"
+#include "iop/esp8266/generated/certificates.hpp"
 #ifdef IOP_SSL
 using NetworkClient = BearSSL::WiFiClientSecure;
 #else

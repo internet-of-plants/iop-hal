@@ -1,7 +1,7 @@
-#include "driver/network.hpp"
-#include "driver/thread.hpp"
-#include "driver/upgrade.hpp"
-#include "driver/panic.hpp"
+#include "iop/network.hpp"
+#include "iop/thread.hpp"
+#include "iop/upgrade.hpp"
+#include "iop/panic.hpp"
 
 constexpr static iop::UpgradeHook defaultHook(iop::UpgradeHook::defaultHook);
 
@@ -54,13 +54,13 @@ Network::Network(StaticString uri, const LogLevel &logLevel) noexcept
 }
 
 #if !defined(IOP_ONLINE) || defined(IOP_NOOP)
-#include "driver/noop/network.hpp"
+#include "iop/noop/network.hpp"
 #else
 
-#include "driver/wifi.hpp"
-#include "driver/device.hpp"
-#include "driver/client.hpp"
-#include "driver/panic.hpp"
+#include "iop/wifi.hpp"
+#include "iop/device.hpp"
+#include "iop/client.hpp"
+#include "iop/panic.hpp"
 #include "string.h"
 
 static driver::HTTPClient http;
