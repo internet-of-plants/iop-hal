@@ -17,6 +17,6 @@
     "exclude": [],
     "frameworks": "*",
     "platforms": ["espressif8266", "espressif32","native"],
-    "libLDFMode": "chain+"
+    "libLDFMode": "deep"
   }
   
