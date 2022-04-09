@@ -29,6 +29,9 @@
         "-D IOP_NETWORK_LOGGING",
         "-D IOP_SENSORS"
       ],
+      "unflags": [
+        "-std=gnu++11"
+      ],
       "libArchive": false
     }
   }
