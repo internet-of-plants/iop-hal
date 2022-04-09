@@ -7,7 +7,7 @@ namespace iop {
     class Network;
 }
 
-namespace driver {
+namespace iop_hal {
 /// Higher level error reporting. Lower level is handled by core
 enum class UpgradeStatus {
   IO_ERROR,
@@ -22,7 +22,7 @@ enum class UpgradeStatus {
 //
 // Downloads firmware from behind the monitor server's authentication
 struct Upgrade {
-    static auto run(const iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> driver::UpgradeStatus;
+    static auto run(const iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> iop_hal::UpgradeStatus;
 };
 }
 

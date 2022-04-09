@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-namespace driver {
+namespace iop_hal {
 auto Thread::sleep(iop::time::milliseconds ms) const noexcept -> void {
   ::delay(ms);
 }

@@ -3,9 +3,9 @@
 #include <Arduino.h>
 
 void setup() {
-    driver::setup();
+    iop_hal::setup();
 }
 
 void loop() {
-    driver::loop();
+    iop_hal::loop();
 }

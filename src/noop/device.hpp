@@ -1,6 +1,6 @@
 #include "iop-hal/device.hpp"
 
-namespace driver {
+namespace iop_hal {
 auto Device::syncNTP() const noexcept -> void {}
 auto Device::platform() const noexcept -> ::iop::StaticString { return IOP_STR("NOOP"); }
 auto Device::vcc() const noexcept -> uint16_t { return UINT16_MAX; }

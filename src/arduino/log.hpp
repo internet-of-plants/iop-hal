@@ -5,7 +5,7 @@
 
 //HardwareSerial Serial(UART0);
 
-namespace driver {
+namespace iop_hal {
 void logSetup(const iop::LogLevel &level) noexcept {
     constexpr const uint32_t BAUD_RATE = 115200;
     Serial.begin(BAUD_RATE);
@@ -13,9 +13,9 @@ void logSetup(const iop::LogLevel &level) noexcept {
         Serial.setDebugOutput(true);
 
     constexpr const uint32_t twoSec = 2 * 1000;
-    const auto end = driver::thisThread.timeRunning() + twoSec;
-    while (!Serial && driver::thisThread.timeRunning() < end)
-        driver::thisThread.yield();
+    const auto end = iop_hal::thisThread.timeRunning() + twoSec;
+    while (!Serial && iop_hal::thisThread.timeRunning() < end)
+        iop_hal::thisThread.yield();
 }
 void logPrint(const iop::StaticString msg) noexcept {
     Serial.print(msg.get());

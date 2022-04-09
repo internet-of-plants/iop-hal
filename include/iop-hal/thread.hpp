@@ -11,7 +11,7 @@ using milliseconds = uintmax_t;
 }
 }
 
-namespace driver {
+namespace iop_hal {
 /// Describes the device's memory state in an instant.
 struct Memory {
   uintmax_t availableStack;

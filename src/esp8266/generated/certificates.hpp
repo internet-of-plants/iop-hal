@@ -644,7 +644,7 @@ static const uint8_t* const certificates[] IOP_ROM = {cert_0, cert_1, cert_2, ce
 
 static const uint8_t* const indexes[] IOP_ROM = {idx_0, idx_1, idx_2, idx_3, idx_4, idx_5, idx_6, idx_7, idx_8, idx_9, idx_10, idx_11, idx_12, idx_13, idx_14, idx_15, idx_16, idx_17, idx_18, idx_19, idx_20, idx_21, idx_22, idx_23, idx_24, idx_25, idx_26, idx_27, idx_28, idx_29, idx_30, idx_31, idx_32, idx_33, idx_34, idx_35, idx_36, idx_37, idx_38, idx_39, idx_40, idx_41, idx_42, idx_43, idx_44, idx_45, idx_46, idx_47, idx_48, idx_49, idx_50, idx_51, idx_52, idx_53, idx_54, idx_55, idx_56, idx_57, idx_58, idx_59, idx_60, idx_61, idx_62, idx_63, idx_64, idx_65, idx_66, idx_67, idx_68, idx_69, idx_70, idx_71, idx_72, idx_73, idx_74, idx_75, idx_76, idx_77, idx_78, idx_79, idx_80, idx_81, idx_82, idx_83, idx_84, idx_85, idx_86, idx_87, idx_88, idx_89, idx_90, idx_91, idx_92, idx_93, idx_94, idx_95, idx_96, idx_97, idx_98, idx_99, idx_100, idx_101, idx_102, idx_103, idx_104, idx_105, idx_106, idx_107, idx_108, idx_109, idx_110, idx_111, idx_112, idx_113, idx_114, idx_115, idx_116, idx_117, idx_118, idx_119, idx_120, idx_121, idx_122, idx_123, idx_124, idx_125, idx_126, idx_127, idx_128, idx_129, idx_130, idx_131, idx_132, idx_133, idx_134, idx_135, idx_136, idx_137, idx_138, idx_139, idx_140, idx_141, idx_142, idx_143, idx_144, idx_145, idx_146, idx_147, idx_148, idx_149, idx_150, idx_151, idx_152, idx_153, idx_154, idx_155, idx_156};
 
-static const driver::CertList certList(certificates, indexes, certSizes, numberOfCertificates);
+static const iop_hal::CertList certList(certificates, indexes, certSizes, numberOfCertificates);
 } // namespace generated
 
 #endif

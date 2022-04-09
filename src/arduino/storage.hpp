@@ -2,7 +2,7 @@
 
 #include <EEPROM.h>
 
-namespace driver {
+namespace iop_hal {
 auto Storage::setup(const uintmax_t size) noexcept -> bool {
     this->size = size;
     // Throws exception on OOM

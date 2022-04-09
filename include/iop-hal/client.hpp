@@ -10,7 +10,7 @@
 
 class HTTPClient;
 
-namespace driver {
+namespace iop_hal {
 class HTTPClient;
 
 class SessionContext;

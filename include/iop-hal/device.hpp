@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <array>
 
-namespace driver {
+namespace iop_hal {
 /// High level abstraction to manage and monitor device resources
 class Device {
 public:

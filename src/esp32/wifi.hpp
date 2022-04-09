@@ -13,7 +13,7 @@ using NetworkClient = WiFiClient;
 
 extern const uint8_t rootca_crt_bundle_start[] asm("_binary_x509_crt_bundle_bin_start");
 
-namespace driver { 
+namespace iop_hal { 
 Wifi::Wifi() noexcept: client(new (std::nothrow) NetworkClient) {
     iop_assert(client, IOP_STR("OOM"));
 }
@@ -122,12 +122,12 @@ void Wifi::setup() noexcept {
 
   this->disconnectFromAccessPoint();
   ::WiFi.mode(WIFI_STA);
-  driver::thisThread.sleep(1);
+  iop_hal::thisThread.sleep(1);
 }
 
 void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
     ::WiFi.mode(WIFI_AP_STA);
-    driver::thisThread.sleep(1);
+    iop_hal::thisThread.sleep(1);
     
     // NOLINTNEXTLINE *-avoid-magic-numbers
     const auto staticIp = IPAddress(192, 168, 1, 1);
@@ -142,7 +142,7 @@ auto Wifi::disableOurAccessPoint() const noexcept -> void {
     ::WiFi.softAPdisconnect();
     ::WiFi.disconnect();
     ::WiFi.mode(WIFI_STA);
-    driver::thisThread.sleep(1);
+    iop_hal::thisThread.sleep(1);
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {

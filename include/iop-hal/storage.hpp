@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <optional>
 
-namespace driver {
+namespace iop_hal {
 
 /// Low level abstraction to write data to storage, might be flash, HDDs, SSDs, etc.
 /// Sadly it doesn't provide much type-safety, nor runtime checks, it's a mere wrapper over the internal storage

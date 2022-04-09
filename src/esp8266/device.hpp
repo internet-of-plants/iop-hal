@@ -2,7 +2,7 @@
 
 #include "Esp.h"
 
-namespace driver {
+namespace iop_hal {
 auto Device::platform() const noexcept -> iop::StaticString {
   return IOP_STR("ESP8266");
 }

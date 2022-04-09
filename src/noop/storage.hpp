@@ -1,7 +1,7 @@
 #include "iop-hal/storage.hpp"
 #include "iop-hal/panic.hpp"
 
-namespace driver {
+namespace iop_hal {
 auto Storage::setup(const uintmax_t size) noexcept -> bool {
     iop_assert(size > 0, IOP_STR("Storage size is zero"));
     

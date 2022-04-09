@@ -261,12 +261,12 @@ public:
 void logMemory(const iop::Log &logger) noexcept;
 } // namespace iop
 
-namespace driver {
+namespace iop_hal {
 // Internals, don't use them. Use the Log abstraction instead
 void logSetup(const iop::LogLevel &level) noexcept;
 void logPrint(const std::string_view msg) noexcept;
 void logPrint(const iop::StaticString msg) noexcept;
 void logFlush() noexcept;
-} // namespace driver
+} // namespace iop_hal
 
 #endif

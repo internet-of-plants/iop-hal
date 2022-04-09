@@ -19,7 +19,7 @@ enum class NetworkStatus {
 };
 }
 
-namespace driver{
+namespace iop_hal{
 auto networkStatus(int code) noexcept -> std::optional<iop::NetworkStatus>;
 
 class Payload {
@@ -37,8 +37,8 @@ class Response {
 
 public:
   Response(const Payload payload, const iop::NetworkStatus status) noexcept: headers_({}), promise(payload), code_(static_cast<uint8_t>(status)), status_(status) {}
-  Response(std::unordered_map<std::string, std::string> headers, const Payload payload, const int code) noexcept: headers_(headers), promise(payload), code_(code), status_(driver::networkStatus(code)) {}
-  explicit Response(const int code) noexcept: code_(code), status_(driver::networkStatus(code)) {}
+  Response(std::unordered_map<std::string, std::string> headers, const Payload payload, const int code) noexcept: headers_(headers), promise(payload), code_(code), status_(iop_hal::networkStatus(code)) {}
+  explicit Response(const int code) noexcept: code_(code), status_(iop_hal::networkStatus(code)) {}
   explicit Response(const iop::NetworkStatus status) noexcept: code_(static_cast<uint8_t>(status)), status_(status) {}
   auto code() const noexcept -> int { return this->code_; }
   auto status() const noexcept -> std::optional<iop::NetworkStatus> { return this->status_; }

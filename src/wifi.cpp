@@ -12,27 +12,27 @@
 
 #include "iop-hal/log.hpp"
 
-namespace driver {
-auto statusToString(const driver::StationStatus status) noexcept -> std::optional<iop::StaticString> {
+namespace iop_hal {
+auto statusToString(const iop_hal::StationStatus status) noexcept -> std::optional<iop::StaticString> {
   IOP_TRACE();
 
   switch (status) {
-  case driver::StationStatus::IDLE:
+  case iop_hal::StationStatus::IDLE:
     return IOP_STR("STATION_IDLE");
 
-  case driver::StationStatus::CONNECTING:
+  case iop_hal::StationStatus::CONNECTING:
     return IOP_STR("STATION_CONNECTING");
 
-  case driver::StationStatus::WRONG_PASSWORD:
+  case iop_hal::StationStatus::WRONG_PASSWORD:
     return IOP_STR("STATION_WRONG_PASSWORD");
 
-  case driver::StationStatus::NO_AP_FOUND:
+  case iop_hal::StationStatus::NO_AP_FOUND:
     return IOP_STR("STATION_NO_AP_FOUND");
 
-  case driver::StationStatus::CONNECT_FAIL:
+  case iop_hal::StationStatus::CONNECT_FAIL:
     return IOP_STR("STATION_CONNECT_FAIL");
 
-  case driver::StationStatus::  GOT_IP:
+  case iop_hal::StationStatus::  GOT_IP:
     return IOP_STR("STATION_GOT_IP");
   }
 

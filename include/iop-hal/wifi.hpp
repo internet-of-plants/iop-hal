@@ -8,7 +8,7 @@
 #include <array>
 #include <functional>
 
-namespace driver {
+namespace iop_hal {
 enum class WiFiMode {
   OFF = 0, STATION, ACCESS_POINT, ACCESS_POINT_AND_STATION
 };
@@ -21,7 +21,7 @@ enum class StationStatus {
   CONNECT_FAIL,
   GOT_IP,
 };
-auto statusToString(const driver::StationStatus status) noexcept -> std::optional<iop::StaticString>;
+auto statusToString(const iop_hal::StationStatus status) noexcept -> std::optional<iop::StaticString>;
 
 class CertStore;
 

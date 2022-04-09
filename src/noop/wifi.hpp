@@ -1,6 +1,6 @@
 #include "iop-hal/wifi.hpp"
 
-namespace driver { 
+namespace iop_hal { 
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
 void Wifi::onConnect(std::function<void()> f) noexcept { (void) f; }

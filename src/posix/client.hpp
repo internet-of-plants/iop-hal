@@ -47,7 +47,7 @@ auto Network::codeToString(const int code) const noexcept -> std::string {
 }
 }
 
-namespace driver {
+namespace iop_hal {
 class SessionContext {
 public:
   int fd;
@@ -118,7 +118,7 @@ void Session::setAuthorization(std::string auth) noexcept  {
 auto Session::sendRequest(const std::string method, const std::string_view data) noexcept -> Response {
   const auto len = data.length();
 
-  if (iop::wifi.status() != driver::StationStatus::GOT_IP)
+  if (iop::wifi.status() != iop_hal::StationStatus::GOT_IP)
     return Response(iop::NetworkStatus::IO_ERROR);
 
   auto responseHeaders = std::unordered_map<std::string, std::string>();
@@ -307,7 +307,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   if (fd < 0) {
     clientDriverLogger.error(IOP_STR("Unable to open socket"));
-    return driver::Response(iop::NetworkStatus::IO_ERROR);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
 
   iop_assert(uri.find("http://") == 0, IOP_STR("Protocol must be http (no SSL)"));
@@ -321,7 +321,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     port = static_cast<uint16_t>(strtoul(std::string(uri.begin(), portIndex + 1, end).c_str(), nullptr, 10));
     if (port == 0) {
       clientDriverLogger.error(IOP_STR("Unable to parse port, broken server: "), uri);
-      return driver::Response(iop::NetworkStatus::BROKEN_SERVER);
+      return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
     }
   }
   clientDriverLogger.debug(IOP_STR("Port: "), std::to_string(port));
@@ -337,13 +337,13 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   // Convert IPv4 and IPv6 addresses from text to binary form
   if(inet_pton(AF_INET, host.c_str(), &serv_addr.sin_addr) <= 0) {
     clientDriverLogger.error(IOP_STR("Address not supported: "), host);
-    return driver::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
   }
 
   auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
   if (connection < 0) {
     clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
-    return driver::Response(iop::NetworkStatus::IO_ERROR);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
   clientDriverLogger.debug(IOP_STR("Began connection: "), uri);
   auto ctx = SessionContext(fd, this->headersToCollect_, uri);

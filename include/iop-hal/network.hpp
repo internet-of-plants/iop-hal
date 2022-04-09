@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace iop {
-extern driver::Wifi wifi;
+extern iop_hal::Wifi wifi;
 
 /// Hook to schedule the next firmware binary update (_must not_ actually update, but only use it to schedule an update for the next loop run)
 ///
@@ -46,7 +46,7 @@ class Network {
   StaticString uri_;
 
   /// Sends a custom HTTP request that may be authenticated to the monitor server (primitive used by higher level methods)
-  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) const noexcept -> driver::Response;
+  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) const noexcept -> iop_hal::Response;
 public:
   Network(StaticString uri, const LogLevel &logLevel) noexcept;
 
@@ -66,16 +66,16 @@ public:
   static auto isConnected() noexcept -> bool;
 
   /// Sends an HTTP post that is authenticated to the monitor server.
-  auto httpPost(std::string_view token, StaticString path, std::string_view data) const noexcept -> driver::Response;
+  auto httpPost(std::string_view token, StaticString path, std::string_view data) const noexcept -> iop_hal::Response;
 
   /// Sends an HTTP post that is not authenticated to the monitor server (used for authentication).
-  auto httpPost(StaticString path, std::string_view data) const noexcept -> driver::Response;
+  auto httpPost(StaticString path, std::string_view data) const noexcept -> iop_hal::Response;
 
   /// Sends an HTTP get that is authenticated to the monitor server (used for authentication).
-  auto httpGet(StaticString path, std::string_view token, std::string_view data) const noexcept -> driver::Response;
+  auto httpGet(StaticString path, std::string_view token, std::string_view data) const noexcept -> iop_hal::Response;
 
   /// Fetches firmware upgrade from the network
-  auto upgrade(StaticString path, std::string_view token) const noexcept -> driver::UpgradeStatus;
+  auto upgrade(StaticString path, std::string_view token) const noexcept -> iop_hal::UpgradeStatus;
 
   /// Extracts a network status from the raw response
   auto codeToString(int code) const noexcept -> std::string;

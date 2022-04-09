@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <fstream>
 
-namespace driver {
+namespace iop_hal {
 auto Device::availableStorage() const noexcept -> uintmax_t {
   // TODO: handle errors
   std::error_code code;
@@ -29,7 +29,7 @@ iop::MD5Hash & Device::firmwareMD5() const noexcept {
     return hash;
   hash.fill('\0');
   
-  const auto filename = std::filesystem::current_path().append(driver::execution_path());
+  const auto filename = std::filesystem::current_path().append(iop_hal::execution_path());
   std::ifstream file(filename);
   iop_assert(file.is_open(), IOP_STR("Unable to open firmware file"));
 

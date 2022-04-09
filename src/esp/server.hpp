@@ -13,7 +13,7 @@ using WebServer = ESP8266WebServer;
 #include "DNSServer.h"
 #include <optional>
 
-namespace driver {
+namespace iop_hal {
 iop::Log & logger() noexcept {
   static iop::Log logger_(iop::LogLevel::WARN, IOP_STR("HTTP Server"));
   return logger_;
@@ -87,12 +87,12 @@ void HttpServer::handleClient() noexcept {
 }
 void HttpServer::on(iop::StaticString uri, Callback handler) noexcept {
   IOP_TRACE();
-  auto *_server = &driver::validateServer(&this->server);
+  auto *_server = &iop_hal::validateServer(&this->server);
   validateServer(&this->server).on(uri.get(), [handler, _server]() { HttpConnection conn(_server); handler(conn, logger()); });
 }
 void HttpServer::onNotFound(Callback handler) noexcept {
   IOP_TRACE();
-  auto *_server = &driver::validateServer(&this->server);
+  auto *_server = &iop_hal::validateServer(&this->server);
   validateServer(&this->server).onNotFound([handler, _server]() { HttpConnection conn(_server); handler(conn, logger()); });
 }
 CaptivePortal::CaptivePortal(CaptivePortal &&other) noexcept: server(other.server) {

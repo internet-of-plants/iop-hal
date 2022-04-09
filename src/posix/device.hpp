@@ -8,7 +8,7 @@
 #include <net/if.h>
 #include <unistd.h>
 
-namespace driver {
+namespace iop_hal {
 // NOOP for now as we assume the host will do it for us, eventually we will want to do it by ourselves
 void Device::syncNTP() const noexcept {}
 

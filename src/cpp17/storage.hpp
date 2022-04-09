@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-namespace driver {
+namespace iop_hal {
 auto Storage::setup(uintmax_t size) noexcept -> bool {
     // TODO: properly log errors
     iop_assert(size > 0, IOP_STR("Storage size is zero"));

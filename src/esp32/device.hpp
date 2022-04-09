@@ -2,7 +2,7 @@
 
 //extern "C" int rom_phy_get_vdd33();
 
-namespace driver {
+namespace iop_hal {
 auto Device::platform() const noexcept -> iop::StaticString {
   return IOP_STR("ESP32");
 }

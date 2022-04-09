@@ -12,9 +12,9 @@
 
 #include "iop-hal/device.hpp"
 
-namespace driver {
+namespace iop_hal {
 auto Thread::halt() const noexcept -> void {
-    driver::device.deepSleep(0);
+    iop_hal::device.deepSleep(0);
     this->abort();
 }
 

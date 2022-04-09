@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_PINS_HPP
 #define IOP_DRIVER_PINS_HPP
 
-namespace driver {
+namespace iop_hal {
 namespace io {
 /// GPIO access mode, they either are read-only, or write-only.
 enum class Mode {
@@ -59,6 +59,6 @@ public:
 } // namespace io
 
 extern io::GPIO gpio;
-} // namespace driver
+} // namespace iop_hal
 
 #endif

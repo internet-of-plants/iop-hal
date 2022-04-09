@@ -62,7 +62,7 @@ auto Network::codeToString(const int code) const noexcept -> std::string {
 }
 }
 
-namespace driver{
+namespace iop_hal{
 class SessionContext {
 public:
   HTTPClient & http;
@@ -188,7 +188,7 @@ HTTPClient::~HTTPClient() noexcept {
 auto HTTPClient::begin(const std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response {
   IOP_TRACE(); 
 
-  iop_assert(this->http, IOP_STR("driver::HTTPClient* not allocated"));
+  iop_assert(this->http, IOP_STR("iop_hal::HTTPClient* not allocated"));
   this->http->setTimeout(UINT16_MAX);
   this->http->setAuthorization("");
 
@@ -236,7 +236,7 @@ auto HTTPClient::begin(const std::string_view uri, std::function<Response(Sessio
     return ret;
   }
 
-  return driver::Response(iop::NetworkStatus::IO_ERROR);
+  return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
 }
 HTTPClient::HTTPClient(HTTPClient &&other) noexcept: http(other.http) {
   other.http = nullptr;

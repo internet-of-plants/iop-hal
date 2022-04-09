@@ -12,6 +12,6 @@
 
 #include "iop-hal/io.hpp"
 
-namespace driver {
-driver::io::GPIO gpio;
+namespace iop_hal {
+iop_hal::io::GPIO gpio;
 }

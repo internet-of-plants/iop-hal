@@ -3,7 +3,7 @@
 
 #include "iop-hal/string.hpp"
 
-namespace driver {
+namespace iop_hal {
     /// Should be defined by the application
     ///
     /// Initializes system, run only once

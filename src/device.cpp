@@ -10,6 +10,6 @@
 #error "Target not supported"
 #endif
 
-namespace driver {
+namespace iop_hal {
     Device device;
 }

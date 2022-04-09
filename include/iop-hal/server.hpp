@@ -15,7 +15,7 @@ class DNSServer;
 #error "Target not supported"
 #endif
 
-namespace driver {
+namespace iop_hal {
 class HttpConnection {
 // TODO: make variables private with setters/getters available to friend classes (make HttpServer a friend)
 public:

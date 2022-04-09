@@ -25,7 +25,7 @@ auto panicHandler(std::string_view msg, CodePoint const &point) noexcept -> void
   hook.entry(msg, point);
   hook.viewPanic(msg, point);
   hook.halt(msg, point);
-  driver::thisThread.abort();
+  iop_hal::thisThread.abort();
 }
 
 auto panicHandler(StaticString msg, CodePoint const &point) noexcept -> void {
@@ -34,7 +34,7 @@ auto panicHandler(StaticString msg, CodePoint const &point) noexcept -> void {
   hook.entry(msg_, point);
   hook.staticPanic(msg, point);
   hook.halt(msg_, point);
-  driver::thisThread.abort();
+  iop_hal::thisThread.abort();
 }
 auto takePanicHook() noexcept -> PanicHook {
   auto old = hook;
@@ -58,17 +58,17 @@ void PanicHook::defaultEntry(std::string_view const &msg, CodePoint const &point
                 IOP_STR(" of file "), point.file(), IOP_STR(" inside "), point.func(),
                 IOP_STR(": "), msg);
     iop::logMemory(iop::panicLogger());
-    driver::thisThread.halt();
+    iop_hal::thisThread.halt();
   }
   isPanicking = true;
 
   constexpr const uint16_t oneSecond = 1000;
-  driver::thisThread.sleep(oneSecond);
+  iop_hal::thisThread.sleep(oneSecond);
 }
 void PanicHook::defaultHalt(std::string_view const &msg, CodePoint const &point) noexcept {
   (void)msg;
   (void)point;
   IOP_TRACE();
-  driver::thisThread.halt();
+  iop_hal::thisThread.halt();
 }
 } // namespace iop

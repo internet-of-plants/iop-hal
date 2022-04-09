@@ -10,7 +10,7 @@
 #error "Target not supported"
 #endif
 
-namespace driver {
+namespace iop_hal {
 Storage storage;
 
 auto Storage::read(const uintmax_t address) const noexcept -> std::optional<uint8_t> {

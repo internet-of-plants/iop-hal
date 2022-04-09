@@ -2,7 +2,7 @@
 
 #include <umm_malloc/umm_heap_select.h>
 
-namespace driver {
+namespace iop_hal {
 auto Thread::abort() const noexcept -> void {
   __panic_func(__FILE__, __LINE__, __PRETTY_FUNCTION__);
 }

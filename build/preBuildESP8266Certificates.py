@@ -182,7 +182,7 @@ def preBuildCertificates(env):
         if i<idx-1:
             f.write(", ")
     f.write("};\n\n")
-    f.write("static const driver::CertList certList(certificates, indexes, certSizes, numberOfCertificates);\n")
+    f.write("static const iop_hal::CertList certList(certificates, indexes, certSizes, numberOfCertificates);\n")
     f.write("} // namespace generated\n")
     f.write("\n#endif" + "\n")
     f.write("\n#endif" + "\n")

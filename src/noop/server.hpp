@@ -1,7 +1,7 @@
 #include "iop-hal/server.hpp"
 #include <optional>
 
-namespace driver {
+namespace iop_hal {
 auto HttpConnection::arg(iop::StaticString arg) const noexcept -> std::optional<std::string> { (void) arg; return std::nullopt; }
 void HttpConnection::sendHeader(iop::StaticString name, iop::StaticString value) noexcept { (void) name; (void) value; }
 void HttpConnection::send(uint16_t code, iop::StaticString type, iop::StaticString data) const noexcept { (void) code; (void) type, (void) data; }

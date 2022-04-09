@@ -2,7 +2,7 @@
 #include "iop-hal/wifi.hpp"
 #include "iop-hal/log.hpp"
 
-namespace driver {
+namespace iop_hal {
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
 StationStatus Wifi::status() const noexcept {

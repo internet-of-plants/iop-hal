@@ -1,7 +1,7 @@
 #include "arduino/thread.hpp"
 //#include <freertos/task.h>
 
-namespace driver {
+namespace iop_hal {
 auto Thread::abort() const noexcept -> void {
   esp_system_abort("Called Thread::abort");
 }

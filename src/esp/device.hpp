@@ -11,7 +11,7 @@
 #error "Non supported arduino baseds device"
 #endif
 
-namespace driver {
+namespace iop_hal {
 auto Device::syncNTP() const noexcept -> void {
   // UTC by default, should we change according to the user? We currently only use this to validate SSL cert dates
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");

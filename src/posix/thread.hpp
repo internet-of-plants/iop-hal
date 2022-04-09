@@ -6,7 +6,7 @@
 #include <net/if.h>
 #include <unistd.h>
 
-namespace driver {
+namespace iop_hal {
 auto Thread::availableMemory() const noexcept -> Memory {
   long pages = sysconf(_SC_PHYS_PAGES);
   long page_size = sysconf(_SC_PAGE_SIZE);
@@ -17,6 +17,6 @@ auto Thread::availableMemory() const noexcept -> Memory {
   std::map<std::string_view, uintmax_t> biggestBlock;
   biggestBlock.insert({ std::string_view("DRAM"), pages * page_size }); // Ballpark
 
-  return Memory(driver::stack_used(), heap, biggestBlock);
+  return Memory(iop_hal::stack_used(), heap, biggestBlock);
 }
 }   

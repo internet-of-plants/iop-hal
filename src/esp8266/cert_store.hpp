@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-namespace driver {
+namespace iop_hal {
 
 /// Individual certificate structure.
 /// Contains certificate array, its size. And its hash.

@@ -7,7 +7,7 @@
 static char * filename;
 static uintptr_t stackstart = 0;
 
-namespace driver {
+namespace iop_hal {
 auto execution_path() noexcept -> std::string_view {
   iop_assert(filename != nullptr, IOP_STR("Filename wasn't initialized, maybe you are trying to get the execution path before main runs?"));
   return filename;
@@ -32,10 +32,10 @@ int main(int argc, char** argv) {
   iop_assert(argc > 0, IOP_STR("argc is 0"));
   filename = argv[0];
 
-  driver::setup();
+  iop_hal::setup();
   while (true) {
-    driver::loop();
-    driver::thisThread.sleep(50);
+    iop_hal::loop();
+    iop_hal::thisThread.sleep(50);
   }
   return 0;
 }

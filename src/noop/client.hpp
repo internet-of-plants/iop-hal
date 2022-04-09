@@ -16,7 +16,7 @@ auto Network::codeToString(const int code) const noexcept -> std::string {
 }
 }
 
-namespace driver {
+namespace iop_hal {
 auto networkStatus(const int code) noexcept -> std::optional<iop::NetworkStatus> {
   IOP_TRACE();
   switch (code) {

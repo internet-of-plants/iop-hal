@@ -1,6 +1,6 @@
 #include "iop-hal/thread.hpp"
 
-namespace driver {
+namespace iop_hal {
 auto Thread::sleep(iop::time::milliseconds ms) const noexcept -> void { (void) ms; }
 auto Thread::yield() const noexcept -> void {}
 auto Thread::abort() const noexcept -> void { while (true) {} }

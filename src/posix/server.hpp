@@ -44,7 +44,7 @@ static std::string httpCodeToString(const int code) {
   }
 }
 
-namespace driver {
+namespace iop_hal {
 iop::Log & logger() noexcept {
   static iop::Log logger_(iop::LogLevel::WARN, IOP_STR("HTTP Server"));
   return logger_;
@@ -142,7 +142,7 @@ void HttpServer::handleClient() noexcept {
         (signedLen = read(client, buffer.data() + len, buffer.max_size() - len)) < 0) {
       logger().error(IOP_STR("Read error: "), std::to_string(len));
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
-        driver::thisThread.sleep(50);
+        iop_hal::thisThread.sleep(50);
         continue;
       } else {
         logger().error(IOP_STR("Error reading from socket ("), std::to_string(signedLen), IOP_STR("): "), std::to_string(errno), IOP_STR(" - "), strerror(errno));

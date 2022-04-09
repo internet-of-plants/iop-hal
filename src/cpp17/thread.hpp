@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-namespace driver {
+namespace iop_hal {
 auto Thread::sleep(iop::time::milliseconds ms) const noexcept -> void {
   std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }

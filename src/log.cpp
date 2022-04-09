@@ -145,7 +145,7 @@ auto Log::levelToString(const LogLevel level) const noexcept -> StaticString {
 void IOP_RAM LogHook::defaultStaticPrinter(
     const StaticString str, const LogLevel level, const LogType type) noexcept {
 #ifdef IOP_SERIAL
-  driver::logPrint(str);
+  iop_hal::logPrint(str);
 #else
   (void)str;
 #endif
@@ -155,7 +155,7 @@ void IOP_RAM LogHook::defaultStaticPrinter(
 void IOP_RAM
 LogHook::defaultViewPrinter(const std::string_view str, const LogLevel level, const LogType type) noexcept {
 #ifdef IOP_SERIAL
-  driver::logPrint(str);
+  iop_hal::logPrint(str);
 #else
   (void)str;
 #endif
@@ -169,11 +169,11 @@ LogHook::defaultSetuper(const LogLevel level) noexcept {
   const auto shouldInitialize = !hasInitialized;
   hasInitialized = true;
   if (shouldInitialize)
-    driver::logSetup(level);
+    iop_hal::logSetup(level);
 }
 void LogHook::defaultFlusher() noexcept {
 #ifdef IOP_SERIAL
-  driver::logFlush();
+  iop_hal::logFlush();
 #endif
 }
 // NOLINTNEXTLINE *-use-equals-default
@@ -216,7 +216,7 @@ Tracer::Tracer(CodePoint point, Log logger) noexcept : point(std::move(point)), 
   
   {
     // Could this cause memory fragmentation?
-    auto memory = driver::thisThread.availableMemory();
+    auto memory = iop_hal::thisThread.availableMemory();
     
     this->logger.trace(IOP_STR("Free stack"), std::to_string(memory.availableStack));
 
@@ -228,7 +228,7 @@ Tracer::Tracer(CodePoint point, Log logger) noexcept : point(std::move(point)), 
     }
   }
 
-  this->logger.trace(IOP_STR("Connection "), std::to_string(iop::wifi.status() == driver::StationStatus::GOT_IP));
+  this->logger.trace(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
 }
 Tracer::~Tracer() noexcept {
   if (this->logger.level() != LogLevel::TRACE) return;
@@ -246,7 +246,7 @@ void logMemory(const Log &logger) noexcept {
 
   {
     // Could this cause memory fragmentation?
-    auto memory = driver::thisThread.availableMemory();
+    auto memory = iop_hal::thisThread.availableMemory();
     
     logger.info(IOP_STR("Free stack"), std::to_string(memory.availableStack));
 
@@ -258,6 +258,6 @@ void logMemory(const Log &logger) noexcept {
     }
   }
 
-  logger.info(IOP_STR("Connection "), std::to_string(iop::wifi.status() == driver::StationStatus::GOT_IP));
+  logger.info(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
 }
 } // namespace iop
