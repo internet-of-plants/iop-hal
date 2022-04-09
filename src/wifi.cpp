@@ -10,6 +10,8 @@
 #error "Target not supported"
 #endif
 
+#include "log.hpp"
+
 namespace driver {
 auto statusToString(const driver::StationStatus status) noexcept -> std::optional<iop::StaticString> {
   IOP_TRACE();
