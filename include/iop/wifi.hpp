@@ -21,6 +21,7 @@ enum class StationStatus {
   CONNECT_FAIL,
   GOT_IP,
 };
+auto statusToString(const driver::StationStatus status) noexcept -> std::optional<iop::StaticString>;
 
 class CertStore;
 
