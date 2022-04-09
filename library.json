@@ -12,9 +12,7 @@
       "name": "Paulo Cabral Sanz",
       "url": "https://github.com/paulocsanz"
     },
-    "exclude": [
-      "src/*/*.hpp"
-    ],
+    "exclude": [],
     "frameworks": "*",
     "platforms": ["espressif8266", "espressif32","native"],
     "build": {
