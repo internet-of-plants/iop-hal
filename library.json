@@ -13,8 +13,6 @@
       "url": "https://github.com/paulocsanz"
     },
     "license": "AGPL-3.0",
-    "headers": ["include/*"],
-    "exclude": [],
     "frameworks": "*",
     "platforms": ["espressif8266", "espressif32","native"],
     "libLDFMode": "deep"
