@@ -14,9 +14,6 @@
     },
     "license": "AGPL-3.0",
     "frameworks": "*",
-    "platforms": ["espressif8266", "espressif32","native"],
-    "build": {
-      "extraScript": ["build/preBuild.py"],
-    }
+    "platforms": ["espressif8266", "espressif32","native"]
   }
   
