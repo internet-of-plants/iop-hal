@@ -1,7 +1,7 @@
 #ifndef IOP_CERTIFICATES_H
 #define IOP_CERTIFICATES_H
 #ifdef IOP_ESP8266
-#include "driver/esp8266/cert_store.hpp"
+#include "esp8266/cert_store.hpp"
 
 namespace generated {
 // This file is computer generated at build time (`build/preBuildESP8266Certificates.py` called by PlatformIO)
