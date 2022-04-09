@@ -1,11 +1,11 @@
 #ifdef IOP_POSIX
-#include "iop/cpp17/storage.hpp"
+#include "cpp17/storage.hpp"
 #elif defined(IOP_ESP8266)  
-#include "iop/arduino/storage.hpp"
+#include "arduino/storage.hpp"
 #elif defined(IOP_ESP32)
-#include "iop/arduino/storage.hpp"
+#include "arduino/storage.hpp"
 #elif defined(IOP_NOOP)
-#include "iop/noop/storage.hpp"
+#include "noop/storage.hpp"
 #else
 #error "Target not supported"
 #endif

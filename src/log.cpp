@@ -1,16 +1,16 @@
 #ifndef IOP_SERIAL
-#include "iop/noop/log.hpp"
+#include "noop/log.hpp"
 #elif defined(IOP_POSIX)
-#include "iop/cpp17/log.hpp"
+#include "cpp17/log.hpp"
 #elif defined(IOP_ESP8266)
-#include "iop/arduino/log.hpp"
+#include "arduino/log.hpp"
 #elif defined(IOP_ESP32)
-#include "iop/arduino/log.hpp"
+#include "arduino/log.hpp"
 #elif defined(IOP_NOOP)
 #ifdef ARDUINO
-#include "iop/arduino/log.hpp"
+#include "arduino/log.hpp"
 #else
-#include "iop/cpp17/log.hpp"
+#include "cpp17/log.hpp"
 #endif
 #else
 #error "Target not supported"

@@ -3,7 +3,7 @@
 #include "iop/thread.hpp"
 
 #include "ESP8266WiFi.h"
-#include "iop/esp8266/generated/certificates.hpp"
+#include "esp8266/generated/certificates.hpp"
 #ifdef IOP_SSL
 using NetworkClient = BearSSL::WiFiClientSecure;
 #else

@@ -1,11 +1,11 @@
 #ifdef IOP_POSIX
-#include "iop/cpp17/string.hpp"
+#include "cpp17/string.hpp"
 #elif defined(IOP_ESP8266)
-#include "iop/arduino/string.hpp"
+#include "arduino/string.hpp"
 #elif defined(IOP_ESP32)
-#include "iop/arduino/string.hpp"
+#include "arduino/string.hpp"
 #elif defined(IOP_NOOP)
-#include "iop/noop/string.hpp"
+#include "noop/string.hpp"
 #else
 #error "Target not supported"
 #endif

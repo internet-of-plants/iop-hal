@@ -1,4 +1,4 @@
-#include "iop/arduino/thread.hpp"
+#include "arduino/thread.hpp"
 
 #include <umm_malloc/umm_heap_select.h>
 

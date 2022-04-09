@@ -1,8 +1,8 @@
-#include "iop/cpp17/device.hpp"
+#include "cpp17/device.hpp"
 
 #include "iop/runtime.hpp"
 #include "iop/panic.hpp"
-#include "iop/cpp17/runtime_metadata.hpp"
+#include "cpp17/runtime_metadata.hpp"
 
 #include <sys/ioctl.h>
 #include <net/if.h>

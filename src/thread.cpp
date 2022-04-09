@@ -1,11 +1,11 @@
 #ifdef IOP_POSIX
-#include "iop/posix/thread.hpp"
+#include "posix/thread.hpp"
 #elif defined(IOP_ESP8266)
-#include "iop/esp8266/thread.hpp"
+#include "esp8266/thread.hpp"
 #elif defined(IOP_ESP32)
-#include "iop/esp32/thread.hpp"
+#include "esp32/thread.hpp"
 #elif defined(IOP_NOOP)
-#include "iop/noop/thread.hpp"
+#include "noop/thread.hpp"
 #else
 #error "Target not supported"
 #endif

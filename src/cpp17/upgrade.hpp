@@ -1,6 +1,6 @@
 #include "iop/upgrade.hpp"
 #include "iop/network.hpp"
-#include "iop/cpp17/runtime_metadata.hpp"
+#include "cpp17/runtime_metadata.hpp"
 
 #include <cstdlib>
 #include <fstream>

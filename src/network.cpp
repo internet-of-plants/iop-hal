@@ -54,7 +54,7 @@ Network::Network(StaticString uri, const LogLevel &logLevel) noexcept
 }
 
 #if !defined(IOP_ONLINE) || defined(IOP_NOOP)
-#include "iop/noop/network.hpp"
+#include "noop/network.hpp"
 #else
 
 #include "iop/wifi.hpp"
