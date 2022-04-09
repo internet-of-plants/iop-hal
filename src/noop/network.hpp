@@ -1,5 +1,5 @@
 
-#include "iop/network.hpp"
+#include "iop-hal/network.hpp"
 
 namespace iop {
 void Network::setup() const noexcept { IOP_TRACE(); }

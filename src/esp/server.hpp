@@ -1,5 +1,5 @@
-#include "iop/server.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/server.hpp"
+#include "iop-hal/panic.hpp"
 
 #ifdef IOP_ESP8266
 #include "ESP8266WebServer.h"

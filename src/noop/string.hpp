@@ -1,4 +1,4 @@
-#include "iop/string.hpp"
+#include "iop-hal/string.hpp"
 
 namespace iop {
 // StaticString needs platform specific API, so we just noop it

@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_STORAGE_HPP
 #define IOP_DRIVER_STORAGE_HPP
 
-#include "iop/panic.hpp"
+#include "iop-hal/panic.hpp"
 #include <stdint.h>
 #include <optional>
 

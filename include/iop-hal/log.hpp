@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_LOG_HPP
 #define IOP_DRIVER_LOG_HPP
 
-#include "iop/string.hpp"
+#include "iop-hal/string.hpp"
 #include <optional>
 
 /// Helps getting metadata on the executed code (at compile time)

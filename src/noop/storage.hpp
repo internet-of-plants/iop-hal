@@ -1,5 +1,5 @@
-#include "iop/storage.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/storage.hpp"
+#include "iop-hal/panic.hpp"
 
 namespace driver {
 auto Storage::setup(const uintmax_t size) noexcept -> bool {

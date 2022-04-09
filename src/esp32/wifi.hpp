@@ -1,6 +1,6 @@
-#include "iop/wifi.hpp"
-#include "iop/panic.hpp"
-#include "iop/thread.hpp"
+#include "iop-hal/wifi.hpp"
+#include "iop-hal/panic.hpp"
+#include "iop-hal/thread.hpp"
 
 #include "WiFi.h"
 

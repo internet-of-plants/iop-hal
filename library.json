@@ -1,11 +1,11 @@
 {
-    "name": "libiop",
+    "name": "iop-hal",
     "keywords": "http, web",
     "description": "",
-    "homepage": "https://github.com/internet-of-plants/libiop",
+    "homepage": "https://github.com/internet-of-plants/iop-hal",
     "repository": {
       "type": "git",
-      "url": "https://github.com/internet-of-plants/libiop.git"
+      "url": "https://github.com/internet-of-plants/iop-hal.git"
     },
     "version": "0.1.0",
     "authors": {

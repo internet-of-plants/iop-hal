@@ -1,6 +1,6 @@
-#include "iop/runtime.hpp"
-#include "iop/thread.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/runtime.hpp"
+#include "iop-hal/thread.hpp"
+#include "iop-hal/panic.hpp"
 
 #include <sys/resource.h>
 

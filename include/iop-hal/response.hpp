@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_RESPONSE_HPP
 #define IOP_DRIVER_RESPONSE_HPP
 
-#include "iop/string.hpp"
+#include "iop-hal/string.hpp"
 
 #include <unordered_map>
 #include <optional>

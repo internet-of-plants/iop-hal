@@ -1,7 +1,7 @@
-#include "iop/client.hpp"
-#include "iop/network.hpp"
-#include "iop/panic.hpp"
-#include "iop/wifi.hpp"
+#include "iop-hal/client.hpp"
+#include "iop-hal/network.hpp"
+#include "iop-hal/panic.hpp"
+#include "iop-hal/wifi.hpp"
 
 #include <system_error>
 #include <vector>

@@ -10,7 +10,7 @@
 #error "Target not supported"
 #endif
 
-#include "iop/panic.hpp"
+#include "iop-hal/panic.hpp"
 
 #include <vector>
 

@@ -10,7 +10,7 @@
 #error "Target not supported"
 #endif
 
-#include "iop/io.hpp"
+#include "iop-hal/io.hpp"
 
 namespace driver {
 driver::io::GPIO gpio;

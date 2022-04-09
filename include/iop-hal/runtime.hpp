@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_RUNTIME_HPP
 #define IOP_DRIVER_RUNTIME_HPP
 
-#include "iop/string.hpp"
+#include "iop-hal/string.hpp"
 
 namespace driver {
     /// Should be defined by the application

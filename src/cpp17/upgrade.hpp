@@ -1,5 +1,5 @@
-#include "iop/upgrade.hpp"
-#include "iop/network.hpp"
+#include "iop-hal/upgrade.hpp"
+#include "iop-hal/network.hpp"
 #include "cpp17/runtime_metadata.hpp"
 
 #include <cstdlib>

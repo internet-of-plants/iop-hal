@@ -1,5 +1,5 @@
-#include "iop/upgrade.hpp"
-#include "iop/network.hpp"
+#include "iop-hal/upgrade.hpp"
+#include "iop-hal/network.hpp"
 
 namespace driver {
 auto Upgrade::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> driver::UpgradeStatus {

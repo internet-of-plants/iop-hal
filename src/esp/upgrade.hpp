@@ -1,7 +1,7 @@
-#include "iop/upgrade.hpp"
-#include "iop/client.hpp"
-#include "iop/panic.hpp"
-#include "iop/network.hpp"
+#include "iop-hal/upgrade.hpp"
+#include "iop-hal/client.hpp"
+#include "iop-hal/panic.hpp"
+#include "iop-hal/network.hpp"
 
 #include <memory>
 

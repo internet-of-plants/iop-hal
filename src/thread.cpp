@@ -10,13 +10,13 @@
 #error "Target not supported"
 #endif
 
-#include "iop/device.hpp"
+#include "iop-hal/device.hpp"
 
 namespace driver {
-    auto Thread::halt() const noexcept -> void {
-        driver::device.deepSleep(0);
-        this->abort();
-    }
+auto Thread::halt() const noexcept -> void {
+    driver::device.deepSleep(0);
+    this->abort();
+}
 
-    Thread thisThread;
+Thread thisThread;
 }

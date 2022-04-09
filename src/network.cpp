@@ -1,7 +1,7 @@
-#include "iop/network.hpp"
-#include "iop/thread.hpp"
-#include "iop/upgrade.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/network.hpp"
+#include "iop-hal/thread.hpp"
+#include "iop-hal/upgrade.hpp"
+#include "iop-hal/panic.hpp"
 
 constexpr static iop::UpgradeHook defaultHook(iop::UpgradeHook::defaultHook);
 
@@ -57,10 +57,10 @@ Network::Network(StaticString uri, const LogLevel &logLevel) noexcept
 #include "noop/network.hpp"
 #else
 
-#include "iop/wifi.hpp"
-#include "iop/device.hpp"
-#include "iop/client.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/wifi.hpp"
+#include "iop-hal/device.hpp"
+#include "iop-hal/client.hpp"
+#include "iop-hal/panic.hpp"
 #include "string.h"
 
 static driver::HTTPClient http;

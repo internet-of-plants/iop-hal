@@ -1,5 +1,5 @@
-#include "iop/client.hpp"
-#include "iop/network.hpp"
+#include "iop-hal/client.hpp"
+#include "iop-hal/network.hpp"
 
 namespace iop { 
 auto Network::codeToString(const int code) const noexcept -> std::string {

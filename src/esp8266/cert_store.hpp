@@ -1,8 +1,8 @@
 #ifndef IOP_DRIVER_CERTSTORE_HPP
 #define IOP_DRIVER_CERTSTORE_HPP
 
-#include "iop/wifi.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/wifi.hpp"
+#include "iop-hal/panic.hpp"
 
 #include "CertStoreBearSSL.h"
 

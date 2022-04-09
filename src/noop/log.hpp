@@ -1,5 +1,5 @@
-#include "iop/log.hpp"
-#include "iop/thread.hpp"
+#include "iop-hal/log.hpp"
+#include "iop-hal/thread.hpp"
 
 namespace driver {
 void logSetup(const iop::LogLevel &level) noexcept { (void) level; }

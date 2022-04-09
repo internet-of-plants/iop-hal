@@ -1,7 +1,7 @@
 #ifndef IOP_DRIVER_PANIC_HPP
 #define IOP_DRIVER_PANIC_HPP
 
-#include "iop/log.hpp"
+#include "iop-hal/log.hpp"
 
 namespace iop {
 

@@ -1,7 +1,7 @@
-#include "iop/panic.hpp"
-#include "iop/log.hpp"
-#include "iop/device.hpp"
-#include "iop/thread.hpp"
+#include "iop-hal/panic.hpp"
+#include "iop-hal/log.hpp"
+#include "iop-hal/device.hpp"
+#include "iop-hal/thread.hpp"
 
 // TODO: implement panic backend that reboots, we always panic on OOM, but because of heap fragmentation you generally would want to reboot to maximize uptime
 

@@ -16,10 +16,10 @@
 #error "Target not supported"
 #endif
 
-#include "iop/network.hpp"
-#include "iop/device.hpp"
-#include "iop/wifi.hpp"
-#include "iop/thread.hpp"
+#include "iop-hal/network.hpp"
+#include "iop-hal/device.hpp"
+#include "iop-hal/wifi.hpp"
+#include "iop-hal/thread.hpp"
 
 static bool initialized = false;
 static bool isTracing_ = false; 

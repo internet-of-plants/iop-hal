@@ -1,5 +1,5 @@
-#include "iop/device.hpp"
-#include "iop/panic.hpp"
+#include "iop-hal/device.hpp"
+#include "iop-hal/panic.hpp"
 
 #ifdef IOP_ESP8266
 #include "ESP8266WiFi.h"
