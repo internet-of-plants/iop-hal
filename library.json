@@ -15,23 +15,6 @@
     "license": "AGPL-3.0",
     "frameworks": "*",
     "platforms": ["espressif8266", "espressif32","native"],
-    "build": {
-      "flags": [
-        "-std=c++17",
-        "-D IOP_SSL",
-        "-D IOP_SERIAL",
-        "-D IOP_STORAGE",
-        "-D IOP_ONLINE",
-        "-D IOP_MONITOR",
-        "-D IOP_SERVER",
-        "-D IOP_OTA",
-        "-D IOP_FACTORY_RESET",
-        "-D IOP_NETWORK_LOGGING",
-        "-D IOP_SENSORS"
-      ],
-      "unflags": [
-        "-std=gnu++11"
-      ],
       "libArchive": false
     }
   }
