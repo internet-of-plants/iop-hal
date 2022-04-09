@@ -1,0 +1,22 @@
+{
+    "name": "libiop - Internet of Plants",
+    "keywords": "http, web",
+    "description": "",
+    "homepage": "https://github.com/internet-of-plants/libiop",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/internet-of-plants/libiop.git"
+    },
+    "version": "0.1.0",
+    "authors": {
+      "name": "Paulo Cabral Sanz",
+      "url": "https://github.com/paulocsanz"
+    },
+    "exclude": [],
+    "frameworks": "*",
+    "platforms": ["espressif8266", "espressif32","native"],
+    "build": {
+      "libArchive": false
+    }
+  }
+  
