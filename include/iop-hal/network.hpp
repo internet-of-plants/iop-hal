@@ -35,10 +35,10 @@ enum class HttpMethod {
   OPTIONS,
 };
 
-/// General lower level HTTP(S) client, that is focused on our need.
-/// Which are security, good error reporting, no UB possible and ergonomy, in order.
+/// General higher level HTTPs client made to interact with IoP's server
+/// Its purposes are security, good error reporting, no UB possible and ergonomy, in that order.
 ///
-/// Higher level than the simple ESP8266 client network abstractions, but still focused on the HTTP(S) protocol
+/// Higher level than the simple HTTP client network abstraction, but still focused on the HTTP(S) protocol
 ///
 /// `iop::Network::setUpgradeHook` to set the hook that is called to schedule updates.
 class Network {
