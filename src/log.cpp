@@ -1,6 +1,4 @@
-#ifndef IOP_SERIAL
-#include "noop/log.hpp"
-#elif defined(IOP_POSIX)
+#ifdef IOP_POSIX
 #include "cpp17/log.hpp"
 #elif defined(IOP_ESP8266)
 #include "arduino/log.hpp"
@@ -144,21 +142,13 @@ auto Log::levelToString(const LogLevel level) const noexcept -> StaticString {
 
 void IOP_RAM LogHook::defaultStaticPrinter(
     const StaticString str, const LogLevel level, const LogType type) noexcept {
-#ifdef IOP_SERIAL
   iop_hal::logPrint(str);
-#else
-  (void)str;
-#endif
   (void)type;
   (void)level;
 }
 void IOP_RAM
 LogHook::defaultViewPrinter(const std::string_view str, const LogLevel level, const LogType type) noexcept {
-#ifdef IOP_SERIAL
   iop_hal::logPrint(str);
-#else
-  (void)str;
-#endif
   (void)type;
   (void)level;
 }
@@ -172,9 +162,7 @@ LogHook::defaultSetuper(const LogLevel level) noexcept {
     iop_hal::logSetup(level);
 }
 void LogHook::defaultFlusher() noexcept {
-#ifdef IOP_SERIAL
   iop_hal::logFlush();
-#endif
 }
 // NOLINTNEXTLINE *-use-equals-default
 LogHook::LogHook(LogHook const &other) noexcept
