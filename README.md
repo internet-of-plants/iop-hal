@@ -25,8 +25,9 @@ static iop::time::milliseconds waitUntilUseHardcodedCredentials = iop::thisThrea
 namespace iop {
     auto setup() noexcept -> void {
         wifi.setup();
-        // TODO: iop_hal should do this for the user, allowing for a safer Wifi::onConnect (that also passes the credentials as parameter)
         // We shouldn't make expensive operations here, set a flag to handle later
+        // TODO: iop_hal should do this for the user, allowing for a safer Wifi::onConnect
+        // (that also passes the credentials as parameter)
         wifi.onConnect([] { gotWifiCreds = true; });
 
         // Raw storage access, storage is just a huge array backed by HDD/SSD/Flash, not RAM
