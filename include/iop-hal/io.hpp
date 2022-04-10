@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define IOP_PIN_RAW(pin) static_cast<uint8_t>(pin)
+
 namespace iop_hal {
 using PinRaw = uint8_t;
 
