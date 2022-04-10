@@ -1,6 +1,8 @@
 #ifndef IOP_DRIVER_PINS_HPP
 #define IOP_DRIVER_PINS_HPP
 
+#include <stdint.h>
+
 namespace iop_hal {
 using PinRaw = uint8_t;
 
@@ -19,7 +21,7 @@ enum class Data {
 
 /// Some devices come with a builtin led, which is used to communicate some states, like firmware update handling
 /// If the device doesn't have one, this will cause a No-Op
-constexpr static Pin LED_BUILTIN = Pin::D2;
+constexpr static PinRaw LED_BUILTIN = Pin::D2;
 
 /// Represents a state change for a digital GPIO that can trigger an interrupt.
 enum class InterruptState {

@@ -36,7 +36,7 @@ auto Upgrade::run(const iop::Network &network, const iop::StaticString path, con
   ESPhttpUpdate->rebootOnUpdate(true);
 
 #ifdef IOP_ESP8266
-  ESPhttpUpdate->setLedPin(LED_BUILTIN);
+  //ESPhttpUpdate->setLedPin(LED_BUILTIN);
   ESPhttpUpdate->setAuthorization(std::string(authorization_header).c_str());
   ESPhttpUpdate->closeConnectionsOnUpdate(true);
   const auto result = ESPhttpUpdate->update(*client, route, "");
