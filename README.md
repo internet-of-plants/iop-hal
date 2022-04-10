@@ -1,6 +1,6 @@
 # iop-hal - IoP's Hardware Abstraction Layer
 
-A C++17 framework that provides transparent/unified access to different hardwares, without exposing their inner workings.
+A moden C++17, low level, framework that provides transparent/unified access to different hardwares, without exposing their inner workings.
 
 If you want a higher level framework, safer, but more opinionated, check: https://github.com/internet-of-plants/iop
 
