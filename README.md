@@ -16,7 +16,7 @@ Provides the following functionalities:
   - `iop::Thread`
 - Type-safe string abstractions and operations
   - `#include <iop-hal/string.hpp>`
-  - `iop::StaticString`, `iop::CowString`
+  - `iop::StaticString`, `iop::CowString`, `iop::to_view`
 - Persistent storage access
   - `#include <iop-hal/storage.hpp>`
   - `iop::Storage`
