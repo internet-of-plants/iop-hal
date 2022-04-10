@@ -19,10 +19,6 @@ enum class Data {
   HIGH = 1,
 };
 
-/// Some devices come with a builtin led, which is used to communicate some states, like firmware update handling
-/// If the device doesn't have one, this will cause a No-Op
-constexpr static PinRaw LED_BUILTIN = Pin::D2;
-
 /// Represents a state change for a digital GPIO that can trigger an interrupt.
 enum class InterruptState {
   RISING = 1,
