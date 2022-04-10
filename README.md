@@ -62,7 +62,7 @@ namespace iop {
         // Just to show more about wifi, you should not hardcode creds
         // Check the captive_portal.cpp example for a better way
         if (!wifiCredentials && iop::thisThread.timeRunning() > waitUntilUseHardcodedCredetials) {
-            wifi.connectToAccessPoint(iop::to_view("my-ssid"), iop::to_view("my-super-secret-psk"));
+            wifi.connectToAccessPoint("my-ssid", "my-super-secret-psk");
         }
     }
 }
