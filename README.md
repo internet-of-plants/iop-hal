@@ -4,7 +4,7 @@ A moden C++17, low level, framework that provides transparent/unified access to 
 
 If you want a higher level framework, safer, but more opinionated, check: https://github.com/internet-of-plants/iop
 
-Note: Posix target turns some functionalities into No-Ops, we intend to improve this, but some are naturally impossible to implement for this target. If some is needed you should make a speci fic target for that platform, as it surely will depend on things outside of the C++17 + posix API. The Posix target is mostly for ease of testing.
+Note: Posix target turns some functionalities into No-Ops, we intend to improve this, but some are naturally impossible to implement for this target. If some is needed you should make a specific target for that platform, as it surely will depend on things outside of the C++17 + posix API. The Posix target is mostly for ease of testing.
 
 # Example
 
