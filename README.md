@@ -6,38 +6,38 @@ Note: Posix target turns some functionalities into No-Ops, we intend to improve 
 
 Provides the following functionalities:
 - WiFi's Access Point and Station management
-  - #include <iop/wifi.hpp>
+  - `#include <iop/wifi.hpp>`
   - `iop::Wifi`
 - Firmware upgrade functionality
-  - #include <iop/upgrade.hpp>
+  - `#include <iop/upgrade.hpp>`
   - `iop::Upgrade`
 - Thread management
-  - #include <iop/thread.hpp>
+  - `#include <iop/thread.hpp>`
   - `iop::Thread`
 - Type-safe string abstractions and operations
-  - #include <iop/string.hpp>
+  - `#include <iop/string.hpp>`
   - `iop::StaticString`
 - Persistent storage access
-  - #include <iop/storage.hpp>
+  - `#include <iop/storage.hpp>`
   - `iop::Storage`
 - HTTP server hosting
-  - #include <iop/server.hpp>
+  - `#include <iop/server.hpp>`
   - `iop::HttpServer`
 - Runtime hook API
-  - #include <iop/runtime.hpp>
+  - `#include <iop/runtime.hpp>`
   - User defines `iop::setup` and `iop::login`
 - Panic hook API (no exceptions supported, but we have our panic system)
-  - #include <iop/panic.hpp>
+  - `#include <iop/panic.hpp>`
   - `iop_panic` macro
 - HTTPs client
-  - #include <iop/client.hpp>
+  - `#include <iop/client.hpp>`
   - `iop::HttpClient`
 - Higher level client to interface with IoP server, JSON + authentication + firmware upgrade management
-  - #include <iop/network.hpp>
+  - `#include <iop/network.hpp>`
   - `iop::Network`
 - Log system
-  - #include <iop/log.hpp>
+  - `#include <iop/log.hpp>`
   - `iop::Log`
 - Device primitives management
-  - #include <iop/device.hpp>
+  - `#include <iop/device.hpp>`
   - `iop::Device`
