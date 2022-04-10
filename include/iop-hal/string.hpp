@@ -115,11 +115,11 @@ auto to_view(const std::array<char, SIZE>& str) -> std::string_view {
   return to_view(str, strnlen(str.begin(), str.max_size()));
 }
 template <size_t SIZE>
-auto to_view(const std::reference_wrapper<std::array<char, SIZE>> &str, const size_t size) -> std::string_view {
+auto to_view(const std::reference_wrapper<const std::array<char, SIZE>> &str, const size_t size) -> std::string_view {
   return to_view(str.get(), size);
 }
 template <size_t SIZE>
-auto to_view(const std::reference_wrapper<std::array<char, SIZE>> &str) -> std::string_view {
+auto to_view(const std::reference_wrapper<const std::array<char, SIZE>> &str) -> std::string_view {
   return to_view(str.get());
 }
 } // namespace iop
