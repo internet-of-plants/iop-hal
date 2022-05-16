@@ -18,10 +18,8 @@ auto Storage::setup(uintmax_t size) noexcept -> bool {
     }
 
     std::ifstream file("eeprom.dat");
-    std::cout << file.is_open() << std::endl;
     if (!file.is_open()) return false;
 
-    std::cout << size << std::endl;
     file.read((char*) buffer, static_cast<std::streamsize>(size));
     if (file.fail()) return false;
 
@@ -30,6 +28,7 @@ auto Storage::setup(uintmax_t size) noexcept -> bool {
 }
 auto Storage::commit() noexcept -> bool {
     // TODO: properly log errors
+    std::cout << "commit" << std::endl;
     iop_assert(this->buffer, IOP_STR("Unable to allocate storage"));
     std::ofstream file("eeprom.dat");
     if (!file.is_open()) return false;
@@ -38,6 +37,7 @@ auto Storage::commit() noexcept -> bool {
     if (file.fail()) return false;
 
     file.close();
+    std::cout << "commit2" << std::endl;
     return !file.fail();
 }
 auto Storage::asRef() const noexcept -> uint8_t const * {
