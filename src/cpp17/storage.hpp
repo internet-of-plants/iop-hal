@@ -3,6 +3,8 @@
 
 #include <fstream>
 
+#include <iostream>
+
 namespace iop_hal {
 auto Storage::setup(uintmax_t size) noexcept -> bool {
     // TODO: properly log errors
