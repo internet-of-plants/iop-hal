@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <optional>
 
+#include <iostream>
+
 namespace iop_hal {
 
 /// Low level abstraction to write data to storage, might be flash, HDDs, SSDs, etc.
@@ -39,6 +41,7 @@ public:
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
     if (address + sizeof(std::array<char, SIZE>) >= this->size) return std::nullopt;
     std::array<char, SIZE> array;
+    std::cout << address << " " << SIZE << " " << this->size << std::endl;
     memcpy(array.data(), this->asRef() + address, sizeof(std::array<char, SIZE>));
     return array;
   }
