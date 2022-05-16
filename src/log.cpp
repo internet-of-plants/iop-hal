@@ -206,7 +206,7 @@ Tracer::Tracer(CodePoint point, Log logger) noexcept : point(std::move(point)), 
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
     
-    this->logger.trace(IOP_STR("Free stack"), std::to_string(memory.availableStack));
+    this->logger.trace(IOP_STR("Free stack "), std::to_string(memory.availableStack));
 
     for (const auto & item: memory.availableHeap) {
       this->logger.trace(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));
@@ -236,7 +236,7 @@ void logMemory(const Log &logger) noexcept {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
     
-    logger.info(IOP_STR("Free stack"), std::to_string(memory.availableStack));
+    logger.info(IOP_STR("Free stack "), std::to_string(memory.availableStack));
 
     for (const auto & item: memory.availableHeap) {
       logger.info(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));

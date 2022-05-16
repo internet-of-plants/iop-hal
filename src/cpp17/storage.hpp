@@ -16,8 +16,10 @@ auto Storage::setup(uintmax_t size) noexcept -> bool {
     }
 
     std::ifstream file("eeprom.dat");
+    std::cout << file.is_open() << std::endl;
     if (!file.is_open()) return false;
 
+    std::cout << size << std::endl;
     file.read((char*) buffer, static_cast<std::streamsize>(size));
     if (file.fail()) return false;
 
