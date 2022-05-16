@@ -39,6 +39,7 @@ public:
   /// Reads byte from specified address, returns std::nullopt if address is out of bounds
   template<uintmax_t SIZE> 
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
+    IOP_TRACE();
     if (address + sizeof(std::array<char, SIZE>) >= this->size) return std::nullopt;
     std::array<char, SIZE> array;
     std::cout << address << " " << SIZE << " " << this->size << std::endl;
@@ -49,6 +50,7 @@ public:
   /// Schedules writes of arrays to storage.
   template<uintmax_t SIZE> 
   auto write(const uintmax_t address, const std::array<char, SIZE> &array) -> bool {
+    IOP_TRACE();
     if (address + sizeof(std::array<char, SIZE>) >= this->size) return false;
     memcpy(this->asMut() + address, array.data(), sizeof(std::array<char, SIZE>));
     return true;
