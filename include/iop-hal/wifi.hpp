@@ -7,6 +7,7 @@
 #include <string>
 #include <array>
 #include <functional>
+#include <optional>
 
 namespace iop_hal {
 enum class WiFiMode {
