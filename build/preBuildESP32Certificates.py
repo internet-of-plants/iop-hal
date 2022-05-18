@@ -140,14 +140,13 @@ def preBuildCertificates(env):
 
     with open(path.join(dir_path, destination), 'w') as f:
         f.write("#ifndef IOP_ESP32_CERTIFICATES_H\n")
-        f.write("#define IOP_ESP832_CERTIFICATES_H\n")
+        f.write("#define IOP_ESP32_CERTIFICATES_H\n")
         f.write("#ifdef IOP_ESP32\n")
         f.write("namespace generated {\n")
         f.write("// This file is computer generated at build time (`build/preBuildESP32Certificates.py` called by PlatformIO)\n\n")
         f.write("// SHA256: " + str(hash) + "\n\n")
         f.write("static const uint8_t bundle[] IOP_ROM = {")
         f.write(",".join([str(int(b)) for b in crt_bundle]))
-        f.write("'")
         f.write("};\n\n")
         f.write("} // namespace generated\n")
         f.write("\n#endif" + "\n")
