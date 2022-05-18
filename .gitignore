@@ -1,0 +1,7 @@
+__pycache__
+.pio
+.vscode
+.*.swo
+.*.swp
+workspace.code-workspace
+src/esp8266/generated/certificates.hpp
