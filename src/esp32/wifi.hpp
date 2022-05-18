@@ -113,7 +113,7 @@ void Wifi::setup() noexcept {
 
   #ifdef IOP_SSL
   iop_assert(generated::bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
-  static_cast<NetworkClient*>(this->client)->setCACertBundle(rootca_crt_bundle_start);
+  static_cast<NetworkClient*>(this->client)->setCACertBundle(generated::bundle);
   #endif
 
   ::WiFi.persistent(false);
