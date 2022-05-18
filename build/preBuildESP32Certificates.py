@@ -147,7 +147,7 @@ def preBuildCertificates(env):
         f.write("// SHA256: " + str(hash) + "\n\n")
         f.write("static const uint8_t* const bundle[] IOP_ROM = {")
         f.write("'\\")
-        f.write("','\\".join(map(lambda x: str(int(x)), crt_bundle.split())))
+        f.write("','\\".join([b for b in crt_bundle]))
         f.write("'")
         f.write("};\n\n")
         f.write("} // namespace generated\n")
