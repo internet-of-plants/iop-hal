@@ -2,6 +2,8 @@
 #include "iop-hal/panic.hpp"
 #include "iop-hal/thread.hpp"
 
+#include "esp32/"
+
 #include "WiFi.h"
 
 #ifdef IOP_SSL
@@ -10,8 +12,6 @@ using NetworkClient = WiFiClientSecure;
 #else
 using NetworkClient = WiFiClient;
 #endif
-
-extern const uint8_t rootca_crt_bundle_start[] asm("_binary_x509_crt_bundle_bin_start");
 
 namespace iop_hal { 
 Wifi::Wifi() noexcept: client(new (std::nothrow) NetworkClient) {
