@@ -128,7 +128,7 @@ def preBuildCertificates(env):
         def __init__(self, e):
             super(InputError, self).__init__(e)
 
-    p = subprocess.run("perl", "mk-ca-bundle.pl")
+    p = subprocess.run(["perl", "mk-ca-bundle.pl"])
     print(p.communicate())
 
     bundle = CertificateBundle()

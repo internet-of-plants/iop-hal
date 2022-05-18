@@ -5,3 +5,4 @@ __pycache__
 .*.swp
 workspace.code-workspace
 build/ca-bundle.crt
+build/certdata.txt
