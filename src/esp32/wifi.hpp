@@ -2,7 +2,7 @@
 #include "iop-hal/panic.hpp"
 #include "iop-hal/thread.hpp"
 
-#include "esp32/"
+#include "esp32/generated/certificates.hpp"
 
 #include "WiFi.h"
 
@@ -112,7 +112,7 @@ void Wifi::setup() noexcept {
   iop_assert(this->client, IOP_STR("Wifi has been moved out, client is nullptr"));
 
   #ifdef IOP_SSL
-  iop_assert(rootca_crt_bundle_start, IOP_STR("Cert Bundle is null, but SSL is enabled"));
+  iop_assert(generated::bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
   static_cast<NetworkClient*>(this->client)->setCACertBundle(rootca_crt_bundle_start);
   #endif
 

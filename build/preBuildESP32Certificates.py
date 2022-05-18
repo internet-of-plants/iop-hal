@@ -33,7 +33,7 @@ import hashlib
 import sys
 from io import open
 
-folder = "../src/esp8266/generated/"
+folder = "../src/esp32/generated/"
 destination = path.join(folder, "certificates.hpp")
 
 def preBuildCertificates(env):
