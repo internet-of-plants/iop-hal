@@ -138,7 +138,7 @@ def preBuildCertificates(env):
 
     hash = hashlib.sha256(crt_bundle).hexdigest()
 
-    with open(path.join(dir_path, destination), 'wb') as f:
+    with open(path.join(dir_path, destination), 'w') as f:
         f.write("#ifndef IOP_ESP32_CERTIFICATES_H\n")
         f.write("#define IOP_ESP832_CERTIFICATES_H\n")
         f.write("#ifdef IOP_ESP32\n")
@@ -146,7 +146,9 @@ def preBuildCertificates(env):
         f.write("// This file is computer generated at build time (`build/preBuildESP32Certificates.py` called by PlatformIO)\n\n")
         f.write("// SHA256: " + str(hash) + "\n\n")
         f.write("static const uint8_t* const bundle[] IOP_ROM = {")
-        f.write("\"" + "\",\"".join(crt_bundle.split()) + "\"")
+        f.write("'\\")
+        f.write("','\\".join(crt_bundle.split()))
+        f.write("'")
         f.write("};\n\n")
         f.write("} // namespace generated\n")
         f.write("\n#endif" + "\n")
