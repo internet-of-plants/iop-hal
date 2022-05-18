@@ -146,7 +146,6 @@ def preBuildCertificates(env):
         f.write("// This file is computer generated at build time (`build/preBuildESP32Certificates.py` called by PlatformIO)\n\n")
         f.write("// SHA256: " + str(hash) + "\n\n")
         f.write("static const uint8_t* const bundle[] IOP_ROM = {")
-        f.write("'\\")
         f.write(",".join([str(int(b)) for b in crt_bundle]))
         f.write("'")
         f.write("};\n\n")
