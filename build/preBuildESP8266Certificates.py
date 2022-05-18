@@ -24,7 +24,7 @@ except Exception:
 
 from subprocess import Popen, PIPE, call
 
-folder = "../../../../../../src/esp8266/generated/"
+folder = "../../../../../src/esp8266/generated/"
 destination = path.join(folder, "certificates.hpp")
 
 def preBuildCertificates(env):
