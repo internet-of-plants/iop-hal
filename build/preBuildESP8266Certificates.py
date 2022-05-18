@@ -24,7 +24,7 @@ except Exception:
 
 from subprocess import Popen, PIPE, call
 
-folder = "../../../../../src/esp8266/generated/"
+folder = "../../../../src/esp8266/generated/"
 destination = path.join(folder, "certificates.hpp")
 
 def preBuildCertificates(env):
@@ -62,16 +62,19 @@ def preBuildCertificates(env):
     try:
         response = urlopen(mozurl)
     except Exception:
+        success = False
         try:
             with open(path.join(dir_path, destination)) as generated:
                 data = generated.read().split("\n")
                 for line in filter(lambda x: "SHA256" in x, data):
+                    success = True
                     print("Connection failed, using cached certificates")
                     return
         except FileNotFoundError:
             pass
         finally:
-            print("Connection failed, unable to get certificates and no cached version is available")
+            if not success:
+                print("Connection failed, unable to get certificates and no cached version is available")
             return
     csvData = response.read()
     csvHash = hashlib.sha256(csvData).hexdigest()
