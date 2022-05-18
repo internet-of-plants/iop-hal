@@ -15,6 +15,7 @@
   "frameworks": "*",
   "platforms": ["espressif8266", "espressif32","native"],
   "build": {
-    "libArchive": false
+    "libArchive": false,
+    "extraScript": "build/preBuild.py"
   }
 }
