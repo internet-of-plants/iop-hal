@@ -105,8 +105,8 @@ def preBuildCertificates(env):
 
     f = open(path.join(dir_path, destination), "w", encoding="utf8")
 
-    f.write("#ifndef IOP_CERTIFICATES_H\n")
-    f.write("#define IOP_CERTIFICATES_H\n")
+    f.write("#ifndef IOP_ESP8266_CERTIFICATES_H\n")
+    f.write("#define IOP_ESP8266_CERTIFICATES_H\n")
     f.write("#ifdef IOP_ESP8266\n")
     f.write("#include \"esp8266/cert_store.hpp\"\n\n")
     f.write("namespace generated {\n")

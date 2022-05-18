@@ -4,4 +4,4 @@ __pycache__
 .*.swo
 .*.swp
 workspace.code-workspace
-src/esp8266/generated/certificates.hpp
+build/ca-bundle.crt
