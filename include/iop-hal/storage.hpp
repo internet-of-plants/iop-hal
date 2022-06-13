@@ -51,7 +51,7 @@ public:
   auto write(const uintmax_t address, const std::array<char, SIZE> &array) -> bool {
     IOP_TRACE();
     std::cout << address << " " << SIZE << " " << this->size << std::endl;
-    if (this->size < SIZE || address >= this->size - SIZE) return std::false;
+    if (this->size < SIZE || address >= this->size - SIZE) return false;
     std::cout << address << " " << SIZE << " " << this->size << std::endl;
     memcpy(this->asMut() + address, array.data(), SIZE);
     return true;
