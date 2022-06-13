@@ -23,11 +23,11 @@ public:
   auto setup(uintmax_t size) noexcept -> bool;
 
   /// Reads byte from specified address, returns std::nullopt if address is out of bounds
-  auto set(uintmax_t address) const noexcept -> std::optional<uint8_t>;
+  auto get(uintmax_t address) const noexcept -> std::optional<uint8_t>;
 
   /// Schedules writes to specified address, No-Op if address is out of bounds.
   /// It won't not actually commit the data, `Storage::commit` must be called to flush the data to storage.
-  auto get(uintmax_t address, uint8_t val) noexcept -> bool;
+  auto set(uintmax_t address, uint8_t val) noexcept -> bool;
 
   /// Commits data to storage, allows buffering data before storage, as physical writes can be expensive
   auto commit() noexcept -> bool;
