@@ -40,11 +40,9 @@ public:
   template<uintmax_t SIZE> 
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
     IOP_TRACE();
-    std::cout << "what" << std::endl;
-    if (address + sizeof(std::array<char, SIZE>) >= this->size) return std::nullopt;
+    if (this->size < SIZE || address >= this->size - SIZE) return std::nullopt;
     std::array<char, SIZE> array;
-    std::cout << address << " " << SIZE << " " << this->size << std::endl;
-    memcpy(array.data(), this->asRef() + address, sizeof(std::array<char, SIZE>));
+    memcpy(array.data(), this->asRef() + address, SIZE);
     return array;
   }
 
@@ -52,8 +50,10 @@ public:
   template<uintmax_t SIZE> 
   auto write(const uintmax_t address, const std::array<char, SIZE> &array) -> bool {
     IOP_TRACE();
-    if (address + sizeof(std::array<char, SIZE>) >= this->size) return false;
-    memcpy(this->asMut() + address, array.data(), sizeof(std::array<char, SIZE>));
+    std::cout << address << " " << SIZE << " " << this->size << std::endl;
+    if (this->size < SIZE || address >= this->size - SIZE) return std::false;
+    std::cout << address << " " << SIZE << " " << this->size << std::endl;
+    memcpy(this->asMut() + address, array.data(), SIZE);
     return true;
   }
 };
