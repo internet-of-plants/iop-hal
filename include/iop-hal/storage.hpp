@@ -39,8 +39,8 @@ public:
   /// Reads byte from specified address, returns std::nullopt if address is out of bounds
   template<uintmax_t SIZE> 
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
-    std::cout << "what" << std::endl;
     IOP_TRACE();
+    std::cout << "what" << std::endl;
     if (address + sizeof(std::array<char, SIZE>) >= this->size) return std::nullopt;
     std::array<char, SIZE> array;
     std::cout << address << " " << SIZE << " " << this->size << std::endl;
