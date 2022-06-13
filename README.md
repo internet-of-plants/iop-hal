@@ -31,7 +31,7 @@ namespace iop {
         wifi.onConnect([] { gotWifiCreds = true; });
 
         // Raw storage access, storage is just a huge array backed by HDD/SSD/Flash, not RAM
-        if (storage.read(0) == wifiCredsWrittenToFlag) {
+        if (storage.get(0) == wifiCredsWrittenToFlag) {
             const ssid = storage.read<64>(1);
             iop_assert(ssid, IOP_STR("Invalid address when accessing SSID from storage"));
             const psk = storage.read<32>(65); // flag + ssid
@@ -49,14 +49,14 @@ namespace iop {
             wifiCredentials = std::make_pair(name, password);
 
             // Avoids writing to flash if not needed
-            if (storage.read(0) == wifiCredsWrittenToFlag && name == storage.read<64>(1) && password == storage.read<32>(65)) {
+            if (storage.get(0) == wifiCredsWrittenToFlag && name == storage.read<64>(1) && password == storage.read<32>(65)) {
                 return;
             }
 
             // Store credentials for simpler reuse
-            storage.write(0, wifiCredsWrittenToFlag);
-            storage.write(1, *ssid);
-            storage.write(65, *psk);
+            storage.set(0, wifiCredsWrittenToFlag);
+            storage.write(1, name);
+            storage.write(65, password);
         }
 
         // Just to show more about wifi, you should not hardcode creds

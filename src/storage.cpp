@@ -13,13 +13,13 @@
 namespace iop_hal {
 Storage storage;
 
-auto Storage::read(const uintmax_t address) const noexcept -> std::optional<uint8_t> {
+auto Storage::get(const uintmax_t address) const noexcept -> std::optional<uint8_t> {
     IOP_TRACE();
     if (address >= this->size) return std::nullopt;
-    return this->read(address);
+    return this->asRef()[address];
 }
 
-auto Storage::write(const uintmax_t address, uint8_t const val) noexcept -> bool {
+auto Storage::set(const uintmax_t address, uint8_t const val) noexcept -> bool {
     IOP_TRACE();
     if (address >= this->size) return false;
     this->asMut()[address] = val;

@@ -21,13 +21,13 @@ static std::optional<std::array<char, 64>> authToken;
 namespace iop {
     auto setup() noexcept -> void {
         wifi.setup();
-        if (storage.read(0) == wifiCredsWrittenToFlag) {
+        if (storage.get(0) == wifiCredsWrittenToFlag) {
             ssid = storage.read<64>(1);
             iop_assert(ssid, IOP_STR("Invalid address when accessing SSID from storage"));
             psk = storage.read<32>(65); // flag + ssid
             iop_assert(psk, IOP_STR("Invalid address when accessing PSK from storage"));
         }
-        if (storage.read(wifiCredsSizeInStorage) == tokenWrittenToFlag) {
+        if (storage.get(wifiCredsSizeInStorage) == tokenWrittenToFlag) {
             authToken = storage.read<64>(wifiCredsSizeInStorage + 1);
             iop_assert(authToken, IOP_STR("Invalid address when accessing authToken from storage"));
         }
@@ -54,13 +54,14 @@ namespace iop {
             psk = std::make_option(password);
 
             // Avoids writing to flash if not needed
-            if (storage.read(0) == wifiCredsWrittenToFlag && ssid == storage.read<64>(1) && psk == storage.read<32>(65)) {
+            if (storage.get(0) == wifiCredsWrittenToFlag && ssid == storage.read<64>(1) && psk == storage.read<32>(65)) {
                 return;
             }
 
-            storage.write(0, wifiCredsWrittenToFlag);
+            storage.set(0, wifiCredsWrittenToFlag);
             storage.write(1, *ssid);
             storage.write(65, *psk);
+            storage.commit();
         }
 
         if (ssid && psk && authToken) {

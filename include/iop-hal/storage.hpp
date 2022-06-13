@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <optional>
 
-#include <iostream>
-
 namespace iop_hal {
 
 /// Low level abstraction to write data to storage, might be flash, HDDs, SSDs, etc.
@@ -25,18 +23,18 @@ public:
   auto setup(uintmax_t size) noexcept -> bool;
 
   /// Reads byte from specified address, returns std::nullopt if address is out of bounds
-  auto read(uintmax_t address) const noexcept -> std::optional<uint8_t>;
+  auto set(uintmax_t address) const noexcept -> std::optional<uint8_t>;
 
   /// Schedules writes to specified address, No-Op if address is out of bounds.
   /// It won't not actually commit the data, `Storage::commit` must be called to flush the data to storage.
-  auto write(uintmax_t address, uint8_t val) noexcept -> bool;
+  auto get(uintmax_t address, uint8_t val) noexcept -> bool;
 
   /// Commits data to storage, allows buffering data before storage, as physical writes can be expensive
   auto commit() noexcept -> bool;
 
   // TODO: this API still is fragile, we should only support std::arrays, but by type, not size
 
-  /// Reads byte from specified address, returns std::nullopt if address is out of bounds
+  /// Reads byte array from specified address, returns std::nullopt if address is out of bounds
   template<uintmax_t SIZE> 
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
     IOP_TRACE();
@@ -46,13 +44,11 @@ public:
     return array;
   }
 
-  /// Schedules writes of arrays to storage.
+  /// Writes arrays to storage. Commit must be called to ensure it goes through.
   template<uintmax_t SIZE> 
   auto write(const uintmax_t address, const std::array<char, SIZE> &array) -> bool {
     IOP_TRACE();
-    std::cout << address << " " << SIZE << " " << this->size << std::endl;
     if (this->size < SIZE || address >= this->size - SIZE) return false;
-    std::cout << address << " " << SIZE << " " << this->size << std::endl;
     memcpy(this->asMut() + address, array.data(), SIZE);
     return true;
   }
