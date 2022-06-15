@@ -15,7 +15,7 @@ enum class NetworkStatus {
   BROKEN_CLIENT = 400,
 
   OK = 200,
-  FORBIDDEN = 403,
+  UNAUTHORIZED = 401,
 };
 }
 

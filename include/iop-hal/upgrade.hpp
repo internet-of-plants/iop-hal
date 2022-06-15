@@ -15,7 +15,7 @@ enum class UpgradeStatus {
   BROKEN_CLIENT,
 
   NO_UPGRADE,
-  FORBIDDEN,
+  UNAUTHORIZED,
 };
     
 // Handles upgrade procedure, reseting the board on success.

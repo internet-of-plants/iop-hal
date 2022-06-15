@@ -55,8 +55,8 @@ auto Network::codeToString(const int code) const noexcept -> std::string {
     return IOP_STR("OK").toString();
   case 500:
     return IOP_STR("SERVER_ERROR").toString();
-  case 403:
-    return IOP_STR("FORBIDDEN").toString();
+  case 401:
+    return IOP_STR("UNAUTHORIZED").toString();
   }
   return std::to_string(code);
 }
@@ -88,8 +88,8 @@ auto networkStatus(const int code) noexcept -> std::optional<iop::NetworkStatus>
   // Unsupported Transfer-Encoding header, if set it must be "chunked"
   case HTTPC_ERROR_ENCODING:
     return iop::NetworkStatus::BROKEN_SERVER;
-  case 403:
-    return iop::NetworkStatus::FORBIDDEN;
+  case 401:
+    return iop::NetworkStatus::UNAUTHORIZED;
   case HTTPC_ERROR_TOO_LESS_RAM:
     return iop::NetworkStatus::BROKEN_CLIENT;
 

@@ -40,8 +40,8 @@ auto Network::codeToString(const int code) const noexcept -> std::string {
     return IOP_STR("OK").toString();
   case 500:
     return IOP_STR("SERVER_ERROR").toString();
-  case 403:
-    return IOP_STR("FORBIDDEN").toString();
+  case 401:
+    return IOP_STR("UNAUTHORIZED").toString();
   }
   return std::to_string(code);
 }
@@ -71,8 +71,8 @@ auto networkStatus(const int code) noexcept -> std::optional<iop::NetworkStatus>
     return iop::NetworkStatus::OK;
   case 500:
     return iop::NetworkStatus::BROKEN_SERVER;
-  case 403:
-    return iop::NetworkStatus::FORBIDDEN;
+  case 401:
+    return iop::NetworkStatus::UNAUTHORIZED;
   }
   return std::nullopt;
 }
