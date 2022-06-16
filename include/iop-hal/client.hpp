@@ -38,7 +38,7 @@ public:
 };
 
 class HTTPClient {
-#ifdef IOP_POSIX
+#ifdef IOP_POSIX_MOCK
   std::vector<std::string> headersToCollect_;
 #elif defined(IOP_ESP8266) || defined(IOP_ESP32)
   ::HTTPClient * http;

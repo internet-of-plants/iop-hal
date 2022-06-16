@@ -1,4 +1,4 @@
-#ifdef IOP_POSIX
+#ifdef IOP_POSIX_MOCK
 #include "posix/device.hpp"
 #elif defined(IOP_ESP8266)
 #include "esp8266/device.hpp"

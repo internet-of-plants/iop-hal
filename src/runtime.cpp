@@ -1,4 +1,4 @@
-#ifdef IOP_POSIX
+#ifdef IOP_POSIX_MOCK
 #ifndef UNIT_TEST
 #include "cpp17/runtime.hpp"
 #endif

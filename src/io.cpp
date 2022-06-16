@@ -1,4 +1,4 @@
-#ifdef IOP_POSIX
+#ifdef IOP_POSIX_MOCK
 #include "noop/io.hpp"
 #elif defined(IOP_ESP8266)
 #include "arduino/io.hpp"

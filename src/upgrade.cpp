@@ -1,4 +1,4 @@
-#ifdef IOP_POSIX
+#ifdef IOP_POSIX_MOCK
 #include "cpp17/upgrade.hpp"
 #elif defined(IOP_ESP8266)
 #include "esp/upgrade.hpp"
