@@ -1,12 +1,37 @@
 # iop-hal - IoP's Hardware Abstraction Layer
 
-A moden C++17, low level, framework that provides transparent/unified access to different hardwares, without exposing their inner workings.
+A low level modern C++17 framework that provides opaque and unified access to different hardwares, without exposing their inner workings.
 
 If you want a higher level framework, safer, but more opinionated, check: https://github.com/internet-of-plants/iop
 
-Note: Posix target turns some functionalities into No-Ops, we intend to improve this, but some are naturally impossible to implement for this target. If some is needed you should make a specific target for that platform, as it surely will depend on things outside of the C++17 + posix API. The Posix target is mostly for ease of testing.
+## Targets supported
 
-# Example
+- ESP8266 (all boards supported by [esp8266/Arduino](https://github.com/esp8266/Arduino))
+- ESP32 (all boards supported by [espessif/arduino-esp32](https://github.com/espressif/arduino-esp32/))
+- Posix (all targets that support POSIX)
+
+*Note: Some functionalities in the posix target are NOOP, most will be implemented to support Raspberry Pis and other boards that support posix. But for now this is mostly used for testing*
+
+## Functionalities
+
+Provides the following functionalities:
+- [User defined `iop_hal::setup` and `iop_hal::loop`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/runtime.hpp): Entrypoints of the framework, from `#include <iop-hal/runtime.hpp>`
+- [`iop_hal::WiFi`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/wifi.hpp): Access Point + Station management, use `iop::wifi` from `#include <iop-hal/network.hpp>`
+- [`iop::Upgrade`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/upgrade.hpp): Make over-the-air firmware upgrades, from `#include <iop-hal/upgrade.hpp>`
+- [`iop::Thread`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/thread.hpp): Thread management, use `iop::thisThread` from `#include <iop-hal/thread.hpp>`
+- [`iop::StaticString`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Disk stored strings, use it with `IOP_STR(str)` macro, from `#include <iop-hal/string.h>`
+- [`iop::CowString`, `iop::to_view` and string handling functions](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Borrow strings to handle them in a unified way, from `#include<iop-hal/string.h>`
+  - Also includes fixed size char arrays `iop::MD5Hash`, `iop::MacAddress`, `iop::NetworkName`, `iop::NetworkPassword` that can be accessed as strings with `iop::to_view`
+- [`iop::Storage`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/storage.hpp): Low level access to persistent storage as continuous memory, from `#include <iop-hal/storage.hpp>`
+- [`iop::HttpServer`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): HTTP server hosting in the device, from `#include <iop-hal/server.hpp>`
+- [`iop::CaptivePortal`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): Turns access point into a captive portal, redirecting all queries to itself, - [`iop_panic` and `iop_assert` macros](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/panic.hpp): Panic hook API (exceptions aren't supported, fatal errors should use iop_hal's panic), from `#include <iop-hal/panic.hpp>`
+- [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): HTTP(s) client, from `#include <iop-hal/client.hpp>`
+- [`iop::Network`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/network.hpp): Higher level HTTP(s) client with authentication + JSON requests + upgrade hooks, from `#include <iop-hal/network.hpp>`
+- [`iop::Log`](- [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): String log system with variadic arguments + levels + hooks for extension, from `#include <iop-hal/log.hpp>`
+  - Supports `iop::StaticString` or `std::string_view`, the former can be created with the `IOP_STR(str)` macro, the latest can be created with `iop::to_view` (non string data has to be casted with `std::to_string` or similar)
+- [`iop::Device`](- [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/device.hpp): Unified hardware management, from `#include <iop-hal/device.hpp>`
+
+## Example
 
 ```cpp
 #include <iop-hal/runtime.hpp>
@@ -32,9 +57,9 @@ namespace iop {
 
         // Raw storage access, storage is just a huge array backed by HDD/SSD/Flash, not RAM
         if (storage.get(0) == wifiCredsWrittenToFlag) {
-            const ssid = storage.read<64>(1);
+            const auto ssid = storage.read<64>(1);
             iop_assert(ssid, IOP_STR("Invalid address when accessing SSID from storage"));
-            const psk = storage.read<32>(65); // flag + ssid
+            const auto psk = storage.read<32>(65); // flag + ssid
             iop_assert(psk, IOP_STR("Invalid address when accessing PSK from storage"));
             wifiCredentials = std::make_pair(*ssid, *psk);
 
@@ -67,43 +92,3 @@ namespace iop {
     }
 }
 ```
-
-# Details
-
-Provides the following functionalities:
-- WiFi's Access Point and Station management
-  - `#include <iop-hal/wifi.hpp>`
-  - `iop::Wifi`
-- Firmware upgrade functionality
-  - `#include <iop-hal/upgrade.hpp>`
-  - `iop::Upgrade`
-- Thread management
-  - `#include <iop-hal/thread.hpp>`
-  - `iop::Thread`
-- Type-safe string abstractions and operations
-  - `#include <iop-hal/string.hpp>`
-  - `iop::StaticString`, `iop::CowString`, `iop::to_view`
-- Persistent storage access
-  - `#include <iop-hal/storage.hpp>`
-  - `iop::Storage`
-- HTTP server hosting
-  - `#include <iop-hal/server.hpp>`
-  - `iop::HttpServer`
-- Runtime hook API
-  - `#include <iop-hal/runtime.hpp>`
-  - User defines `iop_hal::setup` and `iop_hal::loop`
-- Panic hook API (no exceptions supported, but we have our panic system)
-  - `#include <iop-hal/panic.hpp>`
-  - `iop_panic` macro
-- HTTPs client
-  - `#include <iop-hal/client.hpp>`
-  - `iop::HttpClient`
-- Higher level client to interface with IoP server, JSON + authentication + firmware upgrade management
-  - `#include <iop-hal/network.hpp>`
-  - `iop::Network`
-- Log system
-  - `#include <iop-hal/log.hpp>`
-  - `iop::Log`
-- Device primitives management
-  - `#include <iop-hal/device.hpp>`
-  - `iop::Device`
