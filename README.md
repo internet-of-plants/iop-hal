@@ -26,7 +26,8 @@ Provides the following functionalities:
   - Like `iop::MD5Hash`, `iop::MacAddress`, `iop::NetworkName`, `iop::NetworkPassword`
 - [`iop::Storage`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/storage.hpp): Low level access to persistent flat storage, from `#include <iop-hal/storage.hpp>`
 - [`iop::HttpServer`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): HTTP server hosting in the device, from `#include <iop-hal/server.hpp>`
-- [`iop::CaptivePortal`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): Turns AP into a captive portal, redirects requests to itself, from `#include <iop-hal/server.hpp>`
+- [`iop::CaptivePortal`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): Turns Access Point into a captive portal, from `#include <iop-hal/server.hpp>`
+  - Hijacks DNS to redirect all TCP requests in its own AP to some port
 - [`iop_panic` and `iop_assert` macros](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/panic.hpp): Fatal error handler hook API, from `#include <iop-hal/panic.hpp>`
   - Panic hooks should never return, either halt/wait for a interaction, or reboot the process
   - Exceptions aren't supported, fatal errors should use iop_hal's panic
