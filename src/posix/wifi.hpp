@@ -2,6 +2,10 @@
 #include "iop-hal/wifi.hpp"
 #include "iop-hal/log.hpp"
 
+#ifdef IOP_SSL
+#include <openssl/ssl.h>
+#endif
+
 namespace iop_hal {
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
@@ -27,7 +31,12 @@ std::string Wifi::ourAccessPointIp() const noexcept {
 void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) const noexcept { (void) ssid; (void) psk; }
 auto Wifi::disableOurAccessPoint() const noexcept -> void {}
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept { (void) ssid; (void) psk; return true; }
-void Wifi::setup() noexcept {}
+void Wifi::setup() noexcept {
+#ifdef IOP_SSL
+  SSL_library_init();
+  SSL_load_error_strings();
+#endif
+}
 void Wifi::setMode(WiFiMode mode) const noexcept { (void) mode; }
 void Wifi::onConnect(std::function<void()> f) noexcept { (void) f; }
 }

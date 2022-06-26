@@ -17,14 +17,15 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <netdb.h>
 
 #ifdef IOP_SSL
-#error "SSL not supported for desktop right now"
+#include <openssl/ssl.h>
 #endif
 
 constexpr size_t bufferSize = 8192;
 
-static iop::Log clientDriverLogger(iop::LogLevel::INFO, IOP_STR("HTTP Client"));
+static iop::Log clientDriverLogger(iop::LogLevel::TRACE, IOP_STR("HTTP Client"));
 
 auto shiftChars(char* ptr, const size_t start, const size_t end) noexcept {
   //clientDriverLogger.debug(std::string_view(ptr).substr(start, end), std::to_string(start), " ", std::to_string(end));
@@ -54,8 +55,9 @@ public:
   std::vector<std::string> headersToCollect;
   std::unordered_map<std::string, std::string> headers;
   std::string_view uri;
+  SSL *ssl;
 
-  SessionContext(int fd, std::vector<std::string> headersToCollect, std::string_view uri) noexcept: fd(fd), headersToCollect(headersToCollect), headers({}), uri(uri) {}
+  SessionContext(int fd, std::vector<std::string> headersToCollect, std::string_view uri, SSL *ssl) noexcept: fd(fd), headersToCollect(headersToCollect), headers({}), uri(uri), ssl(ssl) {}
 
   SessionContext(SessionContext &&other) noexcept = delete;
   SessionContext(const SessionContext &other) noexcept = delete;
@@ -79,9 +81,22 @@ auto networkStatus(const int code) noexcept -> std::optional<iop::NetworkStatus>
 HTTPClient::HTTPClient() noexcept: headersToCollect_() {}
 HTTPClient::~HTTPClient() noexcept {}
 
-static ssize_t send(int fd, const char * msg, const size_t len) noexcept {
+static ssize_t send(const SessionContext &ctx, const char * msg, const size_t len) noexcept {
   if (iop::Log::isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::STARTEND);
-  return write(fd, msg, len);
+  #ifdef IOP_SSL
+  if (ctx.ssl) {
+    return SSL_write(ctx.ssl, msg, len);
+  }
+  #endif
+  return write(ctx.fd, msg, len);
+}
+static ssize_t recv(const SessionContext &ctx, char *buffer, const size_t len) noexcept {
+  #ifdef IOP_SSL
+  if (ctx.ssl) {
+    return SSL_read(ctx.ssl, buffer, len);
+  }
+  #endif
+  return read(ctx.fd, buffer, len);
 }
 
 void HTTPClient::headersToCollect(std::vector<std::string> headers) noexcept {
@@ -135,22 +150,22 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     iop_assert(fd != -1, IOP_STR("Invalid file descriptor"));
     if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
       iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
-    send(fd, method.c_str(), method.length());
-    send(fd, " ", 1);
-    send(fd, path.begin(), path.length());
-    send(fd, " HTTP/1.0\r\n", 11);
-    send(fd, "Content-Length: ", 16);
+    send(this->ctx, method.c_str(), method.length());
+    send(this->ctx, " ", 1);
+    send(this->ctx, path.begin(), path.length());
+    send(this->ctx, " HTTP/1.0\r\n", 11);
+    send(this->ctx, "Content-Length: ", 16);
     const auto dataLengthStr = std::to_string(len);
-    send(fd, dataLengthStr.c_str(), dataLengthStr.length());
-    send(fd, "\r\n", 2);
+    send(this->ctx, dataLengthStr.c_str(), dataLengthStr.length());
+    send(this->ctx, "\r\n", 2);
     for (const auto& [key, value]: this->ctx.headers) {
-      send(fd, key.c_str(), key.length());
-      send(fd, ": ", 2);
-      send(fd, value.c_str(), value.length());
-      send(fd, "\r\n", 2);
+      send(this->ctx, key.c_str(), key.length());
+      send(this->ctx, ": ", 2);
+      send(this->ctx, value.c_str(), value.length());
+      send(this->ctx, "\r\n", 2);
     }
-    send(fd, "\r\n", 2);
-    send(fd, data.begin(), len);
+    send(this->ctx, "\r\n", 2);
+    send(this->ctx, data.begin(), len);
     if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
       iop::Log::print(IOP_STR("\n"), iop::LogLevel::TRACE, iop::LogType::END);
     clientDriverLogger.debug(IOP_STR("Sent data: "), data);
@@ -171,7 +186,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
       }
 
       if (size < bufferSize &&
-          (signedSize = read(fd, buffer.get() + size, bufferSize - size)) < 0) {
+          (signedSize = recv(this->ctx, buffer.get() + size, bufferSize - size)) < 0) {
         clientDriverLogger.error(IOP_STR("Error reading from socket ("), std::to_string(signedSize), IOP_STR("): "), std::to_string(errno), IOP_STR(" - "), strerror(errno)); 
         return Response(iop::NetworkStatus::IO_ERROR);
       }
@@ -304,17 +319,31 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
 
 auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> func) noexcept -> Response {
   struct sockaddr_in serv_addr;
+  memset(&serv_addr, 0, sizeof(serv_addr));
+
   auto fd = socket(AF_INET, SOCK_STREAM, 0);
   if (fd < 0) {
     clientDriverLogger.error(IOP_STR("Unable to open socket"));
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
 
-  iop_assert(uri.find("http://") == 0, IOP_STR("Protocol must be http (no SSL)"));
-  uri = uri.substr(7);
+  const auto useTLS = uri.find("https://") == 0;
+  //iop_assert(uri.find("http://") == 0, IOP_STR("Protocol must be http (no SSL)"));
+  if (useTLS) {
+    #ifdef IOP_TLS
+    clientDriverLogger.error(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
+    return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    #else
+    uri = uri.substr(8);
+    #endif
+  } else if (uri.find("http://") == 0) {
+    uri = uri.substr(7);
+  }
 
   const auto portIndex = uri.find(IOP_STR(":").toString());
   uint16_t port = 443;
+  if (!useTLS) port = 80;
+
   if (portIndex != uri.npos) {
     auto end = uri.substr(portIndex + 1).find("/");
     if (end == uri.npos) end = uri.length();
@@ -326,29 +355,75 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   }
   clientDriverLogger.debug(IOP_STR("Port: "), std::to_string(port));
 
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(port);
+  // TODO: handle DNS resolution
 
   auto end = uri.find(":");
   if (end == uri.npos) end = uri.find("/");
   if (end == uri.npos) end = uri.length();
   
   const auto host = std::string(uri.begin(), 0, end);
-  // Convert IPv4 and IPv6 addresses from text to binary form
-  if(inet_pton(AF_INET, host.c_str(), &serv_addr.sin_addr) <= 0) {
-    clientDriverLogger.error(IOP_STR("Address not supported: "), host);
+
+  struct hostent *he = gethostbyname(host.c_str());
+  if (!he) {
+    clientDriverLogger.error(IOP_STR("Unable to obtain hostent from host string: "), host);
     return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
   }
+
+  serv_addr.sin_addr= *(struct in_addr *) he->h_addr_list[0];
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_port = htons(port);
+  
+#ifdef IOP_SSL
+  SSL_CTX* context = nullptr;
+  SSL* ssl = nullptr;
+  if (useTLS) {
+    context = SSL_CTX_new(SSLv23_method());
+    if (!context) {
+      clientDriverLogger.error(IOP_STR("Unable to allocate SSL context: "));
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+  
+    ssl = SSL_new(context);
+    if (!ssl) {
+      clientDriverLogger.error(IOP_STR("Unable to allocate SSL object: "));
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+  }
+#endif
 
   auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
   if (connection < 0) {
     clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
+    #ifdef IOP_SSL
+    SSL_CTX_free(context);
+    #endif
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
+
+#ifdef IOP_SSL
+  if (useTLS && !SSL_set_fd(ssl, fd)) {
+    clientDriverLogger.error(IOP_STR("Unable to set ssl fd"));
+    SSL_CTX_free(context);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+  }
+
+  if (useTLS && !SSL_connect(ssl)) {
+    clientDriverLogger.error(IOP_STR("Unable to connect SSL"));
+    SSL_CTX_free(context);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+  }
+#endif
+
   clientDriverLogger.debug(IOP_STR("Began connection: "), uri);
-  auto ctx = SessionContext(fd, this->headersToCollect_, uri);
+  auto ctx = SessionContext(fd, this->headersToCollect_, uri, ssl);
   auto session = Session(ctx);
-  return func(session);
+  auto result = func(session);
+
+  SSL_free(ssl);
+  SSL_CTX_free(context);
+  close(fd);
+  return result;
 }
 HTTPClient::HTTPClient(HTTPClient &&other) noexcept: headersToCollect_(std::move(other.headersToCollect_)) {}
 auto HTTPClient::operator==(HTTPClient &&other) noexcept -> HTTPClient & {

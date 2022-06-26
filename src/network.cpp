@@ -85,7 +85,7 @@ auto Network::httpRequest(const HttpMethod method_,
   this->logger().debug(method, IOP_STR(" to "), this->uri(), path, IOP_STR(", data length: "), std::to_string(data_.length()));
 
   // TODO: this may log sensitive information, network logging is currently
-  // capped at debug because of that
+  // capped at info because of that
   if (data)
     this->logger().debug(*data);
   
