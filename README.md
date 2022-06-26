@@ -15,21 +15,28 @@ If you want a higher level framework, safer, but more opinionated, check: https:
 ## Functionalities
 
 Provides the following functionalities:
-- [User defined `iop_hal::setup` and `iop_hal::loop`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/runtime.hpp): Entrypoints of the framework, from `#include <iop-hal/runtime.hpp>`
+- [`iop_hal::setup` and `iop_hal::loop`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/runtime.hpp): User defined entrypoints of the framework, from `#include <iop-hal/runtime.hpp>`
 - [`iop_hal::WiFi`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/wifi.hpp): Access Point + Station management, use `iop::wifi` from `#include <iop-hal/network.hpp>`
 - [`iop::Upgrade`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/upgrade.hpp): Make over-the-air firmware upgrades, from `#include <iop-hal/upgrade.hpp>`
 - [`iop::Thread`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/thread.hpp): Thread management, use `iop::thisThread` from `#include <iop-hal/thread.hpp>`
 - [`iop::StaticString`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Disk stored strings, use it with `IOP_STR(str)` macro, from `#include <iop-hal/string.h>`
-- [`iop::CowString`, `iop::to_view` and string handling functions](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Borrow strings to handle them in a unified way, from `#include<iop-hal/string.h>`
-  - Also includes fixed size char arrays `iop::MD5Hash`, `iop::MacAddress`, `iop::NetworkName`, `iop::NetworkPassword` that can be accessed as strings with `iop::to_view`
-- [`iop::Storage`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/storage.hpp): Low level access to persistent storage as continuous memory, from `#include <iop-hal/storage.hpp>`
+- [`iop::CowString`, `iop::to_view`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Borrow strings to handle them in a unified way, from `#include<iop-hal/string.h>`
+  - With string utils functions, we use `std::string` for dynamically allocated strings
+  - With fixed sized (non zero terminated) char arrays castable with `iop::to_view`
+  - Like `iop::MD5Hash`, `iop::MacAddress`, `iop::NetworkName`, `iop::NetworkPassword`
+- [`iop::Storage`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/storage.hpp): Low level access to persistent flat storage, from `#include <iop-hal/storage.hpp>`
 - [`iop::HttpServer`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): HTTP server hosting in the device, from `#include <iop-hal/server.hpp>`
-- [`iop::CaptivePortal`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): Turns access point into a captive portal, redirecting all queries to itself, - [`iop_panic` and `iop_assert` macros](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/panic.hpp): Panic hook API (exceptions aren't supported, fatal errors should use iop_hal's panic), from `#include <iop-hal/panic.hpp>`
+- [`iop::CaptivePortal`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/server.hpp): Makes AP into a captive portal, redirects all queries to itself, from `#include <iop-hal/server.hpp>`
+- [`iop_panic` and `iop_assert` macros](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/panic.hpp): Fatal error handler hook API, from `#include <iop-hal/panic.hpp>`
+  - Panic hooks should never return, either halt/wait for a interaction, or reboot the process
+  - Exceptions aren't supported, fatal errors should use iop_hal's panic
 - [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): HTTP(s) client, from `#include <iop-hal/client.hpp>`
-- [`iop::Network`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/network.hpp): Higher level HTTP(s) client with authentication + JSON requests + upgrade hooks, from `#include <iop-hal/network.hpp>`
-- [`iop::Log`](- [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): String log system with variadic arguments + levels + hooks for extension, from `#include <iop-hal/log.hpp>`
-  - Supports `iop::StaticString` or `std::string_view`, the former can be created with the `IOP_STR(str)` macro, the latest can be created with `iop::to_view` (non string data has to be casted with `std::to_string` or similar)
-- [`iop::Device`](- [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/device.hpp): Unified hardware management, from `#include <iop-hal/device.hpp>`
+- [`iop::Network`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/network.hpp): Higher level HTTP(s) client, from `#include <iop-hal/network.hpp>`
+-  With authentication + JSON requests + upgrade hook
+- [`iop::Log`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): String log system, from `#include <iop-hal/log.hpp>`
+  - With variadic arguments + levels + hooks for extension, supporting `iop::StaticString` and `std::string_view`
+  - The former can be created with the `IOP_STR(str)` macro, the latter can be created with `iop::to_view` + `std::to_string`
+- [`iop::Device`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/device.hpp): Unified hardware management, from `#include <iop-hal/device.hpp>`
 
 ## Example
 
