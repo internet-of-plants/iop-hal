@@ -1,4 +1,4 @@
-#include "iop-hal/upgrade.hpp"
+#include "iop-hal/update.hpp"
 #include "iop-hal/network.hpp"
 #include "cpp17/runtime_metadata.hpp"
 
@@ -7,14 +7,14 @@
 #include <filesystem>
 
 namespace iop_hal {
-auto Upgrade::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpgradeStatus {
+auto Update::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
     auto response = network.httpGet(path, authorization_header, "");
     const auto status = response.status();
     if (status && *status == iop::NetworkStatus::OK) {
         const auto binary = response.await().payload;
         if (binary.size() == 0) {
-            network.logger().error(IOP_STR("Upgrade failed, no firmware returned"));
-            return iop_hal::UpgradeStatus::BROKEN_SERVER;
+            network.logger().error(IOP_STR("Update failed, no firmware returned"));
+            return iop_hal::UpdateStatus::BROKEN_SERVER;
         }
 
         // Possible race here, but it's the best cross platform solution
@@ -24,19 +24,19 @@ auto Upgrade::run(const iop::Network &network, const iop::StaticString path, con
         std::ofstream file(tmpFile);
         if (!file.is_open()) {
             network.logger().error(IOP_STR("Unable to open firmware file"));
-            return iop_hal::UpgradeStatus::IO_ERROR;
+            return iop_hal::UpdateStatus::IO_ERROR;
         }
 
         file.write(reinterpret_cast<const char*>(&binary.front()), static_cast<std::streamsize>(binary.size()));
         if (file.fail()) {
             network.logger().error(IOP_STR("Unable to write to firmware file"));
-            return iop_hal::UpgradeStatus::IO_ERROR;
+            return iop_hal::UpdateStatus::IO_ERROR;
         }
 
         file.close();
         if (file.fail()) {
             network.logger().error(IOP_STR("Unable to close firmware file"));
-            return iop_hal::UpgradeStatus::IO_ERROR;
+            return iop_hal::UpdateStatus::IO_ERROR;
         }
 
         std::error_code code;
@@ -44,7 +44,7 @@ auto Upgrade::run(const iop::Network &network, const iop::StaticString path, con
         std::filesystem::permissions(tmpFile, std::filesystem::perms::owner_all | std::filesystem::perms::others_exec | std::filesystem::perms::others_read | std::filesystem::perms::group_exec | std::filesystem::perms::group_read, code);
         if (code) {
             network.logger().error(IOP_STR("Unable to set file as executable: "), std::to_string(code.value()));
-            return iop_hal::UpgradeStatus::IO_ERROR;
+            return iop_hal::UpdateStatus::IO_ERROR;
         }
 
         // FIXME: Race here
@@ -57,9 +57,9 @@ auto Upgrade::run(const iop::Network &network, const iop::StaticString path, con
         network.logger().info(IOP_STR("Upgrading runtime"));
         exit(system(filename.string().c_str()));
     } else {
-        network.logger().error(IOP_STR("Invalid status returned by the server on upgrade: "), std::to_string(response.code()));
+        network.logger().error(IOP_STR("Invalid status returned by the server on update: "), std::to_string(response.code()));
     }
 
-    return iop_hal::UpgradeStatus::BROKEN_SERVER;
+    return iop_hal::UpdateStatus::BROKEN_SERVER;
 }
 } // namespace iop_hal

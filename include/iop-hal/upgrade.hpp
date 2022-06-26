@@ -9,7 +9,7 @@ namespace iop {
 
 namespace iop_hal {
 /// Higher level error reporting. Lower level is handled by core
-enum class UpgradeStatus {
+enum class UpdateStatus {
   IO_ERROR,
   BROKEN_SERVER,
   BROKEN_CLIENT,
@@ -18,11 +18,11 @@ enum class UpgradeStatus {
   UNAUTHORIZED,
 };
     
-// Handles upgrade procedure, reseting the board on success.
+// Handles update procedure, reseting the board on success.
 //
 // Downloads firmware from behind the monitor server's authentication
-struct Upgrade {
-    static auto run(const iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> iop_hal::UpgradeStatus;
+struct Update {
+    static auto run(const iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus;
 };
 }
 

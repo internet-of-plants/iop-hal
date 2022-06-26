@@ -17,7 +17,7 @@ If you want a higher level framework, safer, but more opinionated, check: https:
 Provides the following functionalities:
 - [`iop_hal::setup`, `iop_hal::loop`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/runtime.hpp): User defined `iop_hal` entrypoints, from `#include <iop-hal/runtime.hpp>`
 - [`iop_hal::WiFi`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/wifi.hpp): Access Point + Station management, use `iop::wifi` from `#include <iop-hal/network.hpp>`
-- [`iop::Upgrade`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/upgrade.hpp): Make over-the-air firmware upgrades, from `#include <iop-hal/upgrade.hpp>`
+- [`iop::Update`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/update.hpp): Make over-the-air firmware updates, from `#include <iop-hal/update.hpp>`
 - [`iop::Thread`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/thread.hpp): Thread management, use `iop::thisThread` from `#include <iop-hal/thread.hpp>`
 - [`iop::StaticString`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Disk stored strings, use it with `IOP_STR(str)` macro, from `#include <iop-hal/string.h>`
 - [`iop::CowString`, `iop::to_view`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/string.hpp): Unifies borrowed strings handling, from `#include<iop-hal/string.h>`
@@ -33,7 +33,7 @@ Provides the following functionalities:
   - Exceptions aren't supported, fatal errors should use iop_hal's panic
 - [`iop::HttpClient`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): HTTP(s) client, from `#include <iop-hal/client.hpp>`
 - [`iop::Network`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/network.hpp): Higher level HTTP(s) client, from `#include <iop-hal/network.hpp>`
-  -  With authentication + JSON requests + upgrade hook
+  -  With authentication + JSON requests + update hook
 - [`iop::Log`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): String log system, from `#include <iop-hal/log.hpp>`
   - With variadic arguments + levels + extension hooks, for `iop::StaticString` and `std::string_view`
   - One comes from the `IOP_STR(str)` macro, the other from `iop::to_view` + `std::to_string`

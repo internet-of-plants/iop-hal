@@ -3,7 +3,7 @@
 
 #include "iop-hal/string.hpp"
 #include "iop-hal/client.hpp"
-#include "iop-hal/upgrade.hpp"
+#include "iop-hal/update.hpp"
 #include <string>
 #include <array>
 #include <functional>
@@ -64,7 +64,7 @@ public:
   auto operator=(Wifi &&other) noexcept -> Wifi &;
 
   friend HTTPClient;
-  friend Upgrade;
+  friend Update;
 };
 }
 

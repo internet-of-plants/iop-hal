@@ -1,11 +1,11 @@
 #include "iop-hal/network.hpp"
 #include "iop-hal/thread.hpp"
-#include "iop-hal/upgrade.hpp"
+#include "iop-hal/update.hpp"
 #include "iop-hal/panic.hpp"
 
-constexpr static iop::UpgradeHook defaultHook(iop::UpgradeHook::defaultHook);
+constexpr static iop::UpdateHook defaultHook(iop::UpdateHook::defaultHook);
 
-static iop::UpgradeHook hook(defaultHook);
+static iop::UpdateHook hook(defaultHook);
 
 namespace iop {
 iop_hal::Wifi wifi;
@@ -13,14 +13,14 @@ iop_hal::Wifi wifi;
 auto Network::logger() const noexcept -> const Log & {
   return this->logger_;
 }
-auto Network::upgrade(StaticString path, std::string_view token) const noexcept -> iop_hal::UpgradeStatus {
-  return iop_hal::Upgrade::run(*this, path, token);
+auto Network::update(StaticString path, std::string_view token) const noexcept -> iop_hal::UpdateStatus {
+  return iop_hal::Update::run(*this, path, token);
 }
-void UpgradeHook::defaultHook() noexcept { IOP_TRACE(); }
-void Network::setUpgradeHook(UpgradeHook scheduler) noexcept {
+void UpdateHook::defaultHook() noexcept { IOP_TRACE(); }
+void Network::setUpdateHook(UpdateHook scheduler) noexcept {
   hook = std::move(scheduler);
 }
-auto Network::takeUpgradeHook() noexcept -> UpgradeHook {
+auto Network::takeUpdateHook() noexcept -> UpdateHook {
   auto old = hook;
   hook = defaultHook;
   return old;
@@ -140,10 +140,10 @@ auto Network::httpRequest(const HttpMethod method_,
   
     this->logger().debug(IOP_STR("Made HTTP request")); 
 
-    // Handle system upgrade request
-    const auto upgrade = response.header(IOP_STR("LATEST_VERSION"));
-    if (upgrade && upgrade != iop::to_view(iop_hal::device.firmwareMD5())) {
-      this->logger().info(IOP_STR("Scheduled upgrade"));
+    // Handle system update request
+    const auto update = response.header(IOP_STR("LATEST_VERSION"));
+    if (update && update != iop::to_view(iop_hal::device.firmwareMD5())) {
+      this->logger().info(IOP_STR("Scheduled update"));
       hook.schedule();
     }
   

@@ -1,4 +1,4 @@
-#include "iop-hal/upgrade.hpp"
+#include "iop-hal/update.hpp"
 #include "iop-hal/client.hpp"
 #include "iop-hal/panic.hpp"
 #include "iop-hal/network.hpp"
@@ -18,12 +18,12 @@ using HTTPUpdate = ESP8266HTTPUpdate;
 #include "HTTPUpdate.h"
 using NetworkClient = WiFiClient;
 #else
-#error "Non supported arduino based upgrade device"
+#error "Non supported arduino based update device"
 #endif
 
 
 namespace iop_hal {
-auto Upgrade::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpgradeStatus {
+auto Update::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
   auto *client = static_cast<NetworkClient*>(iop::wifi.client);
   iop_assert(client, IOP_STR("Wifi has been moved out, client is nullptr"));
 
@@ -43,29 +43,29 @@ auto Upgrade::run(const iop::Network &network, const iop::StaticString path, con
 #elif defined(IOP_ESP32)
   ::HTTPClient http;
   if (!http.begin(*client, route)) {
-    return iop_hal::UpgradeStatus::IO_ERROR;
+    return iop_hal::UpdateStatus::IO_ERROR;
   }
   http.setAuthorization(std::string(authorization_header).c_str());
   const auto result = ESPhttpUpdate->update(http, "");
 #else
-  #error "Non supported arduino based upgrade device"
+  #error "Non supported arduino based update device"
 #endif
 
 switch (result) {
   case HTTP_UPDATE_NO_UPDATES:
   case HTTP_UPDATE_OK:
-    return iop_hal::UpgradeStatus::NO_UPGRADE;
+    return iop_hal::UpdateStatus::NO_UPGRADE;
 
   case HTTP_UPDATE_FAILED:
     // TODO(pc): properly handle ESPhttpUpdate.getLastError()
     network.logger().error(IOP_STR("Update failed: "),
                        std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
-    return iop_hal::UpgradeStatus::BROKEN_SERVER;
+    return iop_hal::UpdateStatus::BROKEN_SERVER;
 }
 
 // TODO(pc): properly handle ESPhttpUpdate.getLastError()
 network.logger().error(IOP_STR("Update failed (UNKNOWN): "),
                     std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
-return iop_hal::UpgradeStatus::BROKEN_SERVER;
+return iop_hal::UpdateStatus::BROKEN_SERVER;
 }
 } // namespace iop_hal
