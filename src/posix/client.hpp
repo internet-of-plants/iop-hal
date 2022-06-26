@@ -21,6 +21,8 @@
 
 #ifdef IOP_SSL
 #include <openssl/ssl.h>
+#else
+class SSL;
 #endif
 
 constexpr size_t bufferSize = 8192;
@@ -328,7 +330,6 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   }
 
   const auto useTLS = uri.find("https://") == 0;
-  //iop_assert(uri.find("http://") == 0, IOP_STR("Protocol must be http (no SSL)"));
   if (useTLS) {
     #ifdef IOP_TLS
     clientDriverLogger.error(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
@@ -377,7 +378,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   SSL_CTX* context = nullptr;
   SSL* ssl = nullptr;
   if (useTLS) {
-    context = SSL_CTX_new(SSLv23_method());
+    context = SSL_CTX_new(TLS_client_method());
     if (!context) {
       clientDriverLogger.error(IOP_STR("Unable to allocate SSL context: "));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
@@ -396,6 +397,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   if (connection < 0) {
     clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
     #ifdef IOP_SSL
+    SSL_free(ssl);
     SSL_CTX_free(context);
     #endif
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
@@ -404,14 +406,41 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 #ifdef IOP_SSL
   if (useTLS && !SSL_set_fd(ssl, fd)) {
     clientDriverLogger.error(IOP_STR("Unable to set ssl fd"));
+    SSL_free(ssl);
     SSL_CTX_free(context);
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
 
   if (useTLS && !SSL_connect(ssl)) {
     clientDriverLogger.error(IOP_STR("Unable to connect SSL"));
+    SSL_free(ssl);
     SSL_CTX_free(context);
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+  }
+  
+  auto *cert_names = SSL_load_client_CA_file("./lib/iop-hal/build/ca-bundle.crt");
+  iop_assert(cert_names != nullptr, IOP_STR("NULL"));
+  SSL_CTX_set_client_CA_list(context, cert_names);
+
+  SSL_set_tlsext_host_name(ssl, host.c_str());
+
+  const auto verify = SSL_get_verify_result(ssl);
+  if (verify != X509_V_OK) {
+    clientDriverLogger.error(IOP_STR("Invalid SSL cert: "), std::to_string(verify));
+    SSL_free(ssl);
+    SSL_CTX_free(context);
+    return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
+  }
+
+  auto *peer = SSL_get_peer_certificate(ssl);
+  std::array<char, 256> peer_CN;
+  peer_CN.fill('0');
+  X509_NAME_get_text_by_NID(X509_get_subject_name(peer), NID_commonName, peer_CN.begin(), 256);
+  if (host != iop::to_view(peer_CN)) {
+    clientDriverLogger.error(IOP_STR("Invalid SSL cert host"));
+    SSL_free(ssl);
+    SSL_CTX_free(context);
+    return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
   }
 #endif
 
@@ -420,6 +449,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   auto session = Session(ctx);
   auto result = func(session);
 
+  SSL_shutdown(ssl);
   SSL_free(ssl);
   SSL_CTX_free(context);
   close(fd);

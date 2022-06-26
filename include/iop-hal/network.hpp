@@ -45,8 +45,6 @@ class Network {
   Log logger_;
   StaticString uri_;
 
-  /// Sends a custom HTTP request that may be authenticated to the monitor server (primitive used by higher level methods)
-  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) const noexcept -> iop_hal::Response;
 public:
   Network(StaticString uri, const LogLevel &logLevel) noexcept;
 
@@ -73,6 +71,9 @@ public:
 
   /// Sends an HTTP get that is authenticated to the monitor server (used for authentication).
   auto httpGet(StaticString path, std::string_view token, std::string_view data) const noexcept -> iop_hal::Response;
+
+  /// Sends a custom HTTP request that may be authenticated to the monitor server (primitive used by higher level methods)
+  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) const noexcept -> iop_hal::Response;
 
   /// Fetches firmware upgrade from the network
   auto upgrade(StaticString path, std::string_view token) const noexcept -> iop_hal::UpgradeStatus;

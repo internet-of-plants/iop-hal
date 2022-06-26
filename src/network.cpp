@@ -68,8 +68,7 @@ static iop_hal::HTTPClient http;
 namespace iop {
 static auto methodToString(const HttpMethod &method) noexcept -> StaticString;
 
-// Returns Response if it can understand what the server sent, int is the raw
-// response given by ESP8266HTTPClient
+// Returns Response if it can understand what the server sent
 auto Network::httpRequest(const HttpMethod method_,
                           const std::optional<std::string_view> &token, StaticString path,
                           const std::optional<std::string_view> &data) const noexcept
