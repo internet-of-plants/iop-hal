@@ -36,7 +36,7 @@ Provides the following functionalities:
   -  With authentication + JSON requests + upgrade hook
 - [`iop::Log`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/client.hpp): String log system, from `#include <iop-hal/log.hpp>`
   - With variadic arguments + levels + extension hooks, for `iop::StaticString` and `std::string_view`
-  - One can be created with the `IOP_STR(str)` macro, the other can be created with `iop::to_view` + `std::to_string`
+  - One comes from the `IOP_STR(str)` macro, the other from `iop::to_view` + `std::to_string`
 - [`iop::Device`](https://github.com/internet-of-plants/iop-hal/blob/main/include/iop-hal/device.hpp): Unified hardware management, from `#include <iop-hal/device.hpp>`
 
 ## Example
