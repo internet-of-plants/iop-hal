@@ -100,3 +100,7 @@ namespace iop {
     }
 }
 ```
+
+## License
+
+[GNU Affero General Public License version 3 or later (AGPL-3.0+)](https://github.com/internet-of-plants/iop-hal/blob/main/LICENSE.md)
