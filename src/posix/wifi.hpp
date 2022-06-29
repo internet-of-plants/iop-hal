@@ -4,6 +4,11 @@
 
 #ifdef IOP_SSL
 #include <openssl/ssl.h>
+#include <filesystem>
+#include <fstream>
+
+#include "iop-hal/panic.hpp"
+#include "generated/certificates.hpp"
 #endif
 
 namespace iop_hal {
@@ -35,6 +40,17 @@ void Wifi::setup() noexcept {
 #ifdef IOP_SSL
   SSL_library_init();
   SSL_load_error_strings();
+  
+  const auto path = std::filesystem::temp_directory_path().append("iop-hal-posix-mock-certs-bundle.crt");
+  std::ofstream file(path);
+  iop_assert(file.is_open(), std::string("Unable to create certs bundle file: ") + path.c_str());
+  
+  iop_assert(generated::certs_bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
+  file.write((char*) generated::certs_bundle, static_cast<std::streamsize>(sizeof(generated::certs_bundle)));
+  iop_assert(!file.fail(), "Unable to write to certs bundle file");
+
+  file.close();
+  iop_assert(!file.fail(), "Unable to close certs bundle file");
 #endif
 }
 void Wifi::setMode(WiFiMode mode) const noexcept { (void) mode; }

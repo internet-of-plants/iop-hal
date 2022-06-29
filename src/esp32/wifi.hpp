@@ -112,8 +112,8 @@ void Wifi::setup() noexcept {
   iop_assert(this->client, IOP_STR("Wifi has been moved out, client is nullptr"));
 
   #ifdef IOP_SSL
-  iop_assert(generated::bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
-  static_cast<NetworkClient*>(this->client)->setCACertBundle(generated::bundle);
+  iop_assert(generated::certs_bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
+  static_cast<NetworkClient*>(this->client)->setCACertBundle(generated::certs_bundle);
   #endif
 
   ::WiFi.persistent(false);

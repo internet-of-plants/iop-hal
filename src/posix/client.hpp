@@ -18,11 +18,13 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <filesystem>
 
 #ifdef IOP_SSL
 #include <openssl/ssl.h>
+int verify_callback(int preverify, X509_STORE_CTX* x509_ctx);
 #else
-class SSL;
+class BIO;
 #endif
 
 constexpr size_t bufferSize = 8192;
@@ -57,9 +59,9 @@ public:
   std::vector<std::string> headersToCollect;
   std::unordered_map<std::string, std::string> headers;
   std::string_view uri;
-  SSL *ssl;
+  BIO *bio;
 
-  SessionContext(int fd, std::vector<std::string> headersToCollect, std::string_view uri, SSL *ssl) noexcept: fd(fd), headersToCollect(headersToCollect), headers({}), uri(uri), ssl(ssl) {}
+  SessionContext(int fd, std::vector<std::string> headersToCollect, std::string_view uri, BIO *bio) noexcept: fd(fd), headersToCollect(headersToCollect), headers({}), uri(uri), bio(bio) {}
 
   SessionContext(SessionContext &&other) noexcept = delete;
   SessionContext(const SessionContext &other) noexcept = delete;
@@ -86,16 +88,16 @@ HTTPClient::~HTTPClient() noexcept {}
 static ssize_t send(const SessionContext &ctx, const char * msg, const size_t len) noexcept {
   if (iop::Log::isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::STARTEND);
   #ifdef IOP_SSL
-  if (ctx.ssl) {
-    return SSL_write(ctx.ssl, msg, len);
+  if (ctx.bio) {
+    return BIO_write(ctx.bio, msg, len);
   }
   #endif
   return write(ctx.fd, msg, len);
 }
 static ssize_t recv(const SessionContext &ctx, char *buffer, const size_t len) noexcept {
   #ifdef IOP_SSL
-  if (ctx.ssl) {
-    return SSL_read(ctx.ssl, buffer, len);
+  if (ctx.bio) {
+    return BIO_read(ctx.bio, buffer, len);
   }
   #endif
   return read(ctx.fd, buffer, len);
@@ -149,7 +151,8 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     clientDriverLogger.debug(IOP_STR("Send request to "), path);
 
     const auto fd = this->ctx.fd;
-    iop_assert(fd != -1, IOP_STR("Invalid file descriptor"));
+    iop_assert(fd != -1 || this->ctx.bio, IOP_STR("Invalid file descriptor or ctx.bio"));
+
     if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
       iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
     send(this->ctx, method.c_str(), method.length());
@@ -323,11 +326,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   struct sockaddr_in serv_addr;
   memset(&serv_addr, 0, sizeof(serv_addr));
 
-  auto fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (fd < 0) {
-    clientDriverLogger.error(IOP_STR("Unable to open socket"));
-    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
-  }
+  auto fd = -1;
 
   const auto useTLS = uri.find("https://") == 0;
   if (useTLS) {
@@ -356,8 +355,6 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   }
   clientDriverLogger.debug(IOP_STR("Port: "), std::to_string(port));
 
-  // TODO: handle DNS resolution
-
   auto end = uri.find(":");
   if (end == uri.npos) end = uri.find("/");
   if (end == uri.npos) end = uri.length();
@@ -377,82 +374,152 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 #ifdef IOP_SSL
   SSL_CTX* context = nullptr;
   SSL* ssl = nullptr;
+  BIO* bio = nullptr;
+  BIO* out = nullptr;
+
   if (useTLS) {
-    context = SSL_CTX_new(TLS_client_method());
+    const auto *method = TLS_client_method();
+    if (!method) {
+      clientDriverLogger.error(IOP_STR("Unable to allocate SSL method: "));
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    context = SSL_CTX_new(method);
     if (!context) {
       clientDriverLogger.error(IOP_STR("Unable to allocate SSL context: "));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
-  
-    ssl = SSL_new(context);
+
+    SSL_CTX_set_verify(context, SSL_VERIFY_PEER, verify_callback);
+    SSL_CTX_set_verify_depth(context, 4);
+    const long flags = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION;
+    SSL_CTX_set_options(context, flags);
+
+    const auto certsPath = std::filesystem::temp_directory_path().append("iop-hal-posix-mock-certs-bundle.crt");
+    if (SSL_CTX_load_verify_locations(context, certsPath.c_str(), nullptr) == 0) {
+      clientDriverLogger.error(IOP_STR("Unable to load verify locations"));
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    }
+
+    bio = BIO_new_ssl_connect(context);
+    if(bio == nullptr) {
+      clientDriverLogger.error(IOP_STR("Unable to BIO new ssl connect"));
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    }
+
+    if (BIO_set_conn_hostname(bio, (host + ":" + std::to_string(port)).c_str()) == 0) {
+      clientDriverLogger.error(IOP_STR("Unable to set BIO conn hostname"));
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    }
+
+    BIO_get_ssl(bio, &ssl);
     if (!ssl) {
       clientDriverLogger.error(IOP_STR("Unable to allocate SSL object: "));
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    const char* const PREFERRED_CIPHERS = "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4";
+    if (SSL_set_cipher_list(ssl, PREFERRED_CIPHERS) == 0) {
+      clientDriverLogger.error(IOP_STR("Unable to set cipher list"));
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    if (SSL_set_tlsext_host_name(ssl, host.c_str()) == 0) {
+      clientDriverLogger.error(IOP_STR("Unable to set tlsext host name"));
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    out = BIO_new_fp(stdout, BIO_NOCLOSE);
+    if(out == nullptr) {
+      clientDriverLogger.error(IOP_STR("Unable to set BIO fp"));
+      BIO_free(out);
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    if (BIO_do_connect(bio) == 0) {
+      clientDriverLogger.error(IOP_STR("Unable to bio connect"));
+      BIO_free(out);
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    if (BIO_do_handshake(bio) == 0) {
+      clientDriverLogger.error(IOP_STR("Handshake failed"));
+      BIO_free(out);
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    /* Step 1: verify a server certificate was presented during the negotiation */
+    X509* cert = SSL_get_peer_certificate(ssl);
+    if (cert) {
+      // Decreases reference count as it just increased unecessarily
+      X509_free(cert);
+    } else {
+      clientDriverLogger.error(IOP_STR("Unable to get peer cert"));
+      BIO_free(out);
+      BIO_free_all(bio);
+      SSL_CTX_free(context);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
+
+    /* Step 2: verify the result of chain verification */
+    /* Verification performed according to RFC 4158    */
+    const auto verifyResult = SSL_get_verify_result(ssl);
+    if (verifyResult != X509_V_OK) {
+      clientDriverLogger.error(IOP_STR("Unable to verify cert: "), iop::to_view(std::to_string(verifyResult)));
+      BIO_free(out);
+      BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
   }
 #endif
 
-  auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-  if (connection < 0) {
-    clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
-    #ifdef IOP_SSL
-    SSL_free(ssl);
-    SSL_CTX_free(context);
-    #endif
-    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
-  }
+  if (!useTLS) {
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+      clientDriverLogger.error(IOP_STR("Unable to open socket"));
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
 
-#ifdef IOP_SSL
-  if (useTLS && !SSL_set_fd(ssl, fd)) {
-    clientDriverLogger.error(IOP_STR("Unable to set ssl fd"));
-    SSL_free(ssl);
-    SSL_CTX_free(context);
-    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if (connection < 0) {
+      clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
+    }
   }
-
-  if (useTLS && !SSL_connect(ssl)) {
-    clientDriverLogger.error(IOP_STR("Unable to connect SSL"));
-    SSL_free(ssl);
-    SSL_CTX_free(context);
-    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
-  }
-  
-  auto *cert_names = SSL_load_client_CA_file("./lib/iop-hal/build/ca-bundle.crt");
-  iop_assert(cert_names != nullptr, IOP_STR("NULL"));
-  SSL_CTX_set_client_CA_list(context, cert_names);
-
-  SSL_set_tlsext_host_name(ssl, host.c_str());
-
-  const auto verify = SSL_get_verify_result(ssl);
-  if (verify != X509_V_OK) {
-    clientDriverLogger.error(IOP_STR("Invalid SSL cert: "), std::to_string(verify));
-    SSL_free(ssl);
-    SSL_CTX_free(context);
-    return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
-  }
-
-  auto *peer = SSL_get_peer_certificate(ssl);
-  std::array<char, 256> peer_CN;
-  peer_CN.fill('0');
-  X509_NAME_get_text_by_NID(X509_get_subject_name(peer), NID_commonName, peer_CN.begin(), 256);
-  if (host != iop::to_view(peer_CN)) {
-    clientDriverLogger.error(IOP_STR("Invalid SSL cert host"));
-    SSL_free(ssl);
-    SSL_CTX_free(context);
-    return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
-  }
-#endif
 
   clientDriverLogger.debug(IOP_STR("Began connection: "), uri);
-  auto ctx = SessionContext(fd, this->headersToCollect_, uri, ssl);
+  auto ctx = SessionContext(fd, this->headersToCollect_, uri, bio);
   auto session = Session(ctx);
   auto result = func(session);
 
-  SSL_shutdown(ssl);
-  SSL_free(ssl);
-  SSL_CTX_free(context);
-  close(fd);
+#ifdef IOP_SSL
+  if (useTLS) {
+    BIO_free(out);
+    BIO_free_all(bio);
+    SSL_CTX_free(context);
+  }
+#endif
+  if (!useTLS) {
+    close(fd);
+  }
   return result;
 }
 HTTPClient::HTTPClient(HTTPClient &&other) noexcept: headersToCollect_(std::move(other.headersToCollect_)) {}
@@ -461,3 +528,25 @@ auto HTTPClient::operator==(HTTPClient &&other) noexcept -> HTTPClient & {
   return *this;
 }
 }
+
+#ifdef IOP_SSL
+int verify_callback(int preverify, X509_STORE_CTX* x509_ctx) {
+  (void) x509_ctx;
+  //int depth = X509_STORE_CTX_get_error_depth(x509_ctx);
+  //int err = X509_STORE_CTX_get_error(x509_ctx);
+  
+  //X509* cert = X509_STORE_CTX_get_current_cert(x509_ctx);
+  //X509_NAME* iname = cert ? X509_get_issuer_name(cert) : NULL;
+  //X509_NAME* sname = cert ? X509_get_subject_name(cert) : NULL;
+  
+  //print_cn_name("Issuer (cn)", iname);
+  //print_cn_name("Subject (cn)", sname);
+  
+  //if(depth == 0) {
+      /* If depth is 0, its the server's certificate. Print the SANs too */
+      //print_san_name("Subject (san)", cert);
+  //}
+
+  return preverify;
+}
+#endif
