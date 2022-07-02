@@ -1,4 +1,4 @@
-#ifdef IOP_LINUX_MOCK
+#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 #include "cpp17/update.hpp"
 #elif defined(IOP_ESP8266)
 #include "arduino/esp/update.hpp"

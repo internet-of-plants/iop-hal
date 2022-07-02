@@ -1,4 +1,4 @@
-#ifdef IOP_LINUX_MOCK
+#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 #include "posix/linux/wifi.hpp"
 #elif defined(IOP_ESP8266)
 #include "arduino/esp/esp8266/wifi.hpp"

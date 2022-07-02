@@ -12,7 +12,7 @@ auto execution_path() noexcept -> std::string_view {
   iop_assert(filename != nullptr, IOP_STR("Filename wasn't initialized, maybe you are trying to get the execution path before main runs?"));
   return filename;
 }
-#ifdef IOP_LINUX_MOCK
+#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 auto stack_used() noexcept -> uintmax_t {
   // Not the most precise way of getting stack usage
   uintptr_t stackend;

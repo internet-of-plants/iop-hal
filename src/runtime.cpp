@@ -1,4 +1,4 @@
-#ifdef IOP_LINUX_MOCK
+#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 #ifndef UNIT_TEST
 #include "posix/runtime.hpp"
 #endif
