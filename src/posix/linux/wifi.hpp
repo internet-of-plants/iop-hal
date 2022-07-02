@@ -54,22 +54,20 @@ StationStatus Wifi::status() const noexcept {
   }
   return isConnected.load() == 1 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
 }
+
 void Wifi::onConnect(std::function<void()> f) noexcept {
   IOP_TRACE();
-
-  // TODO: fix this, this is horrible
-  std::thread([f=std::move(f)]() {
-    IOP_TRACE();
+  std::thread([](std::function<void()> f) {
     auto wifi = Wifi();
     iop_hal::HTTPClient http;
     auto lastConnection = std::chrono::system_clock::now();
-    IOP_TRACE();
+
     while (true) {
       const auto isConn = isConnected.load() == 1;
       if (isConn) {
         std::this_thread::sleep_for(std::chrono::seconds(600));
       }
-      IOP_TRACE();
+
       const auto conn = http.begin("https://google.com", [](iop_hal::Session & session) {
         return session.sendRequest("GET", "");
       }).code() > 0;
@@ -82,7 +80,7 @@ void Wifi::onConnect(std::function<void()> f) noexcept {
       }
       std::this_thread::sleep_for(std::chrono::seconds(60));
     }
-  });
+  }, std::move(f)).detach();
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
