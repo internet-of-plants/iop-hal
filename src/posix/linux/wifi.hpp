@@ -55,11 +55,15 @@ StationStatus Wifi::status() const noexcept {
   return isConnected.load() == 1 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
 }
 void Wifi::onConnect(std::function<void()> f) noexcept {
+  IOP_TRACE();
+
   // TODO: fix this, this is horrible
   std::thread([f=std::move(f)]() {
+    IOP_TRACE();
     auto wifi = Wifi();
     iop_hal::HTTPClient http;
     auto lastConnection = std::chrono::system_clock::now();
+    IOP_TRACE();
     while (true) {
       const auto isConn = isConnected.load() == 1;
       if (isConn) {
