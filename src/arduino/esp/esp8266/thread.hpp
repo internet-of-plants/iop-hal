@@ -1,9 +1,11 @@
 #include "arduino/thread.hpp"
+#include "iop-hal/log.hpp"
 
 #include <umm_malloc/umm_heap_select.h>
 
 namespace iop_hal {
 auto Thread::abort() const noexcept -> void {
+  IOP_TRACE();
   __panic_func(__FILE__, __LINE__, __PRETTY_FUNCTION__);
 }
 

@@ -1,4 +1,5 @@
 #include "iop-hal/thread.hpp"
+#include "iop-hal/log.hpp"
 
 #include <chrono>
 #include <thread>
@@ -11,6 +12,7 @@ auto Thread::yield() const noexcept -> void {
   std::this_thread::yield();
 }
 auto Thread::abort() const noexcept -> void {
+  IOP_TRACE();
   std::abort();
 }
 
