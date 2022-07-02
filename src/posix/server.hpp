@@ -12,7 +12,6 @@
 #include <thread>
 #include <chrono>
 
-// POSIX
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -78,7 +77,7 @@ void HttpServer::begin() noexcept {
 
   this->maybeFD = fd;
 
-  // Posix boilerplate
+  // Linux boilerplate
   sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY;
@@ -372,6 +371,7 @@ void HttpConnection::sendData(iop::StaticString content) const noexcept {
   if (iop::Log::isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::END);
 }
 
+// NOOP
 CaptivePortal::CaptivePortal(CaptivePortal &&other) noexcept { (void) other; }
 auto CaptivePortal::operator=(CaptivePortal &&other) noexcept -> CaptivePortal & { (void) other; return *this; }
 CaptivePortal::CaptivePortal() noexcept {}

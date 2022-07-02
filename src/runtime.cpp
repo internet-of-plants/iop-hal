@@ -1,6 +1,6 @@
-#ifdef IOP_POSIX_MOCK
+#ifdef IOP_LINUX_MOCK
 #ifndef UNIT_TEST
-#include "cpp17/runtime.hpp"
+#include "posix/runtime.hpp"
 #endif
 #elif defined(IOP_ESP8266)
 #include "arduino/runtime.hpp"

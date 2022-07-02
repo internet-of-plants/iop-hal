@@ -18,7 +18,7 @@ auto Device::availableStorage() const noexcept -> uintmax_t {
 
 void Device::deepSleep(uintmax_t seconds) const noexcept {
   if (seconds == 0) seconds = UINTMAX_MAX;
-  // Note: this only sleeps our current thread, but we currently don't use multiple threads on posix anyway
+  // Note: this only sleeps our current thread, but we currently don't use multiple threads on linux anyway
   std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 

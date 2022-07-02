@@ -38,7 +38,7 @@ public:
 };
 
 class HTTPClient {
-#ifdef IOP_POSIX_MOCK
+#ifdef IOP_LINUX_MOCK
   std::vector<std::string> headersToCollect_;
 #elif defined(IOP_ESP8266) || defined(IOP_ESP32)
   ::HTTPClient * http;
@@ -49,6 +49,7 @@ class HTTPClient {
 public:
   HTTPClient() noexcept;
   ~HTTPClient() noexcept;
+  static auto setup() noexcept -> void;
   auto begin(std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response;
   auto headersToCollect(std::vector<std::string> headers) noexcept -> void;
 

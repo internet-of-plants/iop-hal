@@ -9,12 +9,7 @@
 #include <unistd.h>
 
 namespace iop_hal {
-// NOOP for now as we assume the host will do it for us, eventually we will want to do it by ourselves
-void Device::syncNTP() const noexcept {}
-
-auto Device::vcc() const noexcept -> uint16_t { return UINT16_MAX; }
-
-auto Device::platform() const noexcept -> iop::StaticString { return IOP_STR("POSIX"); }
+auto Device::platform() const noexcept -> iop::StaticString { return IOP_STR("LINUX"); }
 
 iop::MacAddress & Device::macAddress() const noexcept {
   static iop::MacAddress mac;
@@ -40,4 +35,8 @@ iop::MacAddress & Device::macAddress() const noexcept {
   cached = true;
   return mac;
 }
+
+// NOOP for now as we assume the host will do it for us, eventually we will want to do it by ourselves
+void Device::syncNTP() const noexcept {}
+auto Device::vcc() const noexcept -> uint16_t { return UINT16_MAX; }
 }

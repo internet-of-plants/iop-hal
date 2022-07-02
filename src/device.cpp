@@ -1,9 +1,9 @@
-#ifdef IOP_POSIX_MOCK
+#ifdef IOP_LINUX_MOCK
 #include "posix/device.hpp"
 #elif defined(IOP_ESP8266)
-#include "esp8266/device.hpp"
+#include "esp/esp8266/device.hpp"
 #elif defined(IOP_ESP32)
-#include "esp32/device.hpp"
+#include "esp/esp32/device.hpp"
 #elif defined(IOP_NOOP)
 #include "noop/device.hpp"
 #else

@@ -38,6 +38,7 @@ void Session::addHeader(std::string_view key, std::string_view value) noexcept {
 void Session::setAuthorization(std::string auth) noexcept { (void) auth; }
 auto Session::sendRequest(const std::string method, const std::string_view data) noexcept -> Response { (void) method; (void) data; return Response(500); }
 
+auto HTTPClient::setup() noexcept -> void {}
 HTTPClient::HTTPClient() noexcept {}
 HTTPClient::~HTTPClient() noexcept {}
 

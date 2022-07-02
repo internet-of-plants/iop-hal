@@ -9,11 +9,10 @@
 #include <unordered_map>
 #include <algorithm>
 #include <cctype>
-#include <string>
 #include <stdio.h>
 #include <stdlib.h>
 
-// POSIX
+// LINUX
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -22,6 +21,11 @@
 
 #ifdef IOP_SSL
 #include <openssl/ssl.h>
+
+#include <fstream>
+
+#include "openssl/generated/certificates.hpp"
+
 int verify_callback(int preverify, X509_STORE_CTX* x509_ctx);
 #else
 class BIO;
@@ -147,7 +151,9 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
   responseHeaders.reserve(this->ctx.headersToCollect.size());
 
   {
-    const auto path = std::string_view(this->ctx.uri.begin() + this->ctx.uri.find("/", this->ctx.uri.find("://") + 3));
+    const auto hostIndex = this->ctx.uri.find("://");
+    const auto pathIndex = std::string_view(this->ctx.uri.begin() + (hostIndex == this->ctx.uri.npos ? 0 : hostIndex + 3)).find("/");
+    const auto path = pathIndex == this->ctx.uri.npos ? std::string_view("/") : std::string_view(this->ctx.uri.begin() + pathIndex);
     clientDriverLogger.debug(IOP_STR("Send request to "), path);
 
     const auto fd = this->ctx.fd;
@@ -200,7 +206,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
 
       clientDriverLogger.debug(IOP_STR("Len: "), std::to_string(size));
       if (firstLine && size == 0) {
-        clientDriverLogger.warn(IOP_STR("Empty request: "), std::to_string(fd), IOP_STR(" "), std::to_string(size));
+        clientDriverLogger.warn(IOP_STR("Empty response: "), std::to_string(fd), IOP_STR(" "), std::to_string(size));
         return Response(status.value_or(500));
       }
 
@@ -323,6 +329,9 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
 }
 
 auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> func) noexcept -> Response {
+  if (iop::wifi.status() != iop_hal::StationStatus::GOT_IP)
+    return Response(iop::NetworkStatus::IO_ERROR);
+
   struct sockaddr_in serv_addr;
   memset(&serv_addr, 0, sizeof(serv_addr));
 
@@ -332,7 +341,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   if (useTLS) {
     #ifdef IOP_TLS
     clientDriverLogger.error(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
-    return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     #else
     uri = uri.substr(8);
     #endif
@@ -349,8 +358,8 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     if (end == uri.npos) end = uri.length();
     port = static_cast<uint16_t>(strtoul(std::string(uri.begin(), portIndex + 1, end).c_str(), nullptr, 10));
     if (port == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to parse port, broken server: "), uri);
-      return iop_hal::Response(iop::NetworkStatus::BROKEN_SERVER);
+      clientDriverLogger.error(IOP_STR("Unable to parse port: "), uri);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
   }
   clientDriverLogger.debug(IOP_STR("Port: "), std::to_string(port));
@@ -364,7 +373,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   struct hostent *he = gethostbyname(host.c_str());
   if (!he) {
     clientDriverLogger.error(IOP_STR("Unable to obtain hostent from host string: "), host);
-    return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
 
   serv_addr.sin_addr= *(struct in_addr *) he->h_addr_list[0];
@@ -395,11 +404,11 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     const long flags = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION;
     SSL_CTX_set_options(context, flags);
 
-    const auto certsPath = std::filesystem::temp_directory_path().append("iop-hal-posix-mock-certs-bundle.crt");
+    const auto certsPath = std::filesystem::temp_directory_path().append("iop-hal-linux-mock-certs-bundle.crt");
     if (SSL_CTX_load_verify_locations(context, certsPath.c_str(), nullptr) == 0) {
       clientDriverLogger.error(IOP_STR("Unable to load verify locations"));
       SSL_CTX_free(context);
-      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     bio = BIO_new_ssl_connect(context);
@@ -407,14 +416,14 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
       clientDriverLogger.error(IOP_STR("Unable to BIO new ssl connect"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
-      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     if (BIO_set_conn_hostname(bio, (host + ":" + std::to_string(port)).c_str()) == 0) {
       clientDriverLogger.error(IOP_STR("Unable to set BIO conn hostname"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
-      return iop_hal::Response(iop::NetworkStatus::BROKEN_CLIENT);
+      return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     BIO_get_ssl(bio, &ssl);
@@ -505,7 +514,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     }
   }
 
-  clientDriverLogger.debug(IOP_STR("Began connection: "), uri);
+  clientDriverLogger.debug(IOP_STR("Began connection: "), host);
   auto ctx = SessionContext(fd, this->headersToCollect_, uri, bio);
   auto session = Session(ctx);
   auto result = func(session);
@@ -526,6 +535,27 @@ HTTPClient::HTTPClient(HTTPClient &&other) noexcept: headersToCollect_(std::move
 auto HTTPClient::operator==(HTTPClient &&other) noexcept -> HTTPClient & {
   this->headersToCollect_ = std::move(other.headersToCollect_);
   return *this;
+}
+auto HTTPClient::setup() noexcept -> void {
+  static bool initialized = false;
+  if (initialized) return;
+  initialized = true;
+
+#ifdef IOP_SSL
+  SSL_library_init();
+  SSL_load_error_strings();
+  
+  const auto path = std::filesystem::temp_directory_path().append("iop-hal-linux-mock-certs-bundle.crt");
+  std::ofstream file(path);
+  iop_assert(file.is_open(), std::string("Unable to create certs bundle file: ") + path.c_str());
+  
+  iop_assert(generated::certs_bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
+  file.write((char*) generated::certs_bundle, static_cast<std::streamsize>(sizeof(generated::certs_bundle)));
+  iop_assert(!file.fail(), "Unable to write to certs bundle file");
+
+  file.close();
+  iop_assert(!file.fail(), "Unable to close certs bundle file");
+#endif
 }
 }
 

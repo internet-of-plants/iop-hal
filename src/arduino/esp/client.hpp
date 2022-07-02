@@ -185,6 +185,7 @@ HTTPClient::~HTTPClient() noexcept {
   delete this->http;
 }
 
+auto HTTPClient::setup() noexcept -> void {}
 auto HTTPClient::begin(const std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response {
   IOP_TRACE(); 
 

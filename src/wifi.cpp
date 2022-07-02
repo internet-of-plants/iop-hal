@@ -1,9 +1,9 @@
-#ifdef IOP_POSIX_MOCK
-#include "posix/wifi.hpp"
+#ifdef IOP_LINUX_MOCK
+#include "posix/linux/wifi.hpp"
 #elif defined(IOP_ESP8266)
-#include "esp8266/wifi.hpp"
+#include "arduino/esp/esp8266/wifi.hpp"
 #elif defined(IOP_ESP32)
-#include "esp32/wifi.hpp"
+#include "arduino/esp/esp32/wifi.hpp"
 #elif defined(IOP_NOOP)
 #include "noop/wifi.hpp"
 #else

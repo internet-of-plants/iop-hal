@@ -47,7 +47,7 @@ auto Update::run(const iop::Network &network, const iop::StaticString path, cons
             return iop_hal::UpdateStatus::IO_ERROR;
         }
 
-        // FIXME: Race here
+        // TODO FIXME: Race here
         const auto filename = std::filesystem::current_path().append(iop_hal::execution_path());
         const auto renamedBinary = std::filesystem::current_path().append(std::string(iop_hal::execution_path()).append(std::string_view(".old")));
         std::filesystem::rename(filename, renamedBinary);

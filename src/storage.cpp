@@ -1,4 +1,4 @@
-#ifdef IOP_POSIX_MOCK
+#ifdef IOP_LINUX_MOCK
 #include "cpp17/storage.hpp"
 #elif defined(IOP_ESP8266)  
 #include "arduino/storage.hpp"

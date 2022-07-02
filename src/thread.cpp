@@ -1,9 +1,9 @@
-#ifdef IOP_POSIX_MOCK
+#ifdef IOP_LINUX_MOCK
 #include "posix/thread.hpp"
 #elif defined(IOP_ESP8266)
-#include "esp8266/thread.hpp"
+#include "arduino/esp/esp8266/thread.hpp"
 #elif defined(IOP_ESP32)
-#include "esp32/thread.hpp"
+#include "arduino/esp/esp32/thread.hpp"
 #elif defined(IOP_NOOP)
 #include "noop/thread.hpp"
 #else

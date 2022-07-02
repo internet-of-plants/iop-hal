@@ -33,7 +33,7 @@ import hashlib
 import sys
 from io import open
 
-folder = "../src/posix/generated/"
+folder = "../src/openssl/generated/"
 destination = path.join(folder, "certificates.hpp")
 
 class InputError(RuntimeError):
@@ -70,7 +70,7 @@ def preBuildCertificates(env):
     with open(path.join(dir_path, destination), "w") as f:
         f.write("#ifndef IOP_PEM_CERTIFICATES_H\n")
         f.write("#define IOP_PEM_CERTIFICATES_H\n")
-        f.write("#if defined(IOP_ESP32) || defined(IOP_POSIX_MOCK)\n")
+        f.write("#if defined(IOP_ESP32) || defined(IOP_LINUX_MOCK)\n")
         f.write("namespace generated {\n")
         f.write("// This file is computer generated at build time (`build/preBuildPEMCertificates.py` called by PlatformIO)\n\n")
         f.write("// SHA256: " + str(hash) + "\n\n")

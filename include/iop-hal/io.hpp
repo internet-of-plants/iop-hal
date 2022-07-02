@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 
-#define IOP_PIN_RAW(pin) static_cast<uint8_t>(pin)
+#define IOP_PIN_RAW(pin) static_cast<iop_hal::PinRaw>(pin)
 
 namespace iop_hal {
-using PinRaw = uint8_t;
+using PinRaw = uint16_t;
 
 namespace io {
 /// GPIO access mode, they either are read-only, or write-only.
