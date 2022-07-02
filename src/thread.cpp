@@ -11,9 +11,11 @@
 #endif
 
 #include "iop-hal/device.hpp"
+#include "iop-hal/log.hpp"
 
 namespace iop_hal {
 auto Thread::halt() const noexcept -> void {
+    IOP_TRACE();
     iop_hal::device.deepSleep(0);
     this->abort();
 }

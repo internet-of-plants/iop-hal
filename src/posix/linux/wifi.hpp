@@ -56,7 +56,7 @@ StationStatus Wifi::status() const noexcept {
 }
 void Wifi::onConnect(std::function<void()> f) noexcept {
   // TODO: fix this, this is horrible
-  std::thread([f]() {
+  std::thread([f=std::move(f)]() {
     auto wifi = Wifi();
     iop_hal::HTTPClient http;
     auto lastConnection = std::chrono::system_clock::now();
@@ -65,9 +65,10 @@ void Wifi::onConnect(std::function<void()> f) noexcept {
       if (isConn) {
         std::this_thread::sleep_for(std::chrono::seconds(600));
       }
-        const auto conn = http.begin("https://google.com", [](iop_hal::Session & session) {
+      IOP_TRACE();
+      const auto conn = http.begin("https://google.com", [](iop_hal::Session & session) {
         return session.sendRequest("GET", "");
-      }).status() == std::make_optional(iop::NetworkStatus::OK);
+      }).code() > 0;
 
       isConnected.store(conn);
       lastConnection = std::chrono::system_clock::now();
