@@ -66,7 +66,7 @@ auto GPIO::setInterruptCallback(const PinRaw pin, const InterruptState state, vo
             lastValue = value;
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-    });
+    }).detach();
 }
 }  // namespace io
 } // namespace iop_hal
