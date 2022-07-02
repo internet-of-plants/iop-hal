@@ -1,5 +1,7 @@
 #ifdef IOP_LINUX_MOCK
-#include "posix/io.hpp"
+#include "noop/io.hpp"
+#elif defined(IOP_LINUX)
+#include "posix/linux/io.hpp"
 #elif defined(IOP_ESP8266)
 #include "arduino/io.hpp"
 #elif defined(IOP_ESP32)

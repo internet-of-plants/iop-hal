@@ -6,9 +6,10 @@ If you want a higher level framework, safer, but more opinionated, check: https:
 
 ## Targets supported
 
-- ESP8266 (all boards supported by [esp8266/Arduino](https://github.com/esp8266/Arduino))
-- ESP32 (all boards supported by [espressif/arduino-esp32](https://github.com/espressif/arduino-esp32/))
-- Linux (all targets that support LINUX)
+- IOP_ESP8266 (all boards supported by [esp8266/Arduino](https://github.com/esp8266/Arduino))
+- IOP_ESP32 (all boards supported by [espressif/arduino-esp32](https://github.com/espressif/arduino-esp32/))
+- IOP_LINUX_MOCK (all targets that support Linux with mocked GPIOs)
+- IOP_LINUX (all targets that support Linux)
 
 *Note: Some functionalities in the linux target are NOOP, most will be implemented to support Raspberry Pis and other boards that support linux. But for now this is mostly used for testing*
 

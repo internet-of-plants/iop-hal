@@ -28,7 +28,7 @@ class __FlashStringHelper;
 #define IOP_RAM _SECTION_ATTR_IMPL(".iram1", __COUNTER__)
 #define IOP_ROM
 #define IOP_STORAGE_RAW(x) x
-#elif (defined(IOP_NOOP) && !defined(ESP8266)) || defined(IOP_LINUX_MOCK)
+#elif (defined(IOP_NOOP) && !defined(ESP8266)) || defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 #define IOP_RAM
 #define IOP_ROM
 #define IOP_STORAGE_RAW(x) x
