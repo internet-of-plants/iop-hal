@@ -1,4 +1,4 @@
-#include "arduino/esp/esp8266/device.hpp"
+#include "iop-hal/device.hpp"
 
 #include "Esp.h"
 
