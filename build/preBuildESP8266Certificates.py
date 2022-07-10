@@ -108,7 +108,7 @@ def preBuildCertificates(env):
     f.write("#ifndef IOP_ESP8266_CERTIFICATES_H\n")
     f.write("#define IOP_ESP8266_CERTIFICATES_H\n")
     f.write("#ifdef IOP_ESP8266\n")
-    f.write("#include \"esp8266/cert_store.hpp\"\n\n")
+    f.write("#include \"arduino/esp/esp8266/cert_store.hpp\"\n\n")
     f.write("namespace generated {\n")
     f.write("// This file is computer generated at build time (`build/preBuildESP8266Certificates.py` called by PlatformIO)\n\n")
     f.write("// SHA256: " + str(csvHash) + "\n\n")
