@@ -98,7 +98,7 @@ void Wifi::disconnectFromAccessPoint() const noexcept {
 void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
   // TODO FIXME: RCE here, this is super dumb, it's just to make everything work and it takes into account ssid and psk are hardcoded
   // Please do not trust user input in this, please
-  auto code = std::system((std::string("nmcli dev wifi hotspot ssid ") + std::string(ssid) + " password " + std::string(psk)).c_str());
+  auto code = std::system((std::string("nmcli dev wifi hotspot ssid ") + std::string(ssid.substr(0, 32)) + " password " + std::string(psk.substr(0, 64)).c_str());
   (void) code;
 }
 

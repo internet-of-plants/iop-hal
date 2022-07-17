@@ -135,7 +135,7 @@ void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) con
     const auto mask = IPAddress(255, 255, 255, 0);
     ::WiFi.softAPConfig(staticIp, staticIp, mask);
 
-    ::WiFi.softAP(std::string(ssid).c_str(), std::string(psk).c_str());
+    ::WiFi.softAP(std::string(ssid.substr(0, 32)).c_str(), std::string(psk.substr(0, 64)).c_str());
 }
 
 auto Wifi::disableOurAccessPoint() const noexcept -> void {
