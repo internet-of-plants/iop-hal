@@ -15,6 +15,7 @@ auto execution_path() noexcept -> std::string_view {
 #if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 auto stack_used() noexcept -> uintmax_t {
   // Not the most precise way of getting stack usage
+  // TODO: this is wrong it gets the stack limit, not the current stack size (as in the maximum stack size we can ask for, but doesn't garantee it was what was asked)
   uintptr_t stackend;
   stackend = (uintptr_t) (void*) &stackend;
 
