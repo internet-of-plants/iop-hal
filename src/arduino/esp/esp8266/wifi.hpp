@@ -117,6 +117,9 @@ void Wifi::setup() noexcept {
   ::WiFi.setAutoReconnect(false);
   ::WiFi.setAutoConnect(false);
 
+  IPAddress dnsAddress { 1, 1, 1, 1 };
+  dns_setserver(0, dnsAddress);
+
   this->disconnectFromAccessPoint();
   ::WiFi.mode(WIFI_STA);
   iop_hal::thisThread.sleep(1);
@@ -155,7 +158,6 @@ bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) con
     ssidStr.concat(ssid.begin(), ssid.length());
     String pskStr;
     pskStr.concat(psk.begin(), psk.length());
-    delay(4000);
     ::WiFi.begin(ssidStr, pskStr);
 
     return ::WiFi.waitForConnectResult() != -1;
