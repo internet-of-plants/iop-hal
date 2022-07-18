@@ -155,6 +155,7 @@ bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) con
     ssidStr.concat(ssid.begin(), ssid.length());
     String pskStr;
     pskStr.concat(psk.begin(), psk.length());
+    delay(4000);
     ::WiFi.begin(ssidStr, pskStr);
 
     return ::WiFi.waitForConnectResult() != -1;
