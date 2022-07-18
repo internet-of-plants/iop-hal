@@ -2,6 +2,7 @@
 #include "iop-hal/panic.hpp"
 #include "iop-hal/thread.hpp"
 
+#include "lwip/dns.h"
 #include "ESP8266WiFi.h"
 #include "arduino/esp/esp8266/generated/certificates.hpp"
 #ifdef IOP_SSL
