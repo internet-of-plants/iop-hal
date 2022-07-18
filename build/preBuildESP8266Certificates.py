@@ -48,8 +48,8 @@ def preBuildCertificates(env):
             raise Exception("Unable to find or install asn1crypto python library, and no certificates are available locally")
 
     # check if ar and openssl are available
-    if which('ar') is None and not path.isfile('./ar') and not path.isfile('./ar.exe'):
-        raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
+    #if which('ar') is None and not path.isfile('./ar') and not path.isfile('./ar.exe'):
+    #    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
     if which('openssl') is None and not path.isfile('./openssl') and not path.isfile('./openssl.exe'):
         raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
 
