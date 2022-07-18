@@ -100,8 +100,6 @@ struct CertStore : public BearSSL::CertStoreBase {
         iop_assert(cs->x509, IOP_STR("OOM"));
         der.reset();
 
-        // We can const cast because it's heap allocated
-        // It shouldn't be a const function. But the upstream API is just that way
         br_x509_trust_anchor *ta = (br_x509_trust_anchor*)cs->x509->getTrustAnchors();
         memcpy_P(ta->dn.data, cert.index, hashSize);
         ta->dn.len = hashSize;

@@ -155,6 +155,8 @@ void Session::setAuthorization(std::string auth) noexcept {
   this->ctx.http.http->setAuthorization(auth.c_str());
 }
 auto Session::sendRequest(const std::string method, const std::string_view data) noexcept -> Response {
+  IOP_TRACE();
+
   iop_assert(this->ctx.http.http, IOP_STR("Session has been moved out"));
   // ESP32 gets a uint8_t* but immediately converts it to immutable, so const cast here is needed
   const auto code = this->ctx.http.http->sendRequest(method.c_str(), reinterpret_cast<uint8_t*>(const_cast<char*>(data.begin())), data.length());
