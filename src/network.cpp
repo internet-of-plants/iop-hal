@@ -143,7 +143,7 @@ auto Network::httpRequest(const HttpMethod method_,
     // Handle system update request
     const auto update = response.header(IOP_STR("LATEST_VERSION"));
     if (update && update != iop::to_view(iop_hal::device.firmwareMD5())) {
-      this->logger().info(IOP_STR("Scheduled update"));
+      this->logger().debug(IOP_STR("Scheduled update"));
       hook.schedule();
     }
   

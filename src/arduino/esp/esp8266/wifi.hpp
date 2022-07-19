@@ -113,7 +113,7 @@ void Wifi::setup() noexcept {
   //static iop_hal::CertStore certStore(generated::certList);
   //static_cast<NetworkClient*>(this->client)->setCertStore(&certStore);
   static_cast<NetworkClient*>(this->client)->setInsecure();
-  #endif
+#endif
 
   ::WiFi.persistent(false);
   ::WiFi.setAutoReconnect(false);
