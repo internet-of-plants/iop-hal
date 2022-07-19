@@ -169,6 +169,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
   for (int index = 0; index < this->ctx.http.http->headers(); ++index) {
     const auto key = std::string(this->ctx.http.http->headerName(index).c_str());
     const auto value = std::string(this->ctx.http.http->header(index).c_str());
+    if (value == "") continue;
     headers[key] = value;
   }
 
