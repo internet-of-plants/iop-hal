@@ -110,8 +110,9 @@ void Wifi::setup() noexcept {
   iop_assert(this->client, IOP_STR("Wifi has been moved out, client is nullptr"));
 
 #ifdef IOP_SSL
-  static iop_hal::CertStore certStore(generated::certList);
-  static_cast<NetworkClient*>(this->client)->setCertStore(&certStore);
+  //static iop_hal::CertStore certStore(generated::certList);
+  //static_cast<NetworkClient*>(this->client)->setCertStore(&certStore);
+  ::WiFi.setInsecure();
   #endif
 
   ::WiFi.persistent(false);
