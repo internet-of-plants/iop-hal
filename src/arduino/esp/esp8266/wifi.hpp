@@ -2,7 +2,7 @@
 #include "iop-hal/panic.hpp"
 #include "iop-hal/thread.hpp"
 
-#include "lwip/dns.h"
+//#include "lwip/dns.h"
 #include "ESP8266WiFi.h"
 #include "arduino/esp/esp8266/generated/certificates.hpp"
 #ifdef IOP_SSL
@@ -112,15 +112,14 @@ void Wifi::setup() noexcept {
 #ifdef IOP_SSL
   static iop_hal::CertStore certStore(generated::certList);
   static_cast<NetworkClient*>(this->client)->setCertStore(&certStore);
-  //static_cast<NetworkClient*>(this->client)->setInsecure();
 #endif
 
   ::WiFi.persistent(false);
   ::WiFi.setAutoReconnect(false);
   ::WiFi.setAutoConnect(false);
 
-  IPAddress dnsAddress { 1, 1, 1, 1 };
-  dns_setserver(0, dnsAddress);
+  //IPAddress dnsAddress { 1, 1, 1, 1 };
+  //dns_setserver(0, dnsAddress);
 
   this->disconnectFromAccessPoint();
   ::WiFi.mode(WIFI_STA);
