@@ -165,21 +165,21 @@ def preBuildCertificates(env):
 
     f.write("static const uint16_t numberOfCertificates = " + str(idx) + ";\n\n")
 
-    f.write("static const uint16_t certSizes[] = {")
+    f.write("static const uint16_t certSizes[] IOP_ROM = {")
     for i in range(0, idx):
         f.write(str(sizes[i]))
         if i<idx-1:
             f.write(", ")
     f.write("};\n\n")
 
-    f.write("static const uint8_t* const certificates[] = {")
+    f.write("static const uint8_t* const certificates[] IOP_ROM = {")
     for i in range(0, idx):
         f.write("cert_" + str(i))
         if i<idx-1:
             f.write(", ")
     f.write("};\n\n")
 
-    f.write("static const uint8_t* const indexes[] = {")
+    f.write("static const uint8_t* const indexes[] IOP_ROM = {")
     for i in range(0, idx):
         f.write("idx_" + str(i))
         if i<idx-1:
