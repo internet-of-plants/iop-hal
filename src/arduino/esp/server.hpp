@@ -15,7 +15,7 @@ using WebServer = ESP8266WebServer;
 
 namespace iop_hal {
 iop::Log & logger() noexcept {
-  static iop::Log logger_(iop::LogLevel::WARN, IOP_STR("HTTP Server"));
+  static iop::Log logger_(IOP_LOG_LEVEL, IOP_STR("HTTP Server"));
   return logger_;
 }
 

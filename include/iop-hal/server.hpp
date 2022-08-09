@@ -81,7 +81,7 @@ public:
 #error "Target not supported"
 #endif
 public:
-  HttpServer(uint32_t port = 8082) noexcept;
+  HttpServer(uint32_t port = 80) noexcept;
 
   void begin() noexcept;
   void close() noexcept;

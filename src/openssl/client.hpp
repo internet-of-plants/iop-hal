@@ -33,7 +33,7 @@ class BIO;
 
 constexpr size_t bufferSize = 8192;
 
-static iop::Log clientDriverLogger(iop::LogLevel::TRACE, IOP_STR("HTTP Client"));
+static iop::Log clientDriverLogger(IOP_LOG_LEVEL, IOP_STR("HTTP Client"));
 
 auto shiftChars(char* ptr, const size_t start, const size_t end) noexcept {
   //clientDriverLogger.debug(std::string_view(ptr).substr(start, end), std::to_string(start), " ", std::to_string(end));

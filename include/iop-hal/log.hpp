@@ -16,7 +16,6 @@
 #define IOP_CODE_POINT() ::iop::CodePoint(IOP_FILE, IOP_LINE, IOP_FUNC)
 
 /// Logs scope changes to serial if logLevel is set to TRACE
-/// TODO FIXME: Sadly tracing is a global property for now, it should be fixed
 #define IOP_TRACE2(logger) IOP_TRACE_INNER(__COUNTER__, logger)
 #define IOP_TRACE() IOP_TRACE_INNER(__COUNTER__, iop::Log(iop::Log::isTracing() ? iop::LogLevel::TRACE : iop::LogLevel::DEBUG, IOP_STR("TRACER")))
 // Technobabble to stringify __COUNTER__

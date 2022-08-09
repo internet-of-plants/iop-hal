@@ -13,6 +13,7 @@
 
 namespace iop_hal {
 auto Device::syncNTP() const noexcept -> void {
+  // TODO FIXME: weak link, hijacking NTP sync means expired certs will be validated
   // UTC by default, should we change according to the user? We currently only use this to validate SSL cert dates
   configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 }
