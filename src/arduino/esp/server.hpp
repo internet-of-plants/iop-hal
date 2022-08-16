@@ -63,7 +63,7 @@ auto HttpConnection::operator=(HttpConnection &&other) noexcept -> HttpConnectio
   return *this;
 }
 HttpConnection::~HttpConnection() noexcept {
-  delete reinterpret_cast<WebServer *>(this->server);
+  //delete reinterpret_cast<WebServer *>(this->server);
 }
 HttpServer::HttpServer(HttpServer &&other) noexcept: server(other.server) {
   other.server = nullptr;
