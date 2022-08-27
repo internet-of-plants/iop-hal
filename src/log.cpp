@@ -192,7 +192,7 @@ auto LogHook::operator=(LogHook &&other) noexcept -> LogHook & {
   return *this;
 }
 
-Tracer::Tracer(CodePoint point, Log logger) noexcept : point(std::move(point)), logger(logger) {
+Tracer::Tracer(CodePoint point, Log logger) noexcept : point(point), logger(logger) {
   if (this->logger.level() != LogLevel::TRACE) return;
 
   this->logger.trace(IOP_STR("Entering new scope at line "),

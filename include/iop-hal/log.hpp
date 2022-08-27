@@ -115,7 +115,7 @@ class Log {
 
 public:
   Log(const LogLevel &level, StaticString target) noexcept
-      : level_{level}, target_(std::move(target)) {}
+      : level_{level}, target_(target) {}
 
   /// Replaces current hook for the argument. 
   /// It's very useful to support other logging channels, like network or storage.
