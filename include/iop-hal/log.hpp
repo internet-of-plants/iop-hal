@@ -16,11 +16,10 @@
 #define IOP_CODE_POINT() ::iop::CodePoint(IOP_FILE, IOP_LINE, IOP_FUNC)
 
 /// Logs scope changes to serial if logLevel is set to TRACE
-#define IOP_TRACE2(logger) IOP_TRACE_INNER(__COUNTER__, logger)
-#define IOP_TRACE() IOP_TRACE_INNER(__COUNTER__, iop::Log(iop::Log::isTracing() ? iop::LogLevel::TRACE : iop::LogLevel::DEBUG, IOP_STR("TRACER")))
+#define IOP_TRACE() IOP_TRACE_INNER(__COUNTER__)
 // Technobabble to stringify __COUNTER__
-#define IOP_TRACE_INNER(x, logger) IOP_TRACE_INNER2(x, logger)
-#define IOP_TRACE_INNER2(x, logger) const ::iop::Tracer iop_tracer_##x(IOP_CODE_POINT(), logger);
+#define IOP_TRACE_INNER(x) IOP_TRACE_INNER2(x)
+#define IOP_TRACE_INNER2(x) const ::iop::Tracer iop_tracer_##x(IOP_CODE_POINT());
 
 namespace iop {
 
@@ -107,6 +106,8 @@ public:
   auto operator=(LogHook const &other) noexcept -> LogHook &;
   auto operator=(LogHook &&other) noexcept -> LogHook &;
 };
+
+class Tracer;
 
 /// Logger structure, contains its log level and log target
 class Log {
@@ -234,6 +235,8 @@ private:
            const StaticString &lineTermination) const noexcept;
   void log(const LogLevel &level, const std::string_view &msg, const LogType &logType,
            const StaticString &lineTermination) const noexcept;
+
+  friend Tracer;
 };
 
 
@@ -243,11 +246,10 @@ private:
 // TODO: use official logging and stop with global tracing
 class Tracer {
   CodePoint point;
-  Log logger;
 
 public:
   /// Use `IOP_TRACE()` instead of instantiating it manually.
-  explicit Tracer(CodePoint point, iop::Log logger) noexcept;
+  explicit Tracer(CodePoint point) noexcept;
   ~Tracer() noexcept;
 
   // Don't move or copy it, just use it as a scope logging guard

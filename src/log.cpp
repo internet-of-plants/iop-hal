@@ -192,41 +192,47 @@ auto LogHook::operator=(LogHook &&other) noexcept -> LogHook & {
   return *this;
 }
 
-Tracer::Tracer(CodePoint point, Log logger) noexcept : point(point), logger(logger) {
-  if (this->logger.level() != LogLevel::TRACE) return;
+constexpr static char TRACER_NAME_RAW[] IOP_ROM = "TRACER";
+static const iop::StaticString TRACER_NAME = reinterpret_cast<const __FlashStringHelper*>(TRACER_NAME_RAW);
+static Log logger(iop::LogLevel::DEBUG, TRACER_NAME);
 
-  this->logger.trace(IOP_STR("Entering new scope at line "),
-                     std::to_string(this->point.line()),
-                     IOP_STR(", in function "),
-                     this->point.func(),
-                     IOP_STR(", at file "),
-                     this->point.file());
+Tracer::Tracer(CodePoint point) noexcept : point(point) {
+  if (!iop::Log::isTracing()) return;
+  logger.level_ = LogLevel::TRACE;
+
+  logger.trace(IOP_STR("Entering new scope at line "),
+                std::to_string(this->point.line()),
+                IOP_STR(", in function "),
+                this->point.func(),
+                IOP_STR(", at file "),
+                this->point.file());
   
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
     
-    this->logger.trace(IOP_STR("Free stack "), std::to_string(memory.availableStack));
+    logger.trace(IOP_STR("Free stack "), std::to_string(memory.availableStack));
 
     for (const auto & item: memory.availableHeap) {
-      this->logger.trace(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));
+      logger.trace(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));
     }
     for (const auto & item: memory.biggestHeapBlock) {
-      this->logger.trace(IOP_STR("Biggest "), item.first, IOP_STR(" Block "), std::to_string(item.second));
+      logger.trace(IOP_STR("Biggest "), item.first, IOP_STR(" Block "), std::to_string(item.second));
     }
   }
 
-  this->logger.trace(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
+  logger.trace(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
 }
 Tracer::~Tracer() noexcept {
-  if (this->logger.level() != LogLevel::TRACE) return;
+  if (!iop::Log::isTracing()) return;
+  logger.level_ = LogLevel::TRACE;
 
-  this->logger.trace(IOP_STR("Leaving scope, at line "),
-                     std::to_string(this->point.line()),
-                     IOP_STR(", in function "),
-                     this->point.func(),
-                     IOP_STR(", at file "),
-                     this->point.file());
+  logger.trace(IOP_STR("Leaving scope, at line "),
+                std::to_string(this->point.line()),
+                IOP_STR(", in function "),
+                this->point.func(),
+                IOP_STR(", at file "),
+                this->point.file());
 }
 
 void logMemory(const Log &logger) noexcept {
