@@ -25,6 +25,22 @@ enum class StationStatus {
 auto statusToString(const iop_hal::StationStatus status) noexcept -> std::optional<iop::StaticString>;
 
 class CertStore;
+class Wifi;
+
+class OnConnectHandler {
+  void *ptr;
+
+  explicit OnConnectHandler(void *p) noexcept: ptr(p) {}
+public:
+  ~OnConnectHandler() noexcept;
+
+  OnConnectHandler(OnConnectHandler &other) noexcept = delete;
+  OnConnectHandler(OnConnectHandler &&other) noexcept: ptr(other.ptr) { other.ptr = nullptr; }
+  auto operator=(OnConnectHandler &other) noexcept -> OnConnectHandler & = delete;
+  auto operator=(OnConnectHandler &&other) noexcept -> OnConnectHandler & { this->ptr = other.ptr; other.ptr = nullptr; return *this; }
+
+  friend Wifi;
+};
 
 class Wifi {
   void *client;
@@ -46,7 +62,7 @@ public:
   // This should be a very short function, as if it was an interrupt
   // Used only to schedule the execution of the more complicated function
   // in the next event-loop run
-  auto onConnect(std::function<void()> f) noexcept -> void;
+  auto onConnect(std::function<void()> f) noexcept -> OnConnectHandler;
 
   auto connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept -> bool;
   // TODO: Remove this. This is only used to disconnect after a factory reset, is it needed?

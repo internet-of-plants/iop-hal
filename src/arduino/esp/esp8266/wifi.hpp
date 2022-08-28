@@ -12,7 +12,11 @@ using NetworkClient = WiFiClient;
 #endif
 
 
-namespace iop_hal { 
+namespace iop_hal {
+OnConnectHandler::~OnConnectHandler() noexcept {
+    delete static_cast<WiFiEventHandler*>(this->ptr);
+}
+
 Wifi::Wifi() noexcept: client(new (std::nothrow) NetworkClient) {
     iop_assert(client, IOP_STR("OOM"));
 }
@@ -21,11 +25,13 @@ Wifi::~Wifi() noexcept {
     delete static_cast<NetworkClient*>(this->client);
 }
 
-void Wifi::onConnect(std::function<void()> f) noexcept {
-  ::WiFi.onStationModeGotIP([f](const ::WiFiEventStationModeGotIP &ev) {
+auto Wifi::onConnect(std::function<void()> f) noexcept -> OnConnectHandler {
+    auto *ptr = new (std::nothrow) WiFiEventHandler(::WiFi.onStationModeGotIP([f](const ::WiFiEventStationModeGotIP &ev) {
       (void) ev;
       f();
-  });
+    }));
+    iop_assert(ptr != nullptr, IOP_STR("Unable to allocate OnConnectHandler"));
+    return OnConnectHandler(ptr);
 }
 
 Wifi::Wifi(Wifi &&other) noexcept: client(other.client) {
