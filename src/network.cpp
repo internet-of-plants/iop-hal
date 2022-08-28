@@ -78,59 +78,63 @@ auto Network::httpRequest(const HttpMethod method_,
 
   const auto uri = this->uri().toString() + path.toString();
   const auto method = methodToString(method_);
-
   const auto data_ = data.value_or(std::string_view());
 
-  this->logger().debug(method, IOP_STR(" to "), this->uri());
-  this->logger().debug(path, IOP_STR(", data length: "), std::to_string(data_.length()));
+  {
+    this->logger().debug(method, IOP_STR(" to "), this->uri());
+    this->logger().debug(path, IOP_STR(", data length: "), std::to_string(data_.length()));
 
-  // TODO: this may log sensitive information, network logging is currently
-  // capped at info because of that
-  if (data)
-    this->logger().debug(*data);
-  
-  this->logger().debug(IOP_STR("Begin"));
-  const auto func = [this, token, data, data_, method](iop_hal::Session & session) {
-    this->logger().trace(IOP_STR("Began HTTP connection"));
-
-    if (token) {
-      session.setAuthorization(std::string(*token));
-    }
-
-    // Currently only JSON is supported
+    // TODO: this may log sensitive information, network logging is currently
+    // capped at info because of that
     if (data)
-      session.addHeader(IOP_STR("Content-Type"), IOP_STR("application/json"));
-
-    // Authentication headers, identifies device and detects updates, perf
-    // monitoring
-    {
-      auto str = iop::to_view(iop_hal::device.firmwareMD5());
-      session.addHeader(IOP_STR("VERSION"), str);
-      session.addHeader(IOP_STR("x-ESP8266-sketch-md5"), str);
-
-      str = iop::to_view(iop_hal::device.macAddress());
-      session.addHeader(IOP_STR("MAC_ADDRESS"), str);
-    }
+      this->logger().debug(*data);
     
+    this->logger().debug(IOP_STR("Begin"));
+  }
+
+  const auto func = [this, token, data, data_, method](iop_hal::Session & session) {
     {
-      // Could this cause memory fragmentation?
-      auto memory = iop_hal::thisThread.availableMemory();
+      this->logger().trace(IOP_STR("Began HTTP connection"));
+
+      if (token) {
+        session.setAuthorization(std::string(*token));
+      }
+
+      // Currently only JSON is supported
+      if (data)
+        session.addHeader(IOP_STR("Content-Type"), IOP_STR("application/json"));
+
+      // Authentication headers, identifies device and detects updates, perf
+      // monitoring
+      {
+        auto str = iop::to_view(iop_hal::device.firmwareMD5());
+        session.addHeader(IOP_STR("VERSION"), str);
+        session.addHeader(IOP_STR("x-ESP8266-sketch-md5"), str);
+
+        str = iop::to_view(iop_hal::device.macAddress());
+        session.addHeader(IOP_STR("MAC_ADDRESS"), str);
+      }
       
-      session.addHeader(IOP_STR("FREE_STACK"), std::to_string(memory.availableStack));
+      {
+        // Could this cause memory fragmentation?
+        auto memory = iop_hal::thisThread.availableMemory();
+        
+        session.addHeader(IOP_STR("FREE_STACK"), std::to_string(memory.availableStack));
 
-      for (const auto & item: memory.availableHeap) {
-        session.addHeader(IOP_STR("FREE_").toString().append(item.first), std::to_string(item.second));
+        for (const auto & item: memory.availableHeap) {
+          session.addHeader(IOP_STR("FREE_").toString().append(item.first), std::to_string(item.second));
+        }
+        for (const auto & item: memory.biggestHeapBlock) {
+          session.addHeader(IOP_STR("BIGGEST_BLOCK_").toString().append(item.first), std::to_string(item.second));
+        }
       }
-      for (const auto & item: memory.biggestHeapBlock) {
-        session.addHeader(IOP_STR("BIGGEST_BLOCK_").toString().append(item.first), std::to_string(item.second));
-      }
+      session.addHeader(IOP_STR("VCC"), std::to_string(iop_hal::device.vcc()));
+      session.addHeader(IOP_STR("TIME_RUNNING"), std::to_string(iop_hal::thisThread.timeRunning()));
+      session.addHeader(IOP_STR("ORIGIN"), this->uri());
+      session.addHeader(IOP_STR("DRIVER"), iop_hal::device.platform());
+
+      this->logger().debug(IOP_STR("Making HTTP request"));
     }
-    session.addHeader(IOP_STR("VCC"), std::to_string(iop_hal::device.vcc()));
-    session.addHeader(IOP_STR("TIME_RUNNING"), std::to_string(iop_hal::thisThread.timeRunning()));
-    session.addHeader(IOP_STR("ORIGIN"), this->uri());
-    session.addHeader(IOP_STR("DRIVER"), iop_hal::device.platform());
-
-    this->logger().debug(IOP_STR("Making HTTP request"));
 
     auto response = session.sendRequest(method.toString(), data_);
 
