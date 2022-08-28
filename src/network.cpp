@@ -81,7 +81,8 @@ auto Network::httpRequest(const HttpMethod method_,
 
   const auto data_ = data.value_or(std::string_view());
 
-  this->logger().debug(method, IOP_STR(" to "), this->uri(), path, IOP_STR(", data length: "), std::to_string(data_.length()));
+  this->logger().debug(method, IOP_STR(" to "), this->uri());
+  this->logger().debug(path, IOP_STR(", data length: "), std::to_string(data_.length()));
 
   // TODO: this may log sensitive information, network logging is currently
   // capped at info because of that
@@ -166,7 +167,8 @@ auto Network::httpRequest(const HttpMethod method_,
       // The payload is always downloaded, since we check for its size and the
       // origin is trusted. If it's there it's supposed to be there.
       const auto payload = std::move(response.await().payload);
-      this->logger().debug(IOP_STR("Payload (") , iop::to_view(std::to_string(payload.size())), IOP_STR("): "), iop::to_view(iop::scapeNonPrintable(iop::to_view(payload).substr(0, payload.size() > 30 ? 30 : payload.size()))));
+      this->logger().debug(IOP_STR("Payload (") , iop::to_view(std::to_string(payload.size())), IOP_STR(")"));
+      this->logger().debug(iop::to_view(iop::scapeNonPrintable(iop::to_view(payload).substr(0, payload.size() > 30 ? 30 : payload.size()))));
       return iop_hal::Response(iop_hal::Payload(payload), *status);
     }
     return iop_hal::Response(response.code());

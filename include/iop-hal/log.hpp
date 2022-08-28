@@ -6,7 +6,7 @@
 
 /// Helps getting metadata on the executed code (at compile time)
 #define IOP_FILE ::iop::StaticString(reinterpret_cast<const __FlashStringHelper*>(__FILE__))
-#define IOP_LINE static_cast<uint32_t>(__LINE__)
+#define IOP_LINE static_cast<uint16_t>(__LINE__)
 #define IOP_FUNC ::iop::StaticString(reinterpret_cast<const __FlashStringHelper*>(__PRETTY_FUNCTION__))
 
 /// Returns CodePoint object pointing to the caller
@@ -32,17 +32,17 @@ enum class LogType { START, CONTINUITY, STARTEND, END };
 
 /// Represents an individual point in the codebase (used to track callers of panics)
 class CodePoint {
-  uint32_t line_;
+  uint16_t line_;
   StaticString file_;
   StaticString func_;
 
 public:
   /// Use the `IOP_CODE_POINT()` instead of instantiating it manually.
-  CodePoint(StaticString file, uint32_t line, StaticString func) noexcept
+  CodePoint(StaticString file, uint16_t line, StaticString func) noexcept
       : line_(line),file_(file), func_(func) {}
 
   auto file() const noexcept -> StaticString { return this->file_; }
-  auto line() const noexcept -> uint32_t { return this->line_; }
+  auto line() const noexcept -> uint16_t { return this->line_; }
   auto func() const noexcept -> StaticString { return this->func_; }
 };
 
