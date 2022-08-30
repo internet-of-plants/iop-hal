@@ -200,58 +200,74 @@ Tracer::Tracer(CodePoint point) noexcept : point(point) {
   if (!iop::Log::isTracing()) return;
   logger.level_ = LogLevel::TRACE;
 
-  logger.trace(IOP_STR("Entering new scope at line "),
-                std::to_string(this->point.line()),
-                IOP_STR(", in function "),
-                this->point.func(),
-                IOP_STR(", at file "),
-                this->point.file());
+  logger.trace(IOP_STR("Entering new scope at line "));
+  logger.trace(this->point.line());
+  logger.trace(IOP_STR(", in function "));
+  logger.trace(this->point.func());
+  logger.trace(IOP_STR(", at file "));
+  logger.traceln(this->point.file());
   
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
     
-    logger.trace(IOP_STR("Free stack "), std::to_string(memory.availableStack));
+    logger.trace(IOP_STR("Free stack "));
+    logger.traceln(memory.availableStack);
 
     for (const auto & item: memory.availableHeap) {
-      logger.trace(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));
+      logger.trace(IOP_STR("Free "));
+      logger.trace(item.first);
+      logger.trace(IOP_STR(" "));
+      logger.traceln(item.second);
     }
     for (const auto & item: memory.biggestHeapBlock) {
-      logger.trace(IOP_STR("Biggest "), item.first, IOP_STR(" Block "), std::to_string(item.second));
+      logger.trace(IOP_STR("Biggest "));
+      logger.trace(item.first);
+      logger.trace(IOP_STR(" Block "));
+      logger.traceln(item.second);
     }
   }
 
-  logger.trace(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
+  logger.trace(IOP_STR("Connection "));
+  logger.traceln(iop::wifi.status() == iop_hal::StationStatus::GOT_IP);
 }
 Tracer::~Tracer() noexcept {
   if (!iop::Log::isTracing()) return;
   logger.level_ = LogLevel::TRACE;
 
-  logger.trace(IOP_STR("Leaving scope, at line "),
-                std::to_string(this->point.line()),
-                IOP_STR(", in function "),
-                this->point.func(),
-                IOP_STR(", at file "),
-                this->point.file());
+  logger.trace(IOP_STR("Leaving scope, at line "));
+  logger.trace(this->point.line());
+  logger.trace(IOP_STR(", in function "));
+  logger.trace(this->point.func());
+  logger.trace(IOP_STR(", at file "));
+  logger.traceln(this->point.file());
 }
 
-void logMemory(const Log &logger) noexcept {
+void logMemory(Log &logger) noexcept {
   if (logger.level() > LogLevel::INFO) return;
 
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
     
-    logger.info(IOP_STR("Free stack "), std::to_string(memory.availableStack));
+    logger.info(IOP_STR("Free stack "));
+    logger.infoln(memory.availableStack);
 
     for (const auto & item: memory.availableHeap) {
-      logger.info(IOP_STR("Free "), item.first, IOP_STR(" "), std::to_string(item.second));
+      logger.info(IOP_STR("Free "));
+      logger.info(item.first);
+      logger.info(IOP_STR(" "));
+      logger.infoln(item.second);
     }
     for (const auto & item: memory.biggestHeapBlock) {
-      logger.info(IOP_STR("Biggest "), item.first, IOP_STR(" Block "), std::to_string(item.second));
+      logger.info(IOP_STR("Biggest "));
+      logger.info(item.first);
+      logger.info(IOP_STR(" Block "));
+      logger.infoln(item.second);
     }
   }
 
-  logger.info(IOP_STR("Connection "), std::to_string(iop::wifi.status() == iop_hal::StationStatus::GOT_IP));
+  logger.info(IOP_STR("Connection "));
+  logger.infoln(iop::wifi.status() == iop_hal::StationStatus::GOT_IP);
 }
 } // namespace iop

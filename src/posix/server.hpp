@@ -61,17 +61,18 @@ void HttpServer::begin() noexcept {
 
   int fd = 0;
   if ((fd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
-    logger().error(IOP_STR("Unable to open socket"));
+    logger().errorln(IOP_STR("Unable to open socket"));
     return;
   }
   
   int flags = fcntl(fd, F_GETFL, 0);
   if (flags == -1) {
-    logger().error(IOP_STR("fnctl get failed: "), std::to_string(flags));
+    logger().error(IOP_STR("fnctl get failed: "));
+    logger().errorln(static_cast<uint64_t>(flags));
     return;
   }
   if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) != 0) {
-    logger().error(IOP_STR("fnctl set failed"));
+    logger().errorln(IOP_STR("fnctl set failed"));
     return;
   }
 
@@ -91,10 +92,11 @@ void HttpServer::begin() noexcept {
   }
 
   if (listen(fd, 100) < 0) {
-    logger().error(IOP_STR("Unable to listen socket"));
+    logger().errorln(IOP_STR("Unable to listen socket"));
     return;
   }
-  logger().info(IOP_STR("Listening to port "), std::to_string(this->port));
+  logger().info(IOP_STR("Listening to port "));
+  logger().infoln(static_cast<uint64_t>(this->port));
 
   this->address = new (std::nothrow) sockaddr_in(addr);
   iop_assert(this->address, IOP_STR("OOM"));
@@ -118,14 +120,18 @@ void HttpServer::handleClient() noexcept {
   auto client = 0;
   if ((client = accept(fd, (sockaddr *)&addr, &addr_len)) <= 0) {
     if (client == 0) {
-      logger().error(IOP_STR("Client fd is zero"));
+      logger().errorln(IOP_STR("Client fd is zero"));
     } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
-      logger().error(IOP_STR("Error accepting connection ("), std::to_string(errno), IOP_STR("): "), strerror(errno));
+      logger().error(IOP_STR("Error accepting connection ("));
+      logger().error(static_cast<uint64_t>(errno));
+      logger().error(IOP_STR("): "));
+      logger().errorln(strerror(errno));
     }
     this->isHandlingRequest = false;
     return;
   }
-  logger().debug(IOP_STR("Accepted connection: "), std::to_string(client));
+  logger().debug(IOP_STR("Accepted connection: "));
+  logger().debugln(static_cast<uint64_t>(client));
   conn.currentClient = client;
 
   auto firstLine = true;
@@ -135,34 +141,45 @@ void HttpServer::handleClient() noexcept {
   ssize_t signedLen = 0;
   size_t len = 0;
   while (true) {
-    logger().debug(IOP_STR("Try read: "), std::to_string(strnlen(buffer.begin(), buffer.max_size())));
+    logger().debug(IOP_STR("Try read: "));
+    logger().debugln(static_cast<uint64_t>(strnlen(buffer.begin(), buffer.max_size())));
 
     if (len < buffer.max_size() &&
         (signedLen = read(client, buffer.data() + len, buffer.max_size() - len)) < 0) {
-      logger().error(IOP_STR("Read error: "), std::to_string(len));
+      logger().error(IOP_STR("Read error: "));
+      logger().errorln(static_cast<uint64_t>(len));
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
         iop_hal::thisThread.sleep(50);
         continue;
       } else {
-        logger().error(IOP_STR("Error reading from socket ("), std::to_string(signedLen), IOP_STR("): "), std::to_string(errno), IOP_STR(" - "), strerror(errno));
+        logger().error(IOP_STR("Error reading from socket ("));
+        logger().error(static_cast<uint64_t>(signedLen));
+        logger().error(IOP_STR("): "));
+        logger().error(static_cast<uint64_t>(errno));
+        logger().error(IOP_STR(" - "));
+        logger().errorln(strerror(errno));
         conn.reset();
         this->isHandlingRequest = false;
         return;
       }
     }
     len += static_cast<size_t>(signedLen);
-    logger().debug(IOP_STR("Len: "), std::to_string(len));
+    logger().debug(IOP_STR("Len: "));
+    logger().debugln(static_cast<uint64_t>(len));
 
     if (firstLine && len == 0) {
-      logger().error(IOP_STR("Empty request"));
+      logger().errorln(IOP_STR("Empty request"));
       conn.reset();
       this->isHandlingRequest = false;
       return;
     }
-    logger().debug(IOP_STR("Read: ("), std::to_string(len), IOP_STR(")"));
+    logger().debug(IOP_STR("Read: ("));
+    logger().debug(static_cast<uint64_t>(len));
+    logger().debugln(IOP_STR(")"));
 
     if (len == 0) {
-      logger().debug(IOP_STR("EOF: "), std::to_string(isPayload));
+      logger().debug(IOP_STR("EOF: "));
+      logger().debugln(isPayload);
       break;
     }
 
@@ -171,17 +188,21 @@ void HttpServer::handleClient() noexcept {
       if (buff.find("POST") != buff.npos) {
         const auto space = buff.substr(5).find(" ");
         conn.currentRoute = buff.substr(5, space);
-        logger().debug(IOP_STR("POST: "), conn.currentRoute);
+        logger().debug(IOP_STR("POST: "));
+        logger().debugln(conn.currentRoute);
       } else if (buff.find("GET") != buff.npos) {
         const auto space = buff.substr(4).find(" ");
         conn.currentRoute = buff.substr(4, space);
-        logger().debug(IOP_STR("GET: "), conn.currentRoute);
+        logger().debug(IOP_STR("GET: "));
+        logger().debugln(conn.currentRoute);
       } else if (buff.find("OPTIONS") != buff.npos) {
         const auto space = buff.substr(8).find(" ");
         conn.currentRoute = buff.substr(8, space);
-        logger().debug(IOP_STR("OPTIONS: "), conn.currentRoute);
+        logger().debug(IOP_STR("OPTIONS: "));
+        logger().debugln(conn.currentRoute);
       } else {
-        logger().error(IOP_STR("HTTP Method not found: "), buff);
+        logger().error(IOP_STR("HTTP Method not found: "));
+        logger().errorln(buff);
         conn.reset();
         this->isHandlingRequest = false;
         return;
@@ -189,13 +210,14 @@ void HttpServer::handleClient() noexcept {
       firstLine = false;
       
       iop_assert(buff.find("\r\n") != buff.npos, IOP_STR("First: ").toString() + std::to_string(buff.length()) + IOP_STR(" bytes don't contain newline, the path is too long\n").toString());
-      logger().debug(IOP_STR("Found first line"));
+      logger().debugln(IOP_STR("Found first line"));
       const auto newlineIndex = buff.find("\r\n");
       len -= newlineIndex + 2;
       memmove(buffer.data(), buffer.begin() + newlineIndex + 2, len);
       buff = std::string_view(buffer.begin(), len);
     }
-    logger().debug(IOP_STR("Headers + Payload: "), buff);
+    logger().debug(IOP_STR("Headers + Payload: "));
+    logger().debugln(buff);
 
     while (len > 0 && !isPayload) {
       const auto newlineIndex = buff.find("\r\n");
@@ -214,16 +236,19 @@ void HttpServer::handleClient() noexcept {
       }
     }
 
-    logger().debug(IOP_STR("Payload ("), std::to_string(len), IOP_STR(")"));
+    logger().debug(IOP_STR("Payload ("));
+    logger().debug(static_cast<uint64_t>(len));
+    logger().debugln(IOP_STR(")"));
 
     conn.currentPayload += buff;
 
-    logger().debug(IOP_STR("Route: "), conn.currentRoute);
+    logger().debug(IOP_STR("Route: "));
+    logger().debugln(conn.currentRoute);
     iop::Log::shouldFlush(false);
     if (this->router.count(conn.currentRoute) != 0) {
       this->router.at(conn.currentRoute)(conn, logger());
     } else {
-      logger().debug(IOP_STR("Route not found"));
+      logger().debugln(IOP_STR("Route not found"));
       this->notFoundHandler(conn, logger());
     }
     iop::Log::shouldFlush(true);
@@ -231,7 +256,7 @@ void HttpServer::handleClient() noexcept {
     break;
   }
 
-  logger().debug(IOP_STR("Close connection"));
+  logger().debugln(IOP_STR("Close connection"));
   conn.reset();
   this->isHandlingRequest = false;
 }
@@ -255,7 +280,8 @@ void HttpServer::onNotFound(HttpServer::Callback fn) noexcept {
 }
 
 static auto percentDecode(const std::string_view input) noexcept -> std::optional<std::string> {
-  logger().debug(IOP_STR("Decode: "), input);
+  logger().debug(IOP_STR("Decode: "));
+  logger().debugln(input);
   static const char tbl[256] = {
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
     -1,-1,-1,-1,-1,-1,-1,-1, -1,-1,-1,-1,-1,-1,-1,-1,
@@ -313,13 +339,13 @@ auto HttpConnection::arg(const iop::StaticString name) const noexcept -> std::op
 
   if (end == view.npos) {
     const auto decoded = percentDecode(view);
-    logger().debug(decoded.value_or("No value"));
+    logger().debugln(decoded.value_or("No value"));
     return decoded;
   }
 
   const auto msg = view.substr(0, end);
   const auto decoded = percentDecode(msg);
-  logger().debug(decoded.value_or("No value"));
+  logger().debugln(decoded.value_or("No value"));
   return decoded;
 }
 
@@ -363,7 +389,10 @@ void HttpConnection::sendHeader(const iop::StaticString name, const iop::StaticS
 }
 void HttpConnection::sendData(iop::StaticString content) const noexcept {
   IOP_TRACE();
-  logger().debug(IOP_STR("Send Content ("), std::to_string(content.length()), IOP_STR("): "), content);
+  logger().debug(IOP_STR("Send Content ("));
+  logger().debug(static_cast<uint64_t>std::to_string(content.length()));
+  logger().debug(IOP_STR("): "));
+  logger().debugln(content);
   iop_assert(this->currentClient, IOP_STR("No active client"));
 
   if (iop::Log::isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);

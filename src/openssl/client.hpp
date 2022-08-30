@@ -36,7 +36,10 @@ constexpr size_t bufferSize = 8192;
 static iop::Log clientDriverLogger(IOP_LOG_LEVEL, IOP_STR("HTTP Client"));
 
 auto shiftChars(char* ptr, const size_t start, const size_t end) noexcept {
-  //clientDriverLogger.debug(std::string_view(ptr).substr(start, end), std::to_string(start), " ", std::to_string(end));
+  //clientDriverLogger.debug(std::string_view(ptr).substr(start, end));
+  //clientDriverLogger.debug(static_cast<uint64_t>(start));
+  //clientDriverLogger.debug(IOP_STR(" "));
+  //clientDriverLogger.debugln(static_cast<uint64_t>(end));
   memmove(ptr, ptr + start, end);
   memset(ptr + end, '\0', bufferSize - end);
 }
@@ -154,7 +157,8 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     const auto hostIndex = this->ctx.uri.find("://");
     const auto pathIndex = std::string_view(this->ctx.uri.begin() + (hostIndex == this->ctx.uri.npos ? 0 : hostIndex + 3)).find("/");
     const auto path = pathIndex == this->ctx.uri.npos ? std::string_view("/") : std::string_view(this->ctx.uri.begin() + pathIndex);
-    clientDriverLogger.debug(IOP_STR("Send request to "), path);
+    clientDriverLogger.debug(IOP_STR("Send request to "));
+    clientDriverLogger.debugln(path);
 
     const auto fd = this->ctx.fd;
     iop_assert(fd != -1 || this->ctx.bio, IOP_STR("Invalid file descriptor or ctx.bio"));
@@ -179,7 +183,8 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     send(this->ctx, data.begin(), len);
     if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
       iop::Log::print(IOP_STR("\n"), iop::LogLevel::TRACE, iop::LogType::END);
-    clientDriverLogger.debug(IOP_STR("Sent data: "), data);
+    clientDriverLogger.debug(IOP_STR("Sent data: "));
+    clientDriverLogger.debugln(data);
     
     auto buffer = std::unique_ptr<char[]>(new (std::nothrow) char[bufferSize]);
     iop_assert(buffer, IOP_STR("OOM"));
@@ -193,25 +198,36 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     std::string_view buff;
     while (true) {
       if (!isPayload) {
-        //clientDriverLogger.debug(IOP_STR("Try read: "), buff);
+        //clientDriverLogger.debug(IOP_STR("Try read: "));
+        //clientDriverLogger.debugln(buff);
       }
 
       if (size < bufferSize &&
           (signedSize = recv(this->ctx, buffer.get() + size, bufferSize - size)) < 0) {
-        clientDriverLogger.error(IOP_STR("Error reading from socket ("), std::to_string(signedSize), IOP_STR("): "), std::to_string(errno), IOP_STR(" - "), strerror(errno)); 
+        clientDriverLogger.error(IOP_STR("Error reading from socket ("));
+        clientDriverLogger.error(static_cast<uint64_t>(signedSize));
+        clientDriverLogger.error(IOP_STR("): "));
+        clientDriverLogger.error(static_cast<uint64_t>(errno));
+        clientDriverLogger.error(IOP_STR(" - "));
+        clientDriverLogger.errorln(strerror(errno));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
       
       size += static_cast<size_t>(signedSize);
 
-      clientDriverLogger.debug(IOP_STR("Len: "), std::to_string(size));
+      clientDriverLogger.debug(IOP_STR("Len: "));
+      clientDriverLogger.debugln(static_cast<uint64_t>(size));
       if (firstLine && size == 0) {
-        clientDriverLogger.warn(IOP_STR("Empty response: "), std::to_string(fd), IOP_STR(" "), std::to_string(size));
+        clientDriverLogger.warn(IOP_STR("Empty response: "));
+        clientDriverLogger.warn(static_cast<uint64_t>(fd));
+        clientDriverLogger.warn(IOP_STR(" "));
+        clientDriverLogger.warnln(static_cast<uint64_t>(size));
         return Response(status.value_or(500));
       }
 
       if (size == 0) {
-        clientDriverLogger.debug(IOP_STR("EOF: "), std::to_string(isPayload));
+        clientDriverLogger.debug(IOP_STR("EOF: "));
+        clientDriverLogger.debugln(static_cast<uint64_t>(isPayload));
         break;
       }
 
@@ -219,40 +235,49 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
 
       if (!firstLine && !isPayload && buff.find("\r\n") == 0) {
           // TODO: move this logic to inside Response::await to be lazy-evaluated
-          clientDriverLogger.debug(IOP_STR("Found Payload"));
+          clientDriverLogger.debugln(IOP_STR("Found Payload"));
           isPayload = true;
 
-          clientDriverLogger.debug(std::to_string(size));
+          clientDriverLogger.debugln(static_cast<uint64_t>(size));
           size -= 2;
           shiftChars(buffer.get(), 2, size);
           buff = std::string_view(buffer.get(), size);
       }
       
       if (!isPayload) {
-        clientDriverLogger.debug(IOP_STR("Buffer ["), std::to_string(size), IOP_STR("]: "), buff.substr(0, buff.find("\r\n") == buff.npos ? (size > 30 ? 30 : size) : buff.find("\r\n")));
+        clientDriverLogger.debug(IOP_STR("Buffer ["));
+        clientDriverLogger.debug(static_cast<uint64_t>(size));
+        clientDriverLogger.debug(IOP_STR("]: "));
+        clientDriverLogger.debugln(buff.substr(0, buff.find("\r\n") == buff.npos ? (size > 30 ? 30 : size) : buff.find("\r\n")));
       }
-      clientDriverLogger.debug(IOP_STR("Is Payload: "), std::to_string(isPayload));
+      clientDriverLogger.debug(IOP_STR("Is Payload: "));
+      clientDriverLogger.debugln(isPayload);
 
       if (!isPayload && buff.find("\n") == buff.npos) {
         iop_panic(IOP_STR("Header line used more than 4kb, currently we don't support this: ").toString() + buffer.get());
       }
 
       if (firstLine && size < 10) { // len("HTTP/1.1 ") = 9
-        clientDriverLogger.error(IOP_STR("Error reading first line: "), std::to_string(size));
+        clientDriverLogger.error(IOP_STR("Error reading first line: "));
+        clientDriverLogger.errorln(static_cast<uint64_t>(size));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
 
       if (firstLine && size > 0) {
-        clientDriverLogger.debug(IOP_STR("Found first line"));
+        clientDriverLogger.debugln(IOP_STR("Found first line"));
 
         const std::string_view statusStr(buffer.get() + 9); // len("HTTP/1.1 ") = 9
         const auto codeEnd = statusStr.find(" ");
         if (codeEnd == statusStr.npos) {
-          clientDriverLogger.error(IOP_STR("Bad server: "), statusStr, IOP_STR(" -- "), buff);
+          clientDriverLogger.error(IOP_STR("Bad server: "));
+          clientDriverLogger.error(statusStr);
+          clientDriverLogger.error(IOP_STR(" -- "));
+          clientDriverLogger.errorln(buff);
           return Response(iop::NetworkStatus::IO_ERROR);
         }
         status = atoi(std::string(statusStr.begin(), 0, codeEnd).c_str());
-        clientDriverLogger.debug(IOP_STR("Status: "), std::to_string(status.value_or(500)));
+        clientDriverLogger.debug(IOP_STR("Status: "));
+        clientDriverLogger.debugln(static_cast<uint64_t>(status.value_or(500)));
         firstLine = false;
 
         const auto newlineIndex = buff.find("\n") + 1;
@@ -261,13 +286,15 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
         buff = std::string_view(buffer.get(), size);
       }
       if (!status) {
-        clientDriverLogger.error(IOP_STR("No status"));
+        clientDriverLogger.errorln(IOP_STR("No status"));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
       if (!isPayload) {
-        //clientDriverLogger.debug(IOP_STR("Buffer: "), buff.substr(0, buff.find("\r\n")));
-      //if (!buff.contains(IOP_STR("\r\n"))) continue;
-        //clientDriverLogger.debug(IOP_STR("Headers + Payload: "), buff.substr(0, buff.find("\r\n") == buff.npos ? size : buff.find("\r\n")));
+        //clientDriverLogger.debug(IOP_STR("Buffer: "));
+        //clientDriverLogger.debugln(buff.substr(0, buff.find("\r\n")));
+        //if (!buff.contains(IOP_STR("\r\n"))) continue;
+        //clientDriverLogger.debug(IOP_STR("Headers + Payload: "));
+        //clientDriverLogger.debugln(buff.substr(0, buff.find("\r\n") == buff.npos ? size : buff.find("\r\n")));
       }
 
       while (size > 0 && !isPayload) {
@@ -276,10 +303,14 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
           shiftChars(buffer.get(), 2, size);
           buff = std::string_view(buffer.get(), size);
           
-          clientDriverLogger.debug(IOP_STR("Found Payload ("), std::to_string(buff.find("\r\n") == buff.npos ? size + 2 : buff.find("\r\n") + 2), IOP_STR(")"));
+          clientDriverLogger.debug(IOP_STR("Found Payload ("));
+          clientDriverLogger.debug(static_cast<uint64_t>(buff.find("\r\n") == buff.npos ? size + 2 : buff.find("\r\n") + 2));
+          clientDriverLogger.debugln(IOP_STR(")"));
           isPayload = true;
         } else if (buff.find("\r\n") != buff.npos) {
-          clientDriverLogger.debug(IOP_STR("Found headers (buffer length: "), std::to_string(size), IOP_STR(")"));
+          clientDriverLogger.debug(IOP_STR("Found headers (buffer length: "));
+          clientDriverLogger.debug(static_cast<uint64_t>(size));
+          clientDriverLogger.debugln(IOP_STR(")"));
           for (const auto &key: this->ctx.headersToCollect) {
             if (size < key.length() + 2) continue; // "\r\n"
             std::string headerKey(buff.substr(0, key.length()));
@@ -287,7 +318,9 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
             std::transform(headerKey.begin(), headerKey.end(), headerKey.begin(),
               [](unsigned char c){ return std::tolower(c); });
 
-            clientDriverLogger.debug(headerKey, IOP_STR(" == "), key);
+            clientDriverLogger.debug(headerKey);
+            clientDriverLogger.debug(IOP_STR(" == "));
+            clientDriverLogger.debugln(key);
             if (headerKey != key.c_str())
               continue;
 
@@ -296,23 +329,32 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
             while (*valueView.begin() == ' ') valueView = valueView.substr(1);
 
             std::string value(valueView, 0, valueView.find("\r\n"));
-            clientDriverLogger.debug(IOP_STR("Found header "), key, IOP_STR(" = "), value, IOP_STR("\n"));
+            clientDriverLogger.debug(IOP_STR("Found header "));
+            clientDriverLogger.debug(key);
+            clientDriverLogger.debug(IOP_STR(" = "));
+            clientDriverLogger.debugln(value);
             responseHeaders.emplace(key.c_str(), value);
           }
-          clientDriverLogger.debug(IOP_STR("Buffer: "), buff.substr(0, buff.find("\r\n") == buff.npos ? (size > 30 ? 30 : size) : buff.find("\r\n")));
-          clientDriverLogger.debug(IOP_STR("Skipping header ("), std::to_string(buff.find("\r\n") == buff.npos ? size : buff.find("\r\n") + 2), IOP_STR(")"));
+          clientDriverLogger.debug(IOP_STR("Buffer: "));
+          clientDriverLogger.debugln(buff.substr(0, buff.find("\r\n") == buff.npos ? (size > 30 ? 30 : size) : buff.find("\r\n")));
+          clientDriverLogger.debug(IOP_STR("Skipping header ("));
+          clientDriverLogger.debug(static_cast<uint64_t>(buff.find("\r\n") == buff.npos ? size : buff.find("\r\n") + 2));
+          clientDriverLogger.debugln(IOP_STR(")"));
           const auto startIndex = buff.find("\r\n") + 2;
           size -= startIndex;
           shiftChars(buffer.get(), startIndex, size);
           buff = std::string_view(buffer.get(), size);
         } else {
-          clientDriverLogger.debug(IOP_STR("Header line too big"));
+          clientDriverLogger.debugln(IOP_STR("Header line too big"));
           return Response(iop::NetworkStatus::IO_ERROR);
         }
       }
 
       if (isPayload && size > 0) {
-        clientDriverLogger.debug(IOP_STR("Appending payload: "), std::to_string(size), IOP_STR(" "), std::to_string(responsePayload.size()));
+        clientDriverLogger.debug(IOP_STR("Appending payload: "));
+        clientDriverLogger.debug(static_cast<uint64_t>(size));
+        clientDriverLogger.debug(IOP_STR(" "));
+        clientDriverLogger.debugln(static_cast<uint64_t>(responsePayload.size()));
         responsePayload.insert(responsePayload.end(), buffer.get(), buffer.get() + size);
         memset(buffer.get(), '\0', bufferSize);
         buff = "";
@@ -321,8 +363,10 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     }
   }
 
-  clientDriverLogger.debug(IOP_STR("Close client: "), std::to_string(this->ctx.fd));
-  clientDriverLogger.debug(IOP_STR("Status: "), std::to_string(status.value_or(500)));
+  clientDriverLogger.debug(IOP_STR("Close client: "));
+  clientDriverLogger.debugln(static_cast<uint64_t>(this->ctx.fd));
+  clientDriverLogger.debug(IOP_STR("Status: "));
+  clientDriverLogger.debugln(static_cast<uint64_t>(status.value_or(500)));
   iop_assert(status, IOP_STR("Status not available"));
 
   return Response(responseHeaders, Payload(responsePayload), *status);
@@ -340,7 +384,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   const auto useTLS = uri.find("https://") == 0;
   if (useTLS) {
     #ifdef IOP_TLS
-    clientDriverLogger.error(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
+    clientDriverLogger.errorln(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     #else
     uri = uri.substr(8);
@@ -358,11 +402,13 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     if (end == uri.npos) end = uri.length();
     port = static_cast<uint16_t>(strtoul(std::string(uri.begin(), portIndex + 1, end).c_str(), nullptr, 10));
     if (port == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to parse port: "), uri);
+      clientDriverLogger.error(IOP_STR("Unable to parse port: "));
+      clientDriverLogger.errorln(uri);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
   }
-  clientDriverLogger.debug(IOP_STR("Port: "), std::to_string(port));
+  clientDriverLogger.debug(IOP_STR("Port: "));
+  clientDriverLogger.debugln(static_cast<uint64_t>(port));
 
   auto end = uri.find(":");
   if (end == uri.npos) end = uri.find("/");
@@ -372,7 +418,8 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
   struct hostent *he = gethostbyname(host.c_str());
   if (!he) {
-    clientDriverLogger.error(IOP_STR("Unable to obtain hostent from host string: "), host);
+    clientDriverLogger.error(IOP_STR("Unable to obtain hostent from host string: "));
+    clientDriverLogger.errorln(host);
     return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
   }
 
@@ -389,13 +436,13 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   if (useTLS) {
     const auto *method = TLS_client_method();
     if (!method) {
-      clientDriverLogger.error(IOP_STR("Unable to allocate SSL method: "));
+      clientDriverLogger.errorln(IOP_STR("Unable to allocate SSL method: "));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     context = SSL_CTX_new(method);
     if (!context) {
-      clientDriverLogger.error(IOP_STR("Unable to allocate SSL context: "));
+      clientDriverLogger.errorln(IOP_STR("Unable to allocate SSL context: "));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
@@ -406,21 +453,21 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
     const auto certsPath = std::filesystem::temp_directory_path().append("iop-hal-linux-mock-certs-bundle.crt");
     if (SSL_CTX_load_verify_locations(context, certsPath.c_str(), nullptr) == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to load verify locations"));
+      clientDriverLogger.errorln(IOP_STR("Unable to load verify locations"));
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     bio = BIO_new_ssl_connect(context);
     if(bio == nullptr) {
-      clientDriverLogger.error(IOP_STR("Unable to BIO new ssl connect"));
+      clientDriverLogger.errorln(IOP_STR("Unable to BIO new ssl connect"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     if (BIO_set_conn_hostname(bio, (host + ":" + std::to_string(port)).c_str()) == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to set BIO conn hostname"));
+      clientDriverLogger.errorln(IOP_STR("Unable to set BIO conn hostname"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
@@ -428,7 +475,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
     BIO_get_ssl(bio, &ssl);
     if (!ssl) {
-      clientDriverLogger.error(IOP_STR("Unable to allocate SSL object: "));
+      clientDriverLogger.errorln(IOP_STR("Unable to allocate SSL object: "));
       BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
@@ -436,14 +483,14 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
     const char* const PREFERRED_CIPHERS = "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4";
     if (SSL_set_cipher_list(ssl, PREFERRED_CIPHERS) == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to set cipher list"));
+      clientDriverLogger.errorln(IOP_STR("Unable to set cipher list"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     if (SSL_set_tlsext_host_name(ssl, host.c_str()) == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to set tlsext host name"));
+      clientDriverLogger.errorln(IOP_STR("Unable to set tlsext host name"));
       BIO_free_all(bio);
       SSL_CTX_free(context);
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
@@ -451,7 +498,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
     out = BIO_new_fp(stdout, BIO_NOCLOSE);
     if(out == nullptr) {
-      clientDriverLogger.error(IOP_STR("Unable to set BIO fp"));
+      clientDriverLogger.errorln(IOP_STR("Unable to set BIO fp"));
       BIO_free(out);
       BIO_free_all(bio);
       SSL_CTX_free(context);
@@ -459,7 +506,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     }
 
     if (BIO_do_connect(bio) == 0) {
-      clientDriverLogger.error(IOP_STR("Unable to bio connect"));
+      clientDriverLogger.errorln(IOP_STR("Unable to bio connect"));
       BIO_free(out);
       BIO_free_all(bio);
       SSL_CTX_free(context);
@@ -467,7 +514,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     }
 
     if (BIO_do_handshake(bio) == 0) {
-      clientDriverLogger.error(IOP_STR("Handshake failed"));
+      clientDriverLogger.errorln(IOP_STR("Handshake failed"));
       BIO_free(out);
       BIO_free_all(bio);
       SSL_CTX_free(context);
@@ -480,7 +527,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
       // Decreases reference count as it just increased unecessarily
       X509_free(cert);
     } else {
-      clientDriverLogger.error(IOP_STR("Unable to get peer cert"));
+      clientDriverLogger.errorln(IOP_STR("Unable to get peer cert"));
       BIO_free(out);
       BIO_free_all(bio);
       SSL_CTX_free(context);
@@ -491,7 +538,8 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     /* Verification performed according to RFC 4158    */
     const auto verifyResult = SSL_get_verify_result(ssl);
     if (verifyResult != X509_V_OK) {
-      clientDriverLogger.error(IOP_STR("Unable to verify cert: "), iop::to_view(std::to_string(verifyResult)));
+      clientDriverLogger.error(IOP_STR("Unable to verify cert: "));
+      clientDriverLogger.errorln(static_cast<uint64_t>(verifyResult));
       BIO_free(out);
       BIO_free_all(bio);
       SSL_CTX_free(context);
@@ -503,18 +551,20 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   if (!useTLS) {
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
-      clientDriverLogger.error(IOP_STR("Unable to open socket"));
+      clientDriverLogger.errorln(IOP_STR("Unable to open socket"));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
 
     auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (connection < 0) {
-      clientDriverLogger.error(IOP_STR("Unable to connect: "), std::to_string(connection));
+      clientDriverLogger.error(IOP_STR("Unable to connect: "));
+      clientDriverLogger.errorln(static_cast<uint64_t>(connection));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
   }
 
-  clientDriverLogger.debug(IOP_STR("Began connection: "), host);
+  clientDriverLogger.debug(IOP_STR("Began connection: "));
+  clientDriverLogger.debugln(host);
   auto ctx = SessionContext(fd, this->headersToCollect_, uri, bio);
   auto session = Session(ctx);
   auto result = func(session);

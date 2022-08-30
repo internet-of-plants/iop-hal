@@ -23,7 +23,7 @@ using NetworkClient = WiFiClient;
 
 
 namespace iop_hal {
-auto Update::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
+auto Update::run(iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
   auto *client = static_cast<NetworkClient*>(iop::wifi.client);
   iop_assert(client, IOP_STR("Wifi has been moved out, client is nullptr"));
 
@@ -58,14 +58,14 @@ switch (result) {
 
   case HTTP_UPDATE_FAILED:
     // TODO(pc): properly handle ESPhttpUpdate.getLastError()
-    network.logger().error(IOP_STR("Update failed: "),
-                       std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
+    network.logger().error(IOP_STR("Update failed: "));
+    network.logger().errorln(std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
     return iop_hal::UpdateStatus::BROKEN_SERVER;
 }
 
 // TODO(pc): properly handle ESPhttpUpdate.getLastError()
-network.logger().error(IOP_STR("Update failed (UNKNOWN): "),
-                    std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
+network.logger().error(IOP_STR("Update failed (UNKNOWN): "));
+network.logger().errorln(std::string_view(ESPhttpUpdate->getLastErrorString().c_str()));
 return iop_hal::UpdateStatus::BROKEN_SERVER;
 }
 } // namespace iop_hal

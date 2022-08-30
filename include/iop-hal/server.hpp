@@ -59,7 +59,7 @@ class HttpServer {
   // TODO: currently we only support one client at a time, this is not thread safe tho
   bool isHandlingRequest = false;
 public:
-  using Callback = std::function<void(HttpConnection&, iop::Log const &)>;
+  using Callback = std::function<void(HttpConnection&, iop::Log &)>;
 #if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)
 private:
   std::unordered_map<std::string, Callback> router;

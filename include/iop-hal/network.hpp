@@ -64,24 +64,24 @@ public:
   static auto isConnected() noexcept -> bool;
 
   /// Sends an HTTP post that is authenticated to the monitor server.
-  auto httpPost(std::string_view token, StaticString path, std::string_view data) const noexcept -> iop_hal::Response;
+  auto httpPost(std::string_view token, StaticString path, std::string_view data) noexcept -> iop_hal::Response;
 
   /// Sends an HTTP post that is not authenticated to the monitor server (used for authentication).
-  auto httpPost(StaticString path, std::string_view data) const noexcept -> iop_hal::Response;
+  auto httpPost(StaticString path, std::string_view data) noexcept -> iop_hal::Response;
 
   /// Sends an HTTP get that is authenticated to the monitor server (used for authentication).
-  auto httpGet(StaticString path, std::string_view token, std::string_view data) const noexcept -> iop_hal::Response;
+  auto httpGet(StaticString path, std::string_view token, std::string_view data) noexcept -> iop_hal::Response;
 
   /// Sends a custom HTTP request that may be authenticated to the monitor server (primitive used by higher level methods)
-  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) const noexcept -> iop_hal::Response;
+  auto httpRequest(HttpMethod method, const std::optional<std::string_view> &token, StaticString path, const std::optional<std::string_view> &data) noexcept -> iop_hal::Response;
 
   /// Fetches firmware update from the network
-  auto update(StaticString path, std::string_view token) const noexcept -> iop_hal::UpdateStatus;
+  auto update(StaticString path, std::string_view token) noexcept -> iop_hal::UpdateStatus;
 
   /// Extracts a network status from the raw response
   auto codeToString(int code) const noexcept -> std::string;
 
-  auto logger() const noexcept -> const Log &;
+  auto logger() noexcept -> Log &;
 };
 
 } // namespace iop

@@ -22,7 +22,7 @@ enum class UpdateStatus {
 //
 // Downloads firmware from behind the monitor server's authentication
 struct Update {
-    static auto run(const iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus;
+    static auto run(iop::Network &network, iop::StaticString path, std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus;
 };
 }
 

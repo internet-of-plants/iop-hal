@@ -2,7 +2,7 @@
 #include "iop-hal/network.hpp"
 
 namespace iop_hal {
-auto Update::run(const iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
+auto Update::run(iop::Network &network, const iop::StaticString path, const std::string_view authorization_header) noexcept -> iop_hal::UpdateStatus {
     (void) network;
     (void) path;
     (void) authorization_header;

@@ -44,19 +44,36 @@ auto takePanicHook() noexcept -> PanicHook {
 auto setPanicHook(PanicHook newHook) noexcept -> void { hook = std::move(newHook); }
 
 auto PanicHook::defaultViewPanic(std::string_view const &msg, CodePoint const &point) noexcept -> void {
-  iop::panicLogger().crit(IOP_STR("Line "), ::std::to_string(point.line()), IOP_STR(" of file "), point.file(),
-              IOP_STR(" inside "), point.func(), IOP_STR(": "), msg);
+  iop::panicLogger().crit(IOP_STR("Line "));
+  iop::panicLogger().crit(point.line());
+  iop::panicLogger().crit(IOP_STR(" of file "));
+  iop::panicLogger().crit(point.file());
+  iop::panicLogger().crit(IOP_STR(" inside "));
+  iop::panicLogger().crit(point.func());
+  iop::panicLogger().crit(IOP_STR(": "));
+  iop::panicLogger().critln(msg);
 }
 void PanicHook::defaultStaticPanic(iop::StaticString const &msg, CodePoint const &point) noexcept {
-  iop::panicLogger().crit(IOP_STR("Line "), ::std::to_string(point.line()), IOP_STR(" of file "), point.file(),
-              IOP_STR(" inside "), point.func(), IOP_STR(": "), msg);
+  iop::panicLogger().crit(IOP_STR("Line "));
+  iop::panicLogger().crit(point.line());
+  iop::panicLogger().crit(IOP_STR(" of file "));
+  iop::panicLogger().crit(point.file());
+  iop::panicLogger().crit(IOP_STR(" inside "));
+  iop::panicLogger().crit(point.func());
+  iop::panicLogger().crit(IOP_STR(": "));
+  iop::panicLogger().critln(msg);
 }
 void PanicHook::defaultEntry(std::string_view const &msg, CodePoint const &point) noexcept {
   IOP_TRACE();
   if (isPanicking) {
-    iop::panicLogger().crit(IOP_STR("PANICK REENTRY: Line "), std::to_string(point.line()),
-                IOP_STR(" of file "), point.file(), IOP_STR(" inside "), point.func(),
-                IOP_STR(": "), msg);
+    iop::panicLogger().crit(IOP_STR("PANICK REENTRY: Line "));
+    iop::panicLogger().crit(point.line());
+    iop::panicLogger().crit(IOP_STR(" of file "));
+    iop::panicLogger().crit(point.file());
+    iop::panicLogger().crit(IOP_STR(" inside "));
+    iop::panicLogger().crit(point.func());
+    iop::panicLogger().crit(IOP_STR(": "));
+    iop::panicLogger().critln(msg);
     iop::logMemory(iop::panicLogger());
     iop_hal::thisThread.halt();
   }

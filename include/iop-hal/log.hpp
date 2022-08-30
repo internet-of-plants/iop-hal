@@ -113,10 +113,11 @@ class Tracer;
 class Log {
   LogLevel level_;
   StaticString target_;
+  LogType state;
 
 public:
   Log(const LogLevel &level, StaticString target) noexcept
-      : level_{level}, target_(target) {}
+      : level_{level}, target_(target), state(LogType::END) {}
 
   /// Replaces current hook for the argument. 
   /// It's very useful to support other logging channels, like network or storage.
@@ -139,35 +140,282 @@ public:
   // TODO: stop with the global tracing
   static auto isTracing() noexcept -> bool;
 
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::TRACE`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::TRACE`
-  template <typename... Args> void trace(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::TRACE, true, args...);
+  auto updateState() noexcept -> void {
+    switch (this->state) {
+      case LogType::START:
+        this->state = LogType::CONTINUITY;
+        break;
+      case LogType::CONTINUITY:
+        break;
+      case LogType::STARTEND:
+        this->state = LogType::START;
+        break;
+      case LogType::END:
+        this->state = LogType::START;
+        break;
+    }
   }
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::DEBUG`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::DEBUG`
-  template <typename... Args> void debug(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::DEBUG, true, args...);
+  auto finalizeState() noexcept -> void {
+    switch (this->state) {
+      case LogType::START:
+        this->state = LogType::END;
+        break;
+      case LogType::CONTINUITY:
+        this->state = LogType::END;
+        break;
+      case LogType::STARTEND:
+        this->state = LogType::STARTEND;
+        break;
+      case LogType::END:
+        this->state = LogType::STARTEND;
+        break;
+    }
   }
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::INFO`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::INFO`
-  template <typename... Args> void info(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::INFO, true, args...);
+
+  auto trace(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR(""));
   }
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::WARN`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::WARN`
-  template <typename... Args> void warn(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::WARN, true, args...);
+  auto trace(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR(""));
   }
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::ERROR`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::ERROR`
-  template <typename... Args> void error(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::ERROR, true, args...);
+  auto trace(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR(""));
   }
-  /// Logs a sequence of runtime and compile time strings as a line, as `iop::LogType::CRIT`
-  /// Message is ignored if the logger has a lower level than `iop::LogType::CRIT`
-  template <typename... Args> void crit(const Args &...args) const noexcept {
-    this->log_recursive(LogLevel::CRIT, true, args...);
+  auto trace(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto trace(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto traceln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR("\n"));
+  }
+  auto traceln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR("\n"));
+  }
+  auto traceln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, msg, this->state, IOP_STR("\n"));
+  }
+  auto traceln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto traceln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), this->state, IOP_STR("\n"));
+  }
+
+  auto debug(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR(""));
+  }
+  auto debug(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR(""));
+  }
+  auto debug(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR(""));
+  }
+  auto debug(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto debug(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto debugln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR("\n"));
+  }
+  auto debugln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR("\n"));
+  }
+  auto debugln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, msg, this->state, IOP_STR("\n"));
+  }
+  auto debugln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto debugln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), this->state, IOP_STR("\n"));
+  }
+
+  auto info(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR(""));
+  }
+  auto info(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR(""));
+  }
+  auto info(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR(""));
+  }
+  auto info(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto info(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto infoln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR("\n"));
+  }
+  auto infoln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR("\n"));
+  }
+  auto infoln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, msg, this->state, IOP_STR("\n"));
+  }
+  auto infoln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto infoln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), this->state, IOP_STR("\n"));
+  }
+
+  auto warn(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR(""));
+  }
+  auto warn(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR(""));
+  }
+  auto warn(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR(""));
+  }
+  auto warn(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto warn(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto warnln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR("\n"));
+  }
+  auto warnln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR("\n"));
+  }
+  auto warnln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, msg, this->state, IOP_STR("\n"));
+  }
+  auto warnln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto warnln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), this->state, IOP_STR("\n"));
+  }
+
+  auto error(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR(""));
+  }
+  auto error(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR(""));
+  }
+  auto error(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR(""));
+  }
+  auto error(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto error(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto errorln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR("\n"));
+  }
+  auto errorln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR("\n"));
+  }
+  auto errorln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, msg, this->state, IOP_STR("\n"));
+  }
+  auto errorln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto errorln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), this->state, IOP_STR("\n"));
+  }
+
+  auto crit(const StaticString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR(""));
+  }
+  auto crit(const std::string_view msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR(""));
+  }
+  auto crit(const std::string msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR(""));
+  }
+  auto crit(const CowString msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, iop::to_view(msg), this->state, IOP_STR(""));
+  }
+  auto crit(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), this->state, IOP_STR(""));
+  }
+  auto critln(const StaticString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR("\n"));
+  }
+  auto critln(const std::string_view msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR("\n"));
+  }
+  auto critln(const std::string msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, msg, this->state, IOP_STR("\n"));
+  }
+  auto critln(const CowString msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, iop::to_view(msg), this->state, IOP_STR("\n"));
+  }
+  auto critln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), this->state, IOP_STR("\n"));
   }
 
   /// Primitive that allows printing an individual compile time string according to the log level
@@ -181,53 +429,6 @@ public:
   static void setup(LogLevel level) noexcept;
 
 private:
-  // "Recursive" internal variadic function 
-  template <typename... Args>
-  void log_recursive(const LogLevel &level, const bool first,
-                     const StaticString msg,
-                     const Args &...args) const noexcept {
-    if (first) {
-      this->log(level, msg, LogType::START, IOP_STR(""));
-    } else {
-      this->log(level, msg, LogType::CONTINUITY, IOP_STR(""));
-    }
-    this->log_recursive(level, false, args...);
-  }
-
-  // Terminator
-  template <typename... Args>
-  void log_recursive(const LogLevel &level, const bool first,
-                     const StaticString msg) const noexcept {
-    if (first) {
-      this->log(level, msg, LogType::STARTEND, IOP_STR("\n"));
-    } else {
-      this->log(level, msg, LogType::END, IOP_STR("\n"));
-    }
-  }
-
-  // "Recursive" variadic function
-  template <typename... Args>
-  void log_recursive(const LogLevel &level, const bool first,
-                     const std::string_view msg, const Args &...args) const noexcept {
-    if (first) {
-      this->log(level, msg, LogType::START, IOP_STR(""));
-    } else {
-      this->log(level, msg, LogType::CONTINUITY, IOP_STR(""));
-    }
-    this->log_recursive(level, false, args...);
-  }
-
-  // Terminator
-  template <typename... Args>
-  void log_recursive(const LogLevel &level, const bool first,
-                     const std::string_view msg) const noexcept {
-    if (first) {
-      this->log(level, msg, LogType::STARTEND, IOP_STR("\n"));
-    } else {
-      this->log(level, msg, LogType::END, IOP_STR("\n"));
-    }
-  }
-
   void printLogType(const LogType &logType, const LogLevel &level) const noexcept;
   auto levelToString(LogLevel level) const noexcept -> StaticString;
 
@@ -259,7 +460,7 @@ public:
   auto operator=(Tracer &&other) noexcept -> Tracer & = delete;
 };
 
-void logMemory(const iop::Log &logger) noexcept;
+void logMemory(iop::Log &logger) noexcept;
 } // namespace iop
 
 namespace iop_hal {

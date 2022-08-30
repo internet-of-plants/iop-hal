@@ -10,10 +10,10 @@ static iop::UpdateHook hook(defaultHook);
 namespace iop {
 iop_hal::Wifi wifi;
 
-auto Network::logger() const noexcept -> const Log & {
+auto Network::logger() noexcept -> Log & {
   return this->logger_;
 }
-auto Network::update(StaticString path, std::string_view token) const noexcept -> iop_hal::UpdateStatus {
+auto Network::update(StaticString path, std::string_view token) noexcept -> iop_hal::UpdateStatus {
   return iop_hal::Update::run(*this, path, token);
 }
 void UpdateHook::defaultHook() noexcept { IOP_TRACE(); }
@@ -35,15 +35,15 @@ void Network::disconnect() noexcept {
   return iop::wifi.disconnectFromAccessPoint();
 }
 
-auto Network::httpPost(std::string_view token, const StaticString path, std::string_view data) const noexcept -> iop_hal::Response {
+auto Network::httpPost(std::string_view token, const StaticString path, std::string_view data) noexcept -> iop_hal::Response {
   return this->httpRequest(HttpMethod::POST, token, path, data);
 }
 
-auto Network::httpPost(StaticString path, std::string_view data) const noexcept -> iop_hal::Response {
+auto Network::httpPost(StaticString path, std::string_view data) noexcept -> iop_hal::Response {
   return this->httpRequest(HttpMethod::POST, std::nullopt, path, data);
 }
 
-auto Network::httpGet(StaticString path, std::string_view token, std::string_view data) const noexcept -> iop_hal::Response {
+auto Network::httpGet(StaticString path, std::string_view token, std::string_view data) noexcept -> iop_hal::Response {
   return this->httpRequest(HttpMethod::GET, token, path, data);
 }
 
@@ -71,7 +71,7 @@ static auto methodToString(const HttpMethod &method) noexcept -> StaticString;
 // Returns Response if it can understand what the server sent
 auto Network::httpRequest(const HttpMethod method_,
                           const std::optional<std::string_view> &token, StaticString path,
-                          const std::optional<std::string_view> &data) const noexcept
+                          const std::optional<std::string_view> &data) noexcept
     -> iop_hal::Response {
   IOP_TRACE();
   Network::setup();
@@ -80,61 +80,63 @@ auto Network::httpRequest(const HttpMethod method_,
   const auto method = methodToString(method_);
   const auto data_ = data.value_or(std::string_view());
 
-  {
-    this->logger().debug(method, IOP_STR(" to "), this->uri());
-    this->logger().debug(path, IOP_STR(", data length: "), std::to_string(data_.length()));
+  this->logger().debug(method);
+  this->logger().debug(IOP_STR(" to "));
+  this->logger().debug(this->uri());
+  this->logger().debug(path);
+  this->logger().debug(IOP_STR(", data length: "));
+  this->logger().debugln(data_.length());
 
-    // TODO: this may log sensitive information, network logging is currently
-    // capped at info because of that
-    if (data)
-      this->logger().debug(*data);
-    
-    this->logger().debug(IOP_STR("Begin"));
+  // TODO: this may log sensitive information, network logging is currently
+  // capped at info because of that
+  if (data) {
+    this->logger().debugln(*data);
   }
+  
+  this->logger().debugln(IOP_STR("Begin"));
 
   const auto func = [this, token, data, data_, method](iop_hal::Session & session) {
-    {
-      this->logger().trace(IOP_STR("Began HTTP connection"));
+    this->logger().debugln(IOP_STR("Began HTTP connection"));
 
-      if (token) {
-        session.setAuthorization(std::string(*token));
-      }
-
-      // Currently only JSON is supported
-      if (data)
-        session.addHeader(IOP_STR("Content-Type"), IOP_STR("application/json"));
-
-      // Authentication headers, identifies device and detects updates, perf
-      // monitoring
-      {
-        auto str = iop::to_view(iop_hal::device.firmwareMD5());
-        session.addHeader(IOP_STR("VERSION"), str);
-        session.addHeader(IOP_STR("x-ESP8266-sketch-md5"), str);
-
-        str = iop::to_view(iop_hal::device.macAddress());
-        session.addHeader(IOP_STR("MAC_ADDRESS"), str);
-      }
-      
-      {
-        // Could this cause memory fragmentation?
-        auto memory = iop_hal::thisThread.availableMemory();
-        
-        session.addHeader(IOP_STR("FREE_STACK"), std::to_string(memory.availableStack));
-
-        for (const auto & item: memory.availableHeap) {
-          session.addHeader(IOP_STR("FREE_").toString().append(item.first), std::to_string(item.second));
-        }
-        for (const auto & item: memory.biggestHeapBlock) {
-          session.addHeader(IOP_STR("BIGGEST_BLOCK_").toString().append(item.first), std::to_string(item.second));
-        }
-      }
-      session.addHeader(IOP_STR("VCC"), std::to_string(iop_hal::device.vcc()));
-      session.addHeader(IOP_STR("TIME_RUNNING"), std::to_string(iop_hal::thisThread.timeRunning()));
-      session.addHeader(IOP_STR("ORIGIN"), this->uri());
-      session.addHeader(IOP_STR("DRIVER"), iop_hal::device.platform());
-
-      this->logger().debug(IOP_STR("Making HTTP request"));
+    if (token) {
+      session.setAuthorization(std::string(*token));
     }
+
+    // Currently only JSON is supported
+    if (data) {
+      session.addHeader(IOP_STR("Content-Type"), IOP_STR("application/json"));
+    }
+
+    // Authentication headers, identifies device and detects updates, perf
+    // monitoring
+    {
+      auto str = iop::to_view(iop_hal::device.firmwareMD5());
+      session.addHeader(IOP_STR("VERSION"), str);
+      session.addHeader(IOP_STR("x-ESP8266-sketch-md5"), str);
+
+      str = iop::to_view(iop_hal::device.macAddress());
+      session.addHeader(IOP_STR("MAC_ADDRESS"), str);
+    }
+    
+    {
+      // Could this cause memory fragmentation?
+      auto memory = iop_hal::thisThread.availableMemory();
+      
+      session.addHeader(IOP_STR("FREE_STACK"), std::to_string(memory.availableStack));
+
+      for (const auto & item: memory.availableHeap) {
+        session.addHeader(IOP_STR("FREE_").toString().append(item.first), std::to_string(item.second));
+      }
+      for (const auto & item: memory.biggestHeapBlock) {
+        session.addHeader(IOP_STR("BIGGEST_BLOCK_").toString().append(item.first), std::to_string(item.second));
+      }
+    }
+    session.addHeader(IOP_STR("VCC"), std::to_string(iop_hal::device.vcc()));
+    session.addHeader(IOP_STR("TIME_RUNNING"), std::to_string(iop_hal::thisThread.timeRunning()));
+    session.addHeader(IOP_STR("ORIGIN"), this->uri());
+    session.addHeader(IOP_STR("DRIVER"), iop_hal::device.platform());
+
+    this->logger().debugln(IOP_STR("Making HTTP request"));
 
     auto response = session.sendRequest(method.toString(), data_);
 
@@ -143,16 +145,17 @@ auto Network::httpRequest(const HttpMethod method_,
       return iop_hal::Response(response.code());
     }
   
-    this->logger().debug(IOP_STR("Made HTTP request")); 
+    this->logger().debugln(IOP_STR("Made HTTP request")); 
 
     // Handle system update request
     const auto update = response.header(IOP_STR("LATEST_VERSION"));
     if (update && update != iop::to_view(iop_hal::device.firmwareMD5())) {
-      this->logger().debug(IOP_STR("Scheduled update"));
+      this->logger().debugln(IOP_STR("Scheduled update"));
       hook.schedule();
     }
   
-    this->logger().debug(IOP_STR("Response code: "), iop::to_view(this->codeToString(response.code())));
+    this->logger().debug(IOP_STR("Response code: "));
+    this->logger().debugln(this->codeToString(response.code()));
 
     // TODO: this is broken because it's not lazy, it should be a HTTPClient setting that bails out if it's bigger, and encapsulated in the API
     /*
@@ -160,7 +163,8 @@ auto Network::httpRequest(const HttpMethod method_,
     if (globalData.http().getSize() > maxPayloadSizeAcceptable) {
       globalData.http().end();
       const auto lengthStr = std::to_string(response.payload.length());
-      this->logger().error(IOP_STR("Payload from server was too big: "), lengthStr);
+      this->logger().error(IOP_STR("Payload from server was too big: "));
+      this->logger().errorln(lengthStr);
       globalData.response() = iop_hal::Response(NetworkStatus::BROKEN_SERVER);
       return globalData.response();
     }
@@ -171,8 +175,10 @@ auto Network::httpRequest(const HttpMethod method_,
       // The payload is always downloaded, since we check for its size and the
       // origin is trusted. If it's there it's supposed to be there.
       const auto payload = std::move(response.await().payload);
-      this->logger().debug(IOP_STR("Payload (") , iop::to_view(std::to_string(payload.size())), IOP_STR(")"));
-      this->logger().debug(iop::to_view(iop::scapeNonPrintable(iop::to_view(payload).substr(0, payload.size() > 30 ? 30 : payload.size()))));
+      this->logger().debug(IOP_STR("Payload ("));
+      this->logger().debug(payload.size());
+      this->logger().debug(IOP_STR("): "));
+      this->logger().debugln(iop::scapeNonPrintable(iop::to_view(payload).substr(0, payload.size() > 30 ? 30 : payload.size())));
       return iop_hal::Response(iop_hal::Payload(payload), *status);
     }
     return iop_hal::Response(response.code());
