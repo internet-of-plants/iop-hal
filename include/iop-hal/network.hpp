@@ -48,7 +48,7 @@ class Network {
 public:
   Network(StaticString uri, const LogLevel &logLevel) noexcept;
 
-  auto setup() const noexcept -> void;
+  static auto setup() noexcept -> void;
   auto uri() const noexcept -> StaticString { return this->uri_; };
 
   /// Sets new firmware update hook for this. Very useful to support updates

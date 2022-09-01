@@ -24,7 +24,7 @@
 namespace iop {
 
 /// Specifies logging level hierarchy
-enum class LogLevel { TRACE, DEBUG, INFO, WARN, ERROR, CRIT, NO_LOG };
+enum class LogLevel { TRACE = 0, DEBUG, INFO, WARN, ERROR, CRIT, NO_LOG };
 
 /// Internal structure to allow dynamically building logs
 /// Helpful for properly displaying logging metadata, but also for network/storage logging

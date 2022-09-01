@@ -154,6 +154,19 @@ void Session::setAuthorization(std::string auth) noexcept {
   iop_assert(this->ctx.http.http, IOP_STR("Session has been moved out"));
   this->ctx.http.http->setAuthorization(auth.c_str());
 }
+
+auto parseHeaders(::HTTPClient & client) noexcept -> std::unordered_map<std::string, std::string> {
+  std::unordered_map<std::string, std::string> headers;
+  headers.reserve(client.headers());
+  for (int index = 0; index < client.headers(); ++index) {
+    const auto key = std::string(client.headerName(index).c_str());
+    const auto value = std::string(client.header(index).c_str());
+    if (value == "") continue;
+    headers[key] = value;
+  }
+  return headers;
+}
+
 auto Session::sendRequest(const std::string method, const std::string_view data) noexcept -> Response {
   IOP_TRACE();
 
@@ -164,20 +177,13 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     return Response(code);
   }
 
-  std::unordered_map<std::string, std::string> headers;
-  headers.reserve(this->ctx.http.http->headers());
-  for (int index = 0; index < this->ctx.http.http->headers(); ++index) {
-    const auto key = std::string(this->ctx.http.http->headerName(index).c_str());
-    const auto value = std::string(this->ctx.http.http->header(index).c_str());
-    if (value == "") continue;
-    headers[key] = value;
-  }
-
+  const auto headers = parseHeaders(*this->ctx.http.http);
   const auto httpString = this->ctx.http.http->getString();
+
   auto storage = std::vector<uint8_t>();
   storage.insert(storage.end(), httpString.c_str(), httpString.c_str() + httpString.length());
-  const auto payload = Payload(storage);
-  const auto response = Response(headers, payload, code);
+  
+  const auto response = Response(headers, Payload(storage), code);
   return response;
 }
 
@@ -189,13 +195,8 @@ HTTPClient::~HTTPClient() noexcept {
 }
 
 auto HTTPClient::setup() noexcept -> void {}
-auto HTTPClient::begin(const std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response {
-  IOP_TRACE(); 
 
-  iop_assert(this->http, IOP_STR("iop_hal::HTTPClient* not allocated"));
-  this->http->setTimeout(UINT16_MAX);
-  this->http->setAuthorization("");
-
+auto validateUri(const std::string_view uri) noexcept -> void {
   // Parse URI
   auto index = uri.find("://");
   if (index == uri.npos) {
@@ -224,11 +225,20 @@ auto HTTPClient::begin(const std::string_view uri, std::function<Response(Sessio
   uint16_t port;
   auto result = std::from_chars(portStr.data(), portStr.data() + portStr.size(), port);
   if (result.ec != std::errc()) {
-    iop_panic(IOP_STR("Unable to confert port to uint16_t: ").toString() + portStr.begin() + IOP_STR(" ").toString() + std::error_condition(result.ec).message());
+    iop_panic(IOP_STR("Unable to convert port to uint16_t: ").toString() + portStr.begin() + IOP_STR(" ").toString() + std::error_condition(result.ec).message());
   }
+}
 
+auto HTTPClient::begin(const std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response {
+  IOP_TRACE(); 
+
+  iop_assert(this->http, IOP_STR("iop_hal::HTTPClient* not allocated"));
   iop_assert(iop::wifi.client, IOP_STR("Wifi has been moved out, client is nullptr"));
-  iop_assert(this->http, IOP_STR("HTTP client is nullptr"));
+
+  this->http->setTimeout(UINT16_MAX);
+  this->http->setAuthorization("");
+
+  validateUri(uri);
 
   auto uriArduino = String();
   uriArduino.concat(uri.begin(), uri.length());
