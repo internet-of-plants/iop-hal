@@ -22,7 +22,7 @@ enum class StationStatus {
   CONNECT_FAIL,
   GOT_IP,
 };
-auto statusToString(const iop_hal::StationStatus status) noexcept -> std::optional<iop::StaticString>;
+auto statusToString(const iop_hal::StationStatus status) noexcept -> iop::StaticString;
 
 class CertStore;
 class Wifi;

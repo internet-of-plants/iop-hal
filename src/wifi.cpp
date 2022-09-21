@@ -13,7 +13,7 @@
 #include "iop-hal/log.hpp"
 
 namespace iop_hal {
-auto statusToString(const iop_hal::StationStatus status) noexcept -> std::optional<iop::StaticString> {
+auto statusToString(const iop_hal::StationStatus status) noexcept -> iop::StaticString {
   IOP_TRACE();
 
   switch (status) {
@@ -37,6 +37,5 @@ auto statusToString(const iop_hal::StationStatus status) noexcept -> std::option
   }
 
   return IOP_STR("UNKNWON_STATUS");
-  return std::nullopt;
 }
 }
