@@ -146,6 +146,7 @@ auto Wifi::disableOurAccessPoint() const noexcept -> void {
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
+    IOP_TRACE();
     ::WiFi.begin(std::string(ssid).c_str(), std::string(psk).c_str());
 
     return ::WiFi.waitForConnectResult() != -1;

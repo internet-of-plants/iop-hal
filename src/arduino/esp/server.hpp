@@ -120,6 +120,7 @@ void CaptivePortal::close() noexcept {
   this->server = nullptr;
 }
 void CaptivePortal::handleClient() const noexcept {
+  IOP_TRACE();
   iop_assert(this->server, IOP_STR("Must initialize DNSServer first"));
   static_cast<DNSServer*>(this->server)->processNextRequest();
 }

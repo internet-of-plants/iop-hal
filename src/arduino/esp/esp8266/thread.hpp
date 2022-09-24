@@ -22,6 +22,7 @@ auto Thread::availableMemory() const noexcept -> Memory {
     {
       HeapSelectIram _guard;
       heap.insert({ std::string_view("IRAM"), ESP.getFreeHeap() });
+      biggestBlock.insert({ std::string_view("IRAM"), ESP.getMaxFreeBlockSize() });
     }
   }
 

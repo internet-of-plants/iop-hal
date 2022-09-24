@@ -46,7 +46,7 @@ auto Device::firmwareMD5() const noexcept -> iop::MD5Hash & {
   std::unique_ptr<uint8_t[]> buf;
   uint32_t offset = 0;
 
-  while (!buf) {
+  while (!buf && bufSize > 1) {
     bufSize /= 2;
     buf = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[bufSize]);
   }

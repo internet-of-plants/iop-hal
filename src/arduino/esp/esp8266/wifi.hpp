@@ -157,6 +157,8 @@ auto Wifi::disableOurAccessPoint() const noexcept -> void {
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
+    IOP_TRACE();
+
     if (wifi_station_get_connect_status() == STATION_CONNECTING) {
         this->disconnectFromAccessPoint();
     }
