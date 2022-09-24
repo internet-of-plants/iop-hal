@@ -24,11 +24,11 @@
 namespace iop {
 
 /// Specifies logging level hierarchy
-enum class LogLevel { TRACE = 0, DEBUG, INFO, WARN, ERROR, CRIT, NO_LOG };
+enum class LogLevel: uint8_t { TRACE = 0, DEBUG, INFO, WARN, ERROR, CRIT, NO_LOG };
 
 /// Internal structure to allow dynamically building logs
 /// Helpful for properly displaying logging metadata, but also for network/storage logging
-enum class LogType { START, CONTINUITY, STARTEND, END };
+enum class LogType: uint8_t { START, CONTINUITY, STARTEND, END };
 
 /// Represents an individual point in the codebase (used to track callers of panics)
 class CodePoint {
@@ -111,13 +111,13 @@ class Tracer;
 
 /// Logger structure, contains its log level and log target
 class Log {
-  LogLevel level_;
   StaticString target_;
+  LogLevel level_;
   LogType state;
 
 public:
   Log(const LogLevel &level, StaticString target) noexcept
-      : level_{level}, target_(target), state(LogType::END) {}
+      : target_(target), level_{level}, state(LogType::END) {}
 
   /// Replaces current hook for the argument. 
   /// It's very useful to support other logging channels, like network or storage.
