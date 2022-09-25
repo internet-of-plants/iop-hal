@@ -2,7 +2,7 @@
 #define IOP_DRIVER_THREAD
 
 #include <stdint.h>
-#include <map>
+#include <unordered_map>
 #include <string_view>
 
 namespace iop {
@@ -17,10 +17,10 @@ struct Memory {
   uintmax_t availableStack;
   // It's a map because some environments have multiple, specialized, RAMs.
   // This allocation sucks tho. The keys should have static lifetime
-  std::map<std::string_view, uintmax_t> availableHeap;
-  std::map<std::string_view, uintmax_t> biggestHeapBlock;
+  std::unordered_map<std::string_view, uintmax_t> availableHeap;
+  std::unordered_map<std::string_view, uintmax_t> biggestHeapBlock;
 
-  Memory(uintmax_t stack, std::map<std::string_view, uintmax_t> heap, std::map<std::string_view, uintmax_t> biggestBlock) noexcept:
+  Memory(uintmax_t stack, std::unordered_map<std::string_view, uintmax_t> heap, std::unordered_map<std::string_view, uintmax_t> biggestBlock) noexcept:
     availableStack(stack), availableHeap(heap), biggestHeapBlock(biggestBlock) {}
 };
 

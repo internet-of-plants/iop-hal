@@ -9,15 +9,16 @@ auto Thread::abort() const noexcept -> void {
 }
 
 auto Thread::availableMemory() const noexcept -> Memory {
-  static std::map<std::string_view, uintmax_t> heap;
-  static std::map<std::string_view, uintmax_t> biggestBlock;
+  static std::unordered_map<std::string_view, uintmax_t> heap;
+  static std::unordered_map<std::string_view, uintmax_t> biggestBlock;
 
   // TODO: get IRAM
-  if (heap.size() == 0) {
-    {
-      heap.insert({ std::string_view("DRAM"), ESP.getFreeHeap() });
-      biggestBlock.insert({ std::string_view("DRAM"), ESP.getMaxAllocHeap() });
-    }
+  heap.clear();
+  biggestBlock.clear();
+  
+  {
+    heap.insert({ std::string_view("DRAM"), ESP.getFreeHeap() });
+    biggestBlock.insert({ std::string_view("DRAM"), ESP.getMaxAllocHeap() });
   }
 
   // TODO: show stack usage: uxTaskGetStackHighWaterMark(taskHandler)

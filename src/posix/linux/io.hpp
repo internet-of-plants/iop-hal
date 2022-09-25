@@ -45,12 +45,12 @@ auto GPIO::digitalRead(const PinRaw pin) const noexcept -> Data {
 }
 
 auto GPIO::setInterruptCallback(const PinRaw pin, const InterruptState state, void (*func)()) const noexcept -> void {
-    auto gpio = std::make_shared<GPIO>(*this);
+    auto gpio = *this;
     // TODO: fix this, this is horrible
     std::thread([pin, state, func, gpio]() {
-        auto lastValue = gpio->digitalRead(pin);
+        auto lastValue = gpio.digitalRead(pin);
         while (true) {
-            auto value = gpio->digitalRead(pin);
+            auto value = gpio.digitalRead(pin);
             switch (state) {
                 case InterruptState::CHANGE:
                     if (lastValue == Data::LOW && value == Data::HIGH) func();
