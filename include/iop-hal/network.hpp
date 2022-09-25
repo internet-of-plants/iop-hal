@@ -46,7 +46,7 @@ class Network {
   StaticString uri_;
 
 public:
-  Network(StaticString uri, const LogLevel &logLevel) noexcept;
+  Network(StaticString uri) noexcept;
 
   static auto setup() noexcept -> void;
   auto uri() const noexcept -> StaticString { return this->uri_; };

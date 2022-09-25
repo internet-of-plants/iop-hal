@@ -14,21 +14,21 @@
 #error "Target not supported"
 #endif
 
+#include "iop-hal/log.hpp"
 #include "iop-hal/network.hpp"
 #include "iop-hal/device.hpp"
 #include "iop-hal/wifi.hpp"
 #include "iop-hal/thread.hpp"
 
 static bool initialized = false;
-static bool isTracing_ = false; 
 static bool shouldFlush_ = true;
 
 void iop::Log::shouldFlush(const bool flush) noexcept {
   shouldFlush_ = flush;
 }
 
-auto iop::Log::isTracing() noexcept -> bool { 
-  return isTracing_;
+auto iop::Log::isTracing() const noexcept -> bool {
+  return this->level() <= iop::LogLevel::TRACE;
 }
 
 constexpr static iop::LogHook defaultHook(iop::LogHook::defaultViewPrinter,
@@ -38,7 +38,7 @@ constexpr static iop::LogHook defaultHook(iop::LogHook::defaultViewPrinter,
 static iop::LogHook hook = defaultHook;
 
 namespace iop {
-void IOP_RAM Log::setup(LogLevel level) noexcept { hook.setup(level); }
+void IOP_RAM Log::setup() noexcept { hook.setup(); }
 void Log::flush() noexcept { if (shouldFlush_) hook.flush(); }
 void IOP_RAM Log::print(const std::string_view view, const LogLevel level,
                                 const LogType kind) noexcept {
@@ -89,7 +89,7 @@ void Log::printLogType(const LogType &logType,
 void Log::log(const LogLevel &level, const StaticString &msg,
               const LogType &logType,
               const StaticString &lineTermination) const noexcept {
-  if (this->level_ > level)
+  if (this->level() > level)
     return;
 
   Log::flush();
@@ -106,7 +106,7 @@ void Log::log(const LogLevel &level, const StaticString &msg,
 void Log::log(const LogLevel &level, const std::string_view &msg,
               const LogType &logType,
               const StaticString &lineTermination) const noexcept {
-  if (this->level_ > level)
+  if (this->level() > level)
     return;
 
   Log::flush();
@@ -140,8 +140,7 @@ auto Log::levelToString(const LogLevel level) const noexcept -> StaticString {
   return IOP_STR("UNKNOWN");
 }
 
-void IOP_RAM LogHook::defaultStaticPrinter(
-    const StaticString str, const LogLevel level, const LogType type) noexcept {
+void IOP_RAM LogHook::defaultStaticPrinter(const StaticString str, const LogLevel level, const LogType type) noexcept {
   iop_hal::logPrint(str);
   (void)type;
   (void)level;
@@ -153,13 +152,12 @@ LogHook::defaultViewPrinter(const std::string_view str, const LogLevel level, co
   (void)level;
 }
 void IOP_RAM
-LogHook::defaultSetuper(const LogLevel level) noexcept {
-  isTracing_ |= level == LogLevel::TRACE;
+LogHook::defaultSetuper() noexcept {
   static bool hasInitialized = false;
   const auto shouldInitialize = !hasInitialized;
   hasInitialized = true;
   if (shouldInitialize)
-    iop_hal::logSetup(level);
+    iop_hal::logSetup();
 }
 void LogHook::defaultFlusher() noexcept {
   iop_hal::logFlush();
@@ -194,12 +192,10 @@ auto LogHook::operator=(LogHook &&other) noexcept -> LogHook & {
 
 constexpr static char TRACER_NAME_RAW[] IOP_ROM = "TRACER";
 static const iop::StaticString TRACER_NAME = reinterpret_cast<const __FlashStringHelper*>(TRACER_NAME_RAW);
-static Log logger(iop::LogLevel::DEBUG, TRACER_NAME);
+static Log logger(TRACER_NAME);
 
 Tracer::Tracer(CodePoint point) noexcept : point(point) {
-  if (!iop::Log::isTracing()) return;
-  logger.level_ = LogLevel::TRACE;
-
+  if (!logger.isTracing()) return;
   logger.trace(IOP_STR("Entering new scope at line "));
   logger.trace(this->point.line());
   logger.trace(IOP_STR(", in function "));
@@ -232,9 +228,7 @@ Tracer::Tracer(CodePoint point) noexcept : point(point) {
   logger.traceln(iop::wifi.status() == iop_hal::StationStatus::GOT_IP);
 }
 Tracer::~Tracer() noexcept {
-  if (!iop::Log::isTracing()) return;
-  logger.level_ = LogLevel::TRACE;
-
+  if (!logger.isTracing()) return;
   logger.trace(IOP_STR("Leaving scope, at line "));
   logger.trace(this->point.line());
   logger.trace(IOP_STR(", in function "));

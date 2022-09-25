@@ -33,7 +33,7 @@ class BIO;
 
 constexpr size_t bufferSize = 8192;
 
-static iop::Log clientDriverLogger(IOP_LOG_LEVEL, IOP_STR("HTTP Client"));
+static iop::Log clientDriverLogger(IOP_STR("HTTP Client"));
 
 auto shiftChars(char* ptr, const size_t start, const size_t end) noexcept {
   //clientDriverLogger.debug(std::string_view(ptr).substr(start, end));
@@ -93,7 +93,7 @@ HTTPClient::HTTPClient() noexcept: headersToCollect_() {}
 HTTPClient::~HTTPClient() noexcept {}
 
 static ssize_t send(const SessionContext &ctx, const char * msg, const size_t len) noexcept {
-  if (iop::Log::isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::STARTEND);
+  if (clientDriverLogger.isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::STARTEND);
   #ifdef IOP_SSL
   if (ctx.bio) {
     return BIO_write(ctx.bio, msg, len);
@@ -163,7 +163,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     const auto fd = this->ctx.fd;
     iop_assert(fd != -1 || this->ctx.bio, IOP_STR("Invalid file descriptor or ctx.bio"));
 
-    if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
+    if (clientDriverLogger.isTracing())
       iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
     send(this->ctx, method.c_str(), method.length());
     send(this->ctx, " ", 1);
@@ -181,7 +181,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
     }
     send(this->ctx, "\r\n", 2);
     send(this->ctx, data.begin(), len);
-    if (clientDriverLogger.level() == iop::LogLevel::TRACE || iop::Log::isTracing())
+    if (clientDriverLogger.isTracing())
       iop::Log::print(IOP_STR("\n"), iop::LogLevel::TRACE, iop::LogType::END);
     clientDriverLogger.debug(IOP_STR("Sent data: "));
     clientDriverLogger.debugln(data);

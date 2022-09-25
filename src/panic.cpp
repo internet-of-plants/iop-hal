@@ -16,7 +16,7 @@ static iop::PanicHook hook(defaultHook);
 
 namespace iop {
 auto panicLogger() noexcept -> Log & {
-  static iop::Log logger(IOP_LOG_LEVEL, IOP_STR("PANIC"));
+  static iop::Log logger(IOP_STR("PANIC"));
   return logger;
 }
 

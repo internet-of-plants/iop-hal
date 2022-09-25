@@ -6,10 +6,10 @@
 //HardwareSerial Serial(UART0);
 
 namespace iop_hal {
-void logSetup(const iop::LogLevel &level) noexcept {
+void logSetup() noexcept {
     constexpr const uint32_t BAUD_RATE = 115200;
     Serial.begin(BAUD_RATE);
-    if (level <= iop::LogLevel::DEBUG)
+    if (IOP_LOG_LEVEL <= iop::LogLevel::DEBUG)
         Serial.setDebugOutput(true);
 
     constexpr const uint32_t twoSec = 2 * 1000;

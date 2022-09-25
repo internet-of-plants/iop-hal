@@ -18,8 +18,15 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 
+namespace iop_hal {
+iop::Log & logger() noexcept {
+  static iop::Log logger_(IOP_STR("HTTP Server"));
+  return logger_;
+}
+}
+
 static ssize_t send(int fd, const char * msg, const size_t len) noexcept {
-  if (iop::Log::isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::CONTINUITY);
+  if (iop_hal::logger().isTracing()) iop::Log::print(msg, iop::LogLevel::TRACE, iop::LogType::CONTINUITY);
   ssize_t sent = 0;
   uint64_t count = 0;
   while ((sent = write(fd, msg, len)) < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -44,11 +51,6 @@ static std::string httpCodeToString(const int code) {
 }
 
 namespace iop_hal {
-iop::Log & logger() noexcept {
-  static iop::Log logger_(IOP_LOG_LEVEL, IOP_STR("HTTP Server"));
-  return logger_;
-}
-
 HttpServer::HttpServer(const uint32_t port) noexcept: port(port) {
   this->notFoundHandler = [](HttpConnection &conn, iop::Log const &logger) {
     conn.send(404, IOP_STR("text/plain"), IOP_STR("Not Found"));
@@ -356,7 +358,7 @@ void HttpConnection::send(uint16_t code, iop::StaticString contentType, iop::Sta
 
   const auto codeStr = std::to_string(code);
   const auto codeText = httpCodeToString(code);
-  if (iop::Log::isTracing())
+  if (logger().isTracing())
     iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
   ::send(fd, "HTTP/1.0 ", 9);
   ::send(fd, codeStr.c_str(), codeStr.length());
@@ -376,7 +378,7 @@ void HttpConnection::send(uint16_t code, iop::StaticString contentType, iop::Sta
   ::send(fd, "\r\n", 2);
   if (content.length() > 0) ::send(fd, content.asCharPtr(), content.length());
 
-  if (iop::Log::isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::END);
+  if (logger().isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::END);
 }
 
 void HttpConnection::setContentLength(const size_t contentLength) noexcept {
@@ -395,9 +397,9 @@ void HttpConnection::sendData(iop::StaticString content) const noexcept {
   logger().debugln(content);
   iop_assert(this->currentClient, IOP_STR("No active client"));
 
-  if (iop::Log::isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
+  if (logger().isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::START);
   ::send(*this->currentClient, content.asCharPtr(), content.length());
-  if (iop::Log::isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::END);
+  if (logger().isTracing()) iop::Log::print(IOP_STR(""), iop::LogLevel::TRACE, iop::LogType::END);
 }
 
 // NOOP

@@ -47,8 +47,8 @@ auto Network::httpGet(StaticString path, std::string_view token, std::string_vie
   return this->httpRequest(HttpMethod::GET, token, path, data);
 }
 
-Network::Network(StaticString uri, const LogLevel &logLevel) noexcept
-  : logger_(logLevel, IOP_STR("NETWORK")), uri_(uri) {
+Network::Network(StaticString uri) noexcept
+  : logger_(IOP_STR("NETWORK")), uri_(uri) {
   IOP_TRACE();
 }
 }
