@@ -38,6 +38,8 @@ constexpr static iop::LogHook defaultHook(iop::LogHook::defaultViewPrinter,
 static iop::LogHook hook = defaultHook;
 
 namespace iop {
+LogType state = LogType::END;
+
 void IOP_RAM Log::setup() noexcept { hook.setup(); }
 void Log::flush() noexcept { if (shouldFlush_) hook.flush(); }
 void IOP_RAM Log::print(const std::string_view view, const LogLevel level,
@@ -71,13 +73,25 @@ void Log::printLogType(const LogType &logType,
   if (level == LogLevel::NO_LOG)
     return;
 
+  auto type = IOP_STR("UNKNOWN");
   switch (logType) {
   case LogType::CONTINUITY:
+    type = IOP_STR("CONTINUITY");
+    break;
   case LogType::END:
+    type = IOP_STR("END");
     break;
 
   case LogType::START:
+    type = IOP_STR("START");
+    Log::print(IOP_STR("["), level, LogType::START);
+    Log::print(this->levelToString(level).get(), level, LogType::CONTINUITY);
+    Log::print(IOP_STR("] "), level, LogType::CONTINUITY);
+    Log::print(this->target_.get(), level, LogType::CONTINUITY);
+    Log::print(IOP_STR(": "), level, LogType::CONTINUITY);
+    break;
   case LogType::STARTEND:
+    type = IOP_STR("STARTEND");
     Log::print(IOP_STR("["), level, LogType::START);
     Log::print(this->levelToString(level).get(), level, LogType::CONTINUITY);
     Log::print(IOP_STR("] "), level, LogType::CONTINUITY);

@@ -113,7 +113,7 @@ public:
 
 class Tracer;
 
-static auto state = LogType::END;
+extern LogType state;
 
 /// Logger structure, contains its log level and log target
 class Log {
