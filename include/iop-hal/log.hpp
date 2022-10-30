@@ -176,6 +176,8 @@ public:
     }
   }
 
+  // TODO: fix wdt reset when logging function is called before Log::setup is
+
   auto trace(const StaticString msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::TRACE, msg, state, IOP_STR(""));

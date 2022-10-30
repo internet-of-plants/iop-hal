@@ -20,7 +20,7 @@
 #include "iop-hal/wifi.hpp"
 #include "iop-hal/thread.hpp"
 
-static bool initialized = false;
+static bool hasInitialized = false;
 static bool shouldFlush_ = true;
 
 void iop::Log::shouldFlush(const bool flush) noexcept {
@@ -28,7 +28,7 @@ void iop::Log::shouldFlush(const bool flush) noexcept {
 }
 
 auto iop::Log::isTracing() const noexcept -> bool {
-  return this->level() <= iop::LogLevel::TRACE;
+  return hasInitialized && this->level() <= iop::LogLevel::TRACE;
 }
 
 constexpr static iop::LogHook defaultHook(iop::LogHook::defaultViewPrinter,
@@ -56,13 +56,13 @@ void IOP_RAM Log::print(const StaticString progmem,
     hook.traceStaticPrint(progmem, level, kind);
 }
 auto Log::takeHook() noexcept -> LogHook {
-  initialized = false;
+  hasInitialized = false;
   auto old = hook;
   hook = defaultHook;
   return old;
 }
 void Log::setHook(LogHook newHook) noexcept {
-  initialized = false;
+  hasInitialized = false;
   hook = std::move(newHook);
 }
 
@@ -153,11 +153,10 @@ LogHook::defaultViewPrinter(const std::string_view str, const LogLevel level, co
 }
 void IOP_RAM
 LogHook::defaultSetuper() noexcept {
-  static bool hasInitialized = false;
-  const auto shouldInitialize = !hasInitialized;
-  hasInitialized = true;
-  if (shouldInitialize)
+  if (!hasInitialized) {
+    hasInitialized = true;
     iop_hal::logSetup();
+  }
 }
 void LogHook::defaultFlusher() noexcept {
   iop_hal::logFlush();

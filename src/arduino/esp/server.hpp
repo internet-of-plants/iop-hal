@@ -43,7 +43,7 @@ void HttpConnection::setContentLength(size_t length) noexcept {
 void HttpConnection::reset() noexcept {}
 
 static uint32_t serverPort = 0;
-HttpServer::HttpServer(uint32_t port) noexcept { IOP_TRACE(); serverPort = port; }
+HttpServer::HttpServer(uint32_t port) noexcept { serverPort = port; }
 
 auto validateServer(void **ptr) noexcept -> WebServer & {
   if (!*ptr) {
