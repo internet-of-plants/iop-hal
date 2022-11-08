@@ -24,21 +24,51 @@
 
 from __future__ import with_statement
 
+import time
 from os import path
 import inspect
 import subprocess
 import os
 import struct
 import hashlib
-import sys
 from io import open
 
-folder = "../src/arduino/esp/esp32/generated/"
-destination = path.join(folder, "certificates.hpp")
+try:
+    from urllib.request import urlopen
+except Exception:
+    from urllib2 import urlopen
 
 def preBuildCertificates(env):
-    filename = inspect.getframeinfo(inspect.currentframe()).filename
-    dir_path = path.dirname(path.abspath(filename))
+    dir_path = path.dirname(path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))
+    destination = path.join(dir_path, "../src/arduino/esp/esp32/generated/certificates.hpp")
+
+    # Avoid downloading if certificates were generated less than 7 days ago
+    try:
+        with open(destination, "r") as generated:
+            if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
+                return
+    except FileNotFoundError:
+        pass
+
+    try:
+        response = urlopen('https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt')
+        hash = hashlib.sha256(response.read()).hexdigest()
+    except Exception:
+        if path.exists(destination):
+            print("Unable to fetch certificates from the network, using cached certificates")
+        else:
+            raise Exception("Unable to fetch certificates from the network, and no certificates are available locally")
+        return
+
+    try:
+        with open(destination, "r") as generated:
+            for line in filter(lambda x: "SHA256: " in x, generated.read().split("\n")):
+                if line.split("SHA256: ")[1] == hash:
+                    print("Certificates already are up-to-date")
+                    return
+                break
+    except FileNotFoundError:
+        pass
 
     try:
         from cryptography import x509
@@ -53,16 +83,21 @@ def preBuildCertificates(env):
             from cryptography.hazmat.backends import default_backend
             from cryptography.hazmat.primitives import serialization
         except Exception:
-            raise Exception("Unable to find or install cryptography python library, and no certificates are available locally")
+            if path.exists(destination):
+                print("Unable to fetch certificates from the network, using cached certificates")
+            else:
+                raise Exception("Unable to fetch certificates from the network, and no certificates are available locally")
+            return
 
     class CertificateBundle:
         def __init__(self):
             self.certificates = []
             self.compressed_crts = []
 
-            # TODO: reuse cached file
-            if os.path.isfile(path.join(dir_path, destination)):
-                os.remove(path.join(dir_path, destination))
+            try:
+                os.remove(destination)
+            except Exception:
+                pass
 
         def add_from_file(self, file_path):
             try:
@@ -72,9 +107,7 @@ def preBuildCertificates(env):
                     return True
 
             except ValueError:
-                raise InputError('Invalid certificate in %s' % file_path)
-
-            return False
+                raise Exception('Invalid certificate in %s' % file_path)
 
         def add_from_pem(self, crt_str):
             """ A single PEM file may have multiple certificates """
@@ -95,8 +128,8 @@ def preBuildCertificates(env):
                 if start is True:
                     crt += strg
 
-            if(count == 0):
-                raise InputError('No certificate found')
+            if count == 0:
+                raise Exception('No certificate found')
 
             print('Successfully added %d certificates' % count)
 
@@ -124,21 +157,19 @@ def preBuildCertificates(env):
 
             return bundle
 
-    class InputError(RuntimeError):
-        def __init__(self, e):
-            super(InputError, self).__init__(e)
+    print("Downloading openssl certificates")
 
-    p = subprocess.run(["perl", "mk-ca-bundle.pl"])
+    subprocess.call(["perl", "mk-ca-bundle.pl"])
+
+    print("Successfully downloaded openssl certificates")
 
     bundle = CertificateBundle()
     bundle.add_from_file("ca-bundle.crt")
-    print('Successfully added %d certificates in total' % len(bundle.certificates))
+    print('Added %d certificates in total' % len(bundle.certificates))
 
     crt_bundle = bundle.create_bundle()
 
-    hash = hashlib.sha256(crt_bundle).hexdigest()
-
-    with open(path.join(dir_path, destination), 'w') as f:
+    with open(destination, 'w') as f:
         f.write("#ifndef IOP_ESP32_CERTIFICATES_H\n")
         f.write("#define IOP_ESP32_CERTIFICATES_H\n")
         f.write("#ifdef IOP_ESP32\n")
@@ -153,8 +184,4 @@ def preBuildCertificates(env):
         f.write("\n#endif" + "\n")
 
 if __name__ == '__main__':
-    try:
-        preBuildCertificates(None)
-    except InputError as e:
-        print(e)
-        sys.exit(2)
+    preBuildCertificates(None)

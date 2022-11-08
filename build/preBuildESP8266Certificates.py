@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 from os import path, unlink
+import time
 import inspect
 import csv
 import re
@@ -24,12 +25,17 @@ except Exception:
 
 from subprocess import Popen, PIPE
 
-folder = "../src/arduino/esp/esp8266/generated/"
-destination = path.join(folder, "certificates.hpp")
-
 def preBuildCertificates(env):
-    filename = inspect.getframeinfo(inspect.currentframe()).filename
-    dir_path = path.dirname(path.abspath(filename))
+    dir_path = path.dirname(path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))
+    destination = path.join(dir_path, "../src/arduino/esp/esp8266/generated/certificates.hpp")
+
+    # Avoid downloading if certificates were generated less than 7 days ago
+    try:
+        with open(destination, "r") as generated:
+            if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
+                return
+    except FileNotFoundError:
+        pass
 
     try:
         from asn1crypto.x509 import Certificate
@@ -40,23 +46,12 @@ def preBuildCertificates(env):
         try:
             from asn1crypto.x509 import Certificate
         except Exception:
-            success = False
-            try:
-                with open(path.join(dir_path, destination), "r") as generated:
-                    data = generated.read().split("\n")
-                    for line in filter(lambda x: "SHA256" in x, data):
-                        success = True
-                        print("Unable to find or install asn1crypto python library, using cached certificates")
-                        return
-            except FileNotFoundError:
-                pass
-            finally:
-                if not success:
-                    print("Unable to find or install asn1crypto python library, and no certificates are available locally")
+            if path.exists(destination):
+                print("Unable to find or install asn1crypto python library, using cached certificates")
+            else:
+                raise Exception("Unable to find or install asn1crypto python library, and no certificates are available locally")
 
-    # check if ar and openssl are available
-    #if which('ar') is None and not path.isfile('./ar') and not path.isfile('./ar.exe'):
-    #    raise Exception("You need the program 'ar' from xtensa-lx106-elf found here: (esp8266-arduino-core)/hardware/esp8266com/esp8266/tools/xtensa-lx106-elf/xtensa-lx106-elf/bin/ar")
+    # check if openssl is available
     if which('openssl') is None and not path.isfile('./openssl') and not path.isfile('./openssl.exe'):
         raise Exception("You need to have openssl in PATH, installable from https://www.openssl.org/")
 
@@ -69,22 +64,23 @@ def preBuildCertificates(env):
     try:
         response = urlopen(mozurl)
     except Exception:
-        success = False
-        try:
-            with open(path.join(dir_path, destination), "r") as generated:
-                data = generated.read().split("\n")
-                for line in filter(lambda x: "SHA256" in x, data):
-                    success = True
-                    print("Connection failed, using cached certificates")
-                    return
-        except FileNotFoundError:
-            pass
-        finally:
-            if not success:
-                print("Connection failed, unable to get certificates and no cached version is available")
-            return
+        if path.exists(destination):
+            print("Connection failed, using cached certificates")
+        else:
+            raise Exception("Connection failed, unable to get certificates and no cached version is available")
     csvData = response.read()
     csvHash = hashlib.sha256(csvData).hexdigest()
+
+    try:
+        with open(destination, "r") as generated:
+            current = generated.read().split("\n")
+            for line in filter(lambda x: "SHA256: " in x, current):
+                if line.split("SHA256: ")[1] == csvHash:
+                    print("Certificates already are up-to-date")
+                    return
+                break
+    except FileNotFoundError:
+        pass
 
     if sys.version_info[0] > 2:
         csvData = csvData.decode('utf-8')
@@ -98,19 +94,9 @@ def preBuildCertificates(env):
     del names[0]
     del pems[0]
 
-    try:
-        with open(path.join(dir_path, destination)) as generated:
-            current = generated.read().split("\n")
-            for line in filter(lambda x: "SHA256: " in x, current):
-                if line.split("SHA256: ")[1] == csvHash:
-                    print("Certificates already are up-to-date")
-                    return
-                break
-    except FileNotFoundError:
-        pass
-    print("Generating " + path.join(dir_path, destination))
+    print("Generating " + destination)
 
-    f = open(path.join(dir_path, destination), "w", encoding="utf8")
+    f = open(destination, "w", encoding="utf8")
 
     f.write("#ifndef IOP_ESP8266_CERTIFICATES_H\n")
     f.write("#define IOP_ESP8266_CERTIFICATES_H\n")
@@ -123,7 +109,6 @@ def preBuildCertificates(env):
     certFiles = []
     totalbytes = 0
     idx = 0
-    addflag = False
 
     # Process the text PEM using openssl into DER files
     sizes=[]

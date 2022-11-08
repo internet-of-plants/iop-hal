@@ -143,9 +143,9 @@ void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) con
     ::WiFi.softAPConfig(staticIp, staticIp, mask);
 
     String ssidStr;
-    ssidStr.concat(ssid.begin(), ssid.substr(0, 32).length());
+    ssidStr.concat(ssid.begin(), std::min(ssid.length(), static_cast<size_t>(31)));
     String pskStr;
-    pskStr.concat(psk.begin(), psk.substr(0, 64).length());
+    pskStr.concat(psk.begin(), std::min(psk.length(), static_cast<size_t>(63)));
     ::WiFi.softAP(ssidStr, pskStr);
 }
 

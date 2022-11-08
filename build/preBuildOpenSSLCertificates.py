@@ -24,66 +24,72 @@
 
 from __future__ import with_statement
 
+import time
 from os import path
 import inspect
 import subprocess
-import os
-import struct
 import hashlib
-import sys
 from io import open
 
-folder = "../src/openssl/generated/"
-destination = path.join(folder, "certificates.hpp")
-
-class InputError(RuntimeError):
-    def __init__(self, e):
-        super(InputError, self).__init__(e)
+try:
+    from urllib.request import urlopen
+except Exception:
+    from urllib2 import urlopen
 
 def preBuildCertificates(env):
-    filename = inspect.getframeinfo(inspect.currentframe()).filename
-    dir_path = path.dirname(path.abspath(filename))
+    dir_path = path.dirname(path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))
+    destination = path.join(dir_path, "../src/openssl/generated/certificates.hpp")
+
+    # Avoid downloading if certificates were generated less than 7 days ago
+    try:
+        with open(destination, "r") as generated:
+            if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
+                return
+    except FileNotFoundError:
+        pass
 
     try:
-        from cryptography import x509
-        from cryptography.hazmat.backends import default_backend
-        from cryptography.hazmat.primitives import serialization
-    except ImportError:
-        if env is None:
-            raise Exception("Must install cryptography library before running")
-        env.Execute("$PYTHONEXE -m pip install cryptography==36.0.2")
-        try:
-            from cryptography import x509
-            from cryptography.hazmat.backends import default_backend
-            from cryptography.hazmat.primitives import serialization
-        except Exception:
-            raise Exception("Unable to find or install cryptography python library, and no certificates are available locally")
+        response = urlopen('https://hg.mozilla.org/releases/mozilla-release/raw-file/default/security/nss/lib/ckfw/builtins/certdata.txt')
+        hash = hashlib.sha256(response.read()).hexdigest()
+    except Exception:
+        if path.exists(destination):
+            print("Unable to fetch certificates from the network, using cached certificates")
+        else:
+            raise Exception("Unable to fetch certificates from the network, and no certificates are available locally")
+        return
 
-    p = subprocess.run(["perl", "mk-ca-bundle.pl"])
+    try:
+        with open(destination, "r") as generated:
+            for line in filter(lambda x: "SHA256: " in x, generated.read().split("\n")):
+                if line.split("SHA256: ")[1] == hash:
+                    print("Certificates already are up-to-date")
+                    return
+                break
+    except FileNotFoundError:
+        pass
+
+    print("Downloading openssl certificates")
+
+    subprocess.call(["perl", "mk-ca-bundle.pl"])
 
     print("Successfully downloaded openssl certificates")
 
     with open(path.join(dir_path, "ca-bundle.crt"), "r") as ca:
         certs = ca.read()
-        hash = hashlib.sha256(certs.encode("utf-8")).hexdigest()
 
-    with open(path.join(dir_path, destination), "w") as f:
-        f.write("#ifndef IOP_PEM_CERTIFICATES_H\n")
-        f.write("#define IOP_PEM_CERTIFICATES_H\n")
-        f.write("#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)\n")
-        f.write("namespace generated {\n")
-        f.write("// This file is computer generated at build time (`build/preBuildPEMCertificates.py` called by PlatformIO)\n\n")
-        f.write("// SHA256: " + str(hash) + "\n\n")
-        f.write("static const char certs_bundle[] IOP_ROM = \"\"\\\n\"")
-        f.write(certs.replace("\n", "\\n\"\\\n\""))
-        f.write("\";\n\n")
-        f.write("} // namespace generated\n")
-        f.write("\n#endif" + "\n")
-        f.write("\n#endif" + "\n")
+        with open(destination, "w") as f:
+            f.write("#ifndef IOP_OPENSSL_CERTIFICATES_H\n")
+            f.write("#define IOP_OPENSSL_CERTIFICATES_H\n")
+            f.write("#if defined(IOP_LINUX_MOCK) || defined(IOP_LINUX)\n")
+            f.write("namespace generated {\n")
+            f.write("// This file is computer generated at build time (`build/preBuildOpenSSLCertificates.py` called by PlatformIO)\n\n")
+            f.write("// SHA256: " + str(hash) + "\n\n")
+            f.write("static const char certs_bundle[] IOP_ROM = \"\"\\\n\"")
+            f.write(certs.replace("\n", "\\n\"\\\n\""))
+            f.write("\";\n\n")
+            f.write("} // namespace generated\n")
+            f.write("#endif" + "\n")
+            f.write("#endif" + "\n")
 
 if __name__ == "__main__":
-    try:
-        preBuildCertificates(None)
-    except InputError as e:
-        print(e)
-        sys.exit(2)
+    preBuildCertificates(None)
