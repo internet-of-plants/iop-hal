@@ -1,7 +1,7 @@
 #include "iop-hal/client.hpp"
 #include "iop-hal/network.hpp"
 
-namespace iop { 
+namespace iop {
 auto Network::codeToString(const int code) const noexcept -> std::string {
   IOP_TRACE();
   switch (code) {

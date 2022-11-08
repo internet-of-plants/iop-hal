@@ -17,7 +17,7 @@ enum class UpdateStatus {
   NO_UPGRADE,
   UNAUTHORIZED,
 };
-    
+
 // Handles update procedure, reseting the board on success.
 //
 // Downloads firmware from behind the monitor server's authentication

@@ -63,7 +63,7 @@ def preBuildCertificates(env):
             # TODO: reuse cached file
             if os.path.isfile(path.join(dir_path, destination)):
                 os.remove(path.join(dir_path, destination))
-    
+
         def add_from_file(self, file_path):
             try:
                 print('Parsing certificates from %s' % file_path)

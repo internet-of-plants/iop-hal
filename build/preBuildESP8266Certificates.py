@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from __future__ import print_function
-from os import path, mkdir, unlink
+from os import path, unlink
 import inspect
 import csv
 import re
@@ -22,7 +22,7 @@ try:
 except Exception:
     from io import StringIO
 
-from subprocess import Popen, PIPE, call
+from subprocess import Popen, PIPE
 
 folder = "../src/arduino/esp/esp8266/generated/"
 destination = path.join(folder, "certificates.hpp")
@@ -40,12 +40,19 @@ def preBuildCertificates(env):
         try:
             from asn1crypto.x509 import Certificate
         except Exception:
-            with open(path.join(dir_path, destination)) as generated:
-                data = generated.read().split("\n")
-                for line in filter(lambda x: "SHA256" in x, data):
-                    print("Unable to find or install asn1crypto python library, using cached certificates")
-                    return
-            raise Exception("Unable to find or install asn1crypto python library, and no certificates are available locally")
+            success = False
+            try:
+                with open(path.join(dir_path, destination), "r") as generated:
+                    data = generated.read().split("\n")
+                    for line in filter(lambda x: "SHA256" in x, data):
+                        success = True
+                        print("Unable to find or install asn1crypto python library, using cached certificates")
+                        return
+            except FileNotFoundError:
+                pass
+            finally:
+                if not success:
+                    print("Unable to find or install asn1crypto python library, and no certificates are available locally")
 
     # check if ar and openssl are available
     #if which('ar') is None and not path.isfile('./ar') and not path.isfile('./ar.exe'):
@@ -64,7 +71,7 @@ def preBuildCertificates(env):
     except Exception:
         success = False
         try:
-            with open(path.join(dir_path, destination)) as generated:
+            with open(path.join(dir_path, destination), "r") as generated:
                 data = generated.read().split("\n")
                 for line in filter(lambda x: "SHA256" in x, data):
                     success = True

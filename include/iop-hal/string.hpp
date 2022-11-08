@@ -87,7 +87,7 @@ public:
   StaticString() noexcept: str(nullptr) { this->str = nullptr; }
   // NOLINTNEXTLINE hicpp-explicit-conversions
   StaticString(const __FlashStringHelper *str) noexcept: str(str) {}
-  
+
   /// Creates a `std::string` from the compile time string
   auto toString() const noexcept -> std::string;
 

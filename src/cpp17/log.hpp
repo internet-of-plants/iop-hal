@@ -15,7 +15,7 @@ void logPrint(const iop::StaticString msg) noexcept {
     std::lock_guard<std::mutex> guard(stdoutMutex);
     std::cout << msg.asCharPtr();
 }
-void logFlush() noexcept { 
+void logFlush() noexcept {
     std::lock_guard<std::mutex> guard(stdoutMutex);
     std::cout << std::flush;
 }

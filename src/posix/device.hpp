@@ -27,7 +27,7 @@ iop::MacAddress & Device::macAddress() const noexcept {
   close(fd);
 
   unsigned char *bin = (unsigned char *) ifr.ifr_hwaddr.sa_data;
-	
+
   for (uint8_t i = 0; i < 6; i++){
     sprintf(mac.data() + (i * 3), "%02X", bin[i]);
     if (i < 5) sprintf(mac.data() + (i * 3) + 2, ":");

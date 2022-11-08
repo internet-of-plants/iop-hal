@@ -90,11 +90,11 @@ auto prepareSession(Network  &network, iop_hal::Session &session, const std::opt
     str = iop::to_view(iop_hal::device.macAddress());
     session.addHeader(IOP_STR("MAC_ADDRESS"), str);
   }
-  
+
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
-    
+
     session.addHeader(IOP_STR("FREE_STACK"), std::to_string(memory.availableStack));
 
     for (const auto & item: memory.availableHeap) {
@@ -127,7 +127,7 @@ auto beforeConnect(Network & network, StaticString path, const std::optional<std
   if (data) {
     network.logger().debugln(*data);
   }
-  
+
   network.logger().debugln(IOP_STR("Begin"));
 }
 
@@ -137,7 +137,7 @@ auto processResponse(Network & network, iop_hal::Response & response) noexcept -
     return iop_hal::Response(response.code());
   }
 
-  network.logger().debugln(IOP_STR("Made HTTP request")); 
+  network.logger().debugln(IOP_STR("Made HTTP request"));
 
   // Handle system update request
   const auto update = response.header(IOP_STR("LATEST_VERSION"));
@@ -232,7 +232,7 @@ static auto methodToString(const HttpMethod &method) noexcept -> StaticString {
 
   case HttpMethod::CONNECT:
     return IOP_STR("CONNECT");
-    
+
   case HttpMethod::OPTIONS:
     return IOP_STR("OPTIONS");
   }

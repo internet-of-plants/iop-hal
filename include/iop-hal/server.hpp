@@ -25,7 +25,7 @@ public:
   std::string currentPayload;
   std::optional<size_t> currentContentLength;
   std::string currentRoute;
-  
+
   using Buffer = std::array<char, 1024>;
 #elif defined(IOP_ESP8266) || defined(IOP_ESP32)
 private:
@@ -33,7 +33,7 @@ private:
 public:
   ~HttpConnection() noexcept;
   HttpConnection(void *parent) noexcept;
-  
+
   HttpConnection(HttpConnection &other) noexcept = delete;
   HttpConnection(HttpConnection &&other) noexcept;
   auto operator=(HttpConnection &other) noexcept -> HttpConnection & = delete;
@@ -102,7 +102,7 @@ public:
   auto operator=(CaptivePortal &&other) noexcept -> CaptivePortal &;
 
   void start() noexcept;
-  void close() noexcept;  
+  void close() noexcept;
   void handleClient() const noexcept;
 };
 }

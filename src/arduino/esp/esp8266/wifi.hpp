@@ -135,7 +135,7 @@ void Wifi::setup() noexcept {
 void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
     ::WiFi.mode(WIFI_AP_STA);
     iop_hal::thisThread.sleep(1);
-    
+
     // NOLINTNEXTLINE *-avoid-magic-numbers
     const auto staticIp = IPAddress(192, 168, 1, 1);
     // NOLINTNEXTLINE *-avoid-magic-numbers

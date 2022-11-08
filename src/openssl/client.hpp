@@ -185,16 +185,16 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
       iop::Log::print(IOP_STR("\n"), iop::LogLevel::TRACE, iop::LogType::END);
     clientDriverLogger.debug(IOP_STR("Sent data: "));
     clientDriverLogger.debugln(data);
-    
+
     auto buffer = std::unique_ptr<char[]>(new (std::nothrow) char[bufferSize]);
     iop_assert(buffer, IOP_STR("OOM"));
     memset(buffer.get(), '\0', bufferSize);
-    
+
     ssize_t signedSize = 0;
     size_t size = 0;
     auto firstLine = true;
     auto isPayload = false;
-    
+
     std::string_view buff;
     while (true) {
       if (!isPayload) {
@@ -212,7 +212,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
         clientDriverLogger.errorln(strerror(errno));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
-      
+
       size += static_cast<size_t>(signedSize);
 
       clientDriverLogger.debug(IOP_STR("Len: "));
@@ -243,7 +243,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
           shiftChars(buffer.get(), 2, size);
           buff = std::string_view(buffer.get(), size);
       }
-      
+
       if (!isPayload) {
         clientDriverLogger.debug(IOP_STR("Buffer ["));
         clientDriverLogger.debug(static_cast<uint64_t>(size));
@@ -302,7 +302,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
           size -= 2;
           shiftChars(buffer.get(), 2, size);
           buff = std::string_view(buffer.get(), size);
-          
+
           clientDriverLogger.debug(IOP_STR("Found Payload ("));
           clientDriverLogger.debug(static_cast<uint64_t>(buff.find("\r\n") == buff.npos ? size + 2 : buff.find("\r\n") + 2));
           clientDriverLogger.debugln(IOP_STR(")"));
@@ -413,7 +413,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   auto end = uri.find(":");
   if (end == uri.npos) end = uri.find("/");
   if (end == uri.npos) end = uri.length();
-  
+
   const auto host = std::string(uri.begin(), 0, end);
 
   struct hostent *he = gethostbyname(host.c_str());
@@ -426,7 +426,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
   serv_addr.sin_addr= *(struct in_addr *) he->h_addr_list[0];
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(port);
-  
+
 #ifdef IOP_SSL
   SSL_CTX* context = nullptr;
   SSL* ssl = nullptr;
@@ -594,11 +594,11 @@ auto HTTPClient::setup() noexcept -> void {
 #ifdef IOP_SSL
   SSL_library_init();
   SSL_load_error_strings();
-  
+
   const auto path = std::filesystem::temp_directory_path().append("iop-hal-linux-mock-certs-bundle.crt");
   std::ofstream file(path);
   iop_assert(file.is_open(), std::string("Unable to create certs bundle file: ") + path.c_str());
-  
+
   iop_assert(generated::certs_bundle, IOP_STR("Cert Bundle is null, but SSL is enabled"));
   file.write((char*) generated::certs_bundle, static_cast<std::streamsize>(sizeof(generated::certs_bundle)));
   iop_assert(!file.fail(), "Unable to write to certs bundle file");
@@ -614,14 +614,14 @@ int verify_callback(int preverify, X509_STORE_CTX* x509_ctx) {
   (void) x509_ctx;
   //int depth = X509_STORE_CTX_get_error_depth(x509_ctx);
   //int err = X509_STORE_CTX_get_error(x509_ctx);
-  
+
   //X509* cert = X509_STORE_CTX_get_current_cert(x509_ctx);
   //X509_NAME* iname = cert ? X509_get_issuer_name(cert) : NULL;
   //X509_NAME* sname = cert ? X509_get_subject_name(cert) : NULL;
-  
+
   //print_cn_name("Issuer (cn)", iname);
   //print_cn_name("Subject (cn)", sname);
-  
+
   //if(depth == 0) {
       /* If depth is 0, its the server's certificate. Print the SANs too */
       //print_san_name("Subject (san)", cert);

@@ -17,7 +17,7 @@ class Storage {
   /// Returns pointers to data, this is very unsafe, but a very useful primitive
   auto asRef() const noexcept -> uint8_t const *;
   auto asMut() noexcept -> uint8_t *;
-  
+
 public:
   /// Initializes storage, requiring at most `size`
   auto setup(uintmax_t size) noexcept -> bool;
@@ -35,7 +35,7 @@ public:
   // TODO: this API still is fragile, we should only support std::arrays, but by type, not size
 
   /// Reads byte array from specified address, returns std::nullopt if address is out of bounds
-  template<size_t SIZE> 
+  template<size_t SIZE>
   auto read(uintmax_t address) const noexcept -> std::optional<std::array<char, SIZE>> {
     IOP_TRACE();
     if (this->size < SIZE || address >= this->size - SIZE) return std::nullopt;
@@ -45,7 +45,7 @@ public:
   }
 
   /// Writes arrays to storage. Commit must be called to ensure it goes through.
-  template<size_t SIZE> 
+  template<size_t SIZE>
   auto write(const uintmax_t address, const std::array<char, SIZE> &array) -> bool {
     IOP_TRACE();
     if (this->size < SIZE || address >= this->size - SIZE) return false;

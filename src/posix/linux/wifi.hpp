@@ -129,11 +129,11 @@ std::pair<iop::NetworkName, iop::NetworkPassword> Wifi::credentials() const noex
   iop::NetworkName ssid;
   ssid.fill('\0');
   memcpy(ssid.data(), "SSID", 4);
-  
+
   iop::NetworkPassword psk;
   psk.fill('\0');
   memcpy(psk.data(), "PSK", 3);
-  
+
   return std::make_pair(ssid, psk);
 }
 

@@ -28,7 +28,7 @@ iop::MD5Hash & Device::firmwareMD5() const noexcept {
   if (cached)
     return hash;
   hash.fill('\0');
-  
+
   const auto filename = std::filesystem::current_path().append(iop_hal::execution_path());
   std::ifstream file(filename);
   iop_assert(file.is_open(), IOP_STR("Unable to open firmware file"));

@@ -49,7 +49,7 @@ public:
   auto setup() noexcept -> void;
 
   // TODO: document this
-  
+
   // TODO: maybe can be removed. Mostly used to check if connected, or to display the status in debugging data
   auto status() const noexcept -> StationStatus;
   // TODO: Could be removed with a little work

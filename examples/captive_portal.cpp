@@ -35,9 +35,9 @@ namespace iop {
         wifi.onConnect([] { gotWifiCreds = true; });
 
         if (!ssid || !psk) {
-            auto http = std::make_option(HttpServer()); 
+            auto http = std::make_option(HttpServer());
             http->begin();
-            auto captivePortal = std::make_option(CaptivePortal()); 
+            auto captivePortal = std::make_option(CaptivePortal());
             captivePortal->start();
 
             server = std::make_optional(std::make_pair(http, captivePortal));

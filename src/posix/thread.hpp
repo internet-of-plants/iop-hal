@@ -19,4 +19,4 @@ auto Thread::availableMemory() const noexcept -> Memory {
 
   return Memory(iop_hal::stack_used(), heap, biggestBlock);
 }
-}   
+}

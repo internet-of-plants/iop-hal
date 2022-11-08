@@ -15,7 +15,7 @@ auto Thread::availableMemory() const noexcept -> Memory {
   // TODO: get IRAM
   heap.clear();
   biggestBlock.clear();
-  
+
   {
     heap.insert({ std::string_view("DRAM"), ESP.getFreeHeap() });
     biggestBlock.insert({ std::string_view("DRAM"), ESP.getMaxAllocHeap() });

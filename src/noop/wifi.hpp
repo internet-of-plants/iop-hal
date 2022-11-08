@@ -1,10 +1,10 @@
 #include "iop-hal/wifi.hpp"
 
-namespace iop_hal { 
+namespace iop_hal {
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
 void Wifi::onConnect(std::function<void()> f) noexcept { (void) f; }
-Wifi::Wifi(Wifi &&other) noexcept { (void) other; } 
+Wifi::Wifi(Wifi &&other) noexcept { (void) other; }
 auto Wifi::operator=(Wifi &&other) noexcept -> Wifi & { (void) other; return *this; }
 StationStatus Wifi::status() const noexcept { return StationStatus::GOT_IP; }
 std::string Wifi::ourAccessPointIp() const noexcept { return "127.0.0.1"; }

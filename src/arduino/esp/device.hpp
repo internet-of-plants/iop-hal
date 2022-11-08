@@ -23,7 +23,7 @@ auto Device::availableStorage() const noexcept -> uintmax_t {
 
 auto Device::deepSleep(const uintmax_t seconds) const noexcept -> void {
   ESP.deepSleep(seconds * 1000000);
-  
+
   // Let's allow the wifi to reconnect
 #ifdef IOP_ESP8266
   ::WiFi.forceSleepWake();
@@ -36,7 +36,7 @@ auto Device::firmwareMD5() const noexcept -> iop::MD5Hash & {
   static auto md5 = std::optional<iop::MD5Hash>();
   if (md5)
     return *md5;
-    
+
   IOP_TRACE();
 
   // Copied verbatim from ESP code
@@ -51,7 +51,7 @@ auto Device::firmwareMD5() const noexcept -> iop::MD5Hash & {
     buf = std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[bufSize]);
   }
   iop_assert(bufSize > 128, IOP_STR("Too low on RAM to generate MD5 hash"));
-  
+
   MD5Builder builder;
   builder.begin();
   while (lengthLeft > 0) {
@@ -59,7 +59,7 @@ auto Device::firmwareMD5() const noexcept -> iop::MD5Hash & {
 
       auto *ptr = reinterpret_cast<uint32_t*>(buf.get());
       auto alignedSize = (readBytes + 3) & ~3;
-      
+
       // What can we do here?
       const auto flashReadFailed = IOP_STR("Failed to read from flash to calculate MD5");
       iop_assert(ESP.flashRead(offset, ptr, alignedSize), flashReadFailed);
@@ -94,7 +94,7 @@ std::array<uint8_t, 6> buff = {0};
   #error "Non supported arduino baseds device"
 #endif
   mac = iop::MacAddress();
-  
+
   const auto *fmt = IOP_STORAGE_RAW("%02X:%02X:%02X:%02X:%02X:%02X");
   sprintf_P(mac->data(), fmt, buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
   return *mac;

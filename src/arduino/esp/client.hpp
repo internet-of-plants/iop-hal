@@ -182,7 +182,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
 
   auto storage = std::vector<uint8_t>();
   storage.insert(storage.end(), httpString.c_str(), httpString.c_str() + httpString.length());
-  
+
   const auto response = Response(headers, Payload(storage), code);
   return response;
 }
@@ -230,7 +230,7 @@ auto validateUri(const std::string_view uri) noexcept -> void {
 }
 
 auto HTTPClient::begin(const std::string_view uri, std::function<Response(Session &)> func) noexcept -> Response {
-  IOP_TRACE(); 
+  IOP_TRACE();
 
   iop_assert(this->http, IOP_STR("iop_hal::HTTPClient* not allocated"));
   iop_assert(iop::wifi.client, IOP_STR("Wifi has been moved out, client is nullptr"));

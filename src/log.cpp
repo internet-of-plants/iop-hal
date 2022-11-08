@@ -215,11 +215,11 @@ Tracer::Tracer(CodePoint point) noexcept : point(point) {
   logger.trace(this->point.func());
   logger.trace(IOP_STR(", at file "));
   logger.traceln(this->point.file());
-  
+
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
-    
+
     logger.trace(IOP_STR("Free stack "));
     logger.traceln(memory.availableStack);
 
@@ -256,7 +256,7 @@ void logMemory(Log &logger) noexcept {
   {
     // Could this cause memory fragmentation?
     auto memory = iop_hal::thisThread.availableMemory();
-    
+
     logger.info(IOP_STR("Free stack "));
     logger.infoln(memory.availableStack);
 

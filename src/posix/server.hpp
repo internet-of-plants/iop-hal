@@ -66,7 +66,7 @@ void HttpServer::begin() noexcept {
     logger().errorln(IOP_STR("Unable to open socket"));
     return;
   }
-  
+
   int flags = fcntl(fd, F_GETFL, 0);
   if (flags == -1) {
     logger().error(IOP_STR("fnctl get failed: "));
@@ -138,7 +138,7 @@ void HttpServer::handleClient() noexcept {
 
   auto firstLine = true;
   auto isPayload = false;
-  
+
   auto buffer = HttpConnection::Buffer({0});
   ssize_t signedLen = 0;
   size_t len = 0;
@@ -210,7 +210,7 @@ void HttpServer::handleClient() noexcept {
         return;
       }
       firstLine = false;
-      
+
       iop_assert(buff.find("\r\n") != buff.npos, IOP_STR("First: ").toString() + std::to_string(buff.length()) + IOP_STR(" bytes don't contain newline, the path is too long\n").toString());
       logger().debugln(IOP_STR("Found first line"));
       const auto newlineIndex = buff.find("\r\n");
@@ -352,7 +352,7 @@ auto HttpConnection::arg(const iop::StaticString name) const noexcept -> std::op
 }
 
 void HttpConnection::send(uint16_t code, iop::StaticString contentType, iop::StaticString content) const noexcept {
-  IOP_TRACE(); 
+  IOP_TRACE();
   iop_assert(this->currentClient, IOP_STR("No active client"));
   const auto fd = *this->currentClient;
 

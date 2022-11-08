@@ -28,7 +28,7 @@ public:
   auto platform() const noexcept -> iop::StaticString;
 
   /// Syncronizes internal clock with the network, might be a No-Op depending on the device
-  /// Returns true if it succeeds, false if it fails 
+  /// Returns true if it succeeds, false if it fails
   ///
   /// Note: network.cpp might be a more appropriate place for this
   /// TODO: report errors, check for network, etc

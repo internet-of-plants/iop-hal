@@ -123,7 +123,7 @@ public:
   Log(const StaticString target) noexcept
       : target_(target) {}
 
-  /// Replaces current hook for the argument. 
+  /// Replaces current hook for the argument.
   /// It's very useful to support other logging channels, like network or storage.
   ///
   /// The default just prints to `UART0`. Assume it has been initialized.
@@ -135,7 +135,7 @@ public:
 
   auto level() const noexcept -> LogLevel { return IOP_LOG_LEVEL; }
   auto target() const noexcept -> StaticString { return this->target_; }
-  
+
   /// Toggles global flushing setting, defines if system flushes after every complete log
   /// (until a `iop::LogType::END` or a `iop::LogType::STARTEND`)
   static void shouldFlush(bool flush) noexcept;
