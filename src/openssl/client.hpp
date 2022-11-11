@@ -383,11 +383,11 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
 
   const auto useTLS = uri.find("https://") == 0;
   if (useTLS) {
-    #ifdef IOP_TLS
-    clientDriverLogger.errorln(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
-    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
-    #else
+    #ifdef IOP_SSL
     uri = uri.substr(8);
+    #else
+    clientDriverLogger.errorln(IOP_STR("Tried o make TLS connection but IOP_SSL is not defined"));
+    return iop_hal::Response(iop::NetworkStatus::IO_ERROR);    
     #endif
   } else if (uri.find("http://") == 0) {
     uri = uri.substr(7);
