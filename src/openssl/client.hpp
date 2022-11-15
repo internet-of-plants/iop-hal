@@ -285,7 +285,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
         shiftChars(buffer.get(), newlineIndex, size);
         buff = std::string_view(buffer.get(), size);
       }
-      if (!status) {
+      if (!status || *status == iop::NetworkStatus::IO_ERROR) {
         clientDriverLogger.errorln(IOP_STR("No status"));
         return Response(iop::NetworkStatus::IO_ERROR);
       }

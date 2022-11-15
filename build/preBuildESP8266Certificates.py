@@ -31,10 +31,9 @@ def preBuildCertificates(env):
 
     # Avoid downloading if certificates were generated less than 7 days ago
     try:
-        with open(destination, "r") as generated:
-            if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
-                return
-    except FileNotFoundError:
+        if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
+            return
+    except OSError:
         pass
 
     try:

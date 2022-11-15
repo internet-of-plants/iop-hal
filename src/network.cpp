@@ -133,7 +133,7 @@ auto beforeConnect(Network & network, StaticString path, const std::optional<std
 
 auto processResponse(Network & network, iop_hal::Response & response) noexcept -> iop_hal::Response {
   const auto status = response.status();
-  if (!status) {
+  if (!status || *status == iop::NetworkStatus::IO_ERROR) {
     return iop_hal::Response(response.code());
   }
 
@@ -147,8 +147,10 @@ auto processResponse(Network & network, iop_hal::Response & response) noexcept -
   }
 
   auto code = network.codeToString(response.code());
-  network.logger().debug(IOP_STR("Response code: "));
-  network.logger().debugln(code);
+  network.logger().debug(IOP_STR("Response code ("));
+  network.logger().debug(code);
+  network.logger().debug(IOP_STR("): "));
+  network.logger().debugln(static_cast<uint64_t>(*status));
 
   // TODO: this is broken because it's not lazy, it should be a HTTPClient setting that bails out if it's bigger, and encapsulated in the API
   /*
@@ -195,7 +197,7 @@ auto Network::httpRequest(const HttpMethod method_,
   const auto method = methodToString(method_);
   beforeConnect(*this, path, token, data, method);
   const auto func = generateRequestProcessor(this, path, token, data, method);
-  return http.begin(this->uri().toString() + path.toString(), func);
+  return http.begin(this->endpoint(path), func);
 }
 
 auto Network::setup() noexcept -> void {

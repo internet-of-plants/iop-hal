@@ -49,7 +49,8 @@ public:
   Network(StaticString uri) noexcept;
 
   static auto setup() noexcept -> void;
-  auto uri() const noexcept -> StaticString { return this->uri_; };
+  auto uri() const noexcept -> StaticString { return this->uri_; }
+  auto endpoint(StaticString path) const noexcept -> std::string { return this->uri_.toString() + path.toString(); }
 
   /// Sets new firmware update hook for this. Very useful to support updates
   /// reported by the network (LAST_VERSION header different than current

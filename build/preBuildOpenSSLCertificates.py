@@ -39,13 +39,13 @@ except Exception:
 def preBuildCertificates(env):
     dir_path = path.dirname(path.abspath(inspect.getframeinfo(inspect.currentframe()).filename))
     destination = path.join(dir_path, "../src/openssl/generated/certificates.hpp")
+    cache = path.join(dir_path, "./certdata.txt")
 
     # Avoid downloading if certificates were generated less than 7 days ago
     try:
-        with open(destination, "r") as generated:
-            if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
-                return
-    except FileNotFoundError:
+        if time.time() - path.getmtime(destination) < 3600 * 24 * 7:
+            return
+    except OSError:
         pass
 
     try:
@@ -70,8 +70,14 @@ def preBuildCertificates(env):
 
     print("Downloading openssl certificates")
 
-    subprocess.call(["perl", "mk-ca-bundle.pl"])
+    # Avoid running perl script if it was last run less than 7 days ago
+    try:
+        has_cache = time.time() - path.getmtime(cache) < 3600 * 24 * 7
+    except OSError:
+        has_cache = False
 
+    if not has_cache:
+        subprocess.call(["perl", "mk-ca-bundle.pl"])
     print("Successfully downloaded openssl certificates")
 
     with open(path.join(dir_path, "ca-bundle.crt"), "r") as ca:

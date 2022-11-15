@@ -194,7 +194,35 @@ public:
     this->updateState();
     this->log(LogLevel::TRACE, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto trace(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
   auto trace(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto trace(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
   }
@@ -214,7 +242,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::TRACE, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto traceln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto traceln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto traceln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR("\n"));
   }
@@ -235,7 +291,35 @@ public:
     this->updateState();
     this->log(LogLevel::DEBUG, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto debug(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
   auto debug(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto debug(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
   }
@@ -255,7 +339,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::DEBUG, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto debugln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto debugln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto debugln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR("\n"));
   }
@@ -276,7 +388,35 @@ public:
     this->updateState();
     this->log(LogLevel::INFO, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto info(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
   auto info(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto info(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
   }
@@ -296,7 +436,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::INFO, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto infoln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto infoln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto infoln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
   }
@@ -317,7 +485,35 @@ public:
     this->updateState();
     this->log(LogLevel::WARN, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto warn(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
   auto warn(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto warn(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
   }
@@ -337,7 +533,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::WARN, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto warnln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto warnln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto warnln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
   }
@@ -358,7 +582,35 @@ public:
     this->updateState();
     this->log(LogLevel::ERROR, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto error(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
   auto error(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto error(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
   }
@@ -378,7 +630,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::ERROR, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto errorln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto errorln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto errorln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
   }
@@ -399,7 +679,35 @@ public:
     this->updateState();
     this->log(LogLevel::CRIT, iop::to_view(msg), state, IOP_STR(""));
   }
+  auto crit(const uint8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const int8_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const uint16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const int16_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const uint32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const int32_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
   auto crit(const uint64_t msg) noexcept -> void {
+    this->updateState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
+  }
+  auto crit(const int64_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
   }
@@ -419,7 +727,35 @@ public:
     this->finalizeState();
     this->log(LogLevel::CRIT, iop::to_view(msg), state, IOP_STR("\n"));
   }
+  auto critln(const uint8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const int8_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const uint16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const int16_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const uint32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const int32_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
   auto critln(const uint64_t msg) noexcept -> void {
+    this->finalizeState();
+    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
+  }
+  auto critln(const int64_t msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
   }
