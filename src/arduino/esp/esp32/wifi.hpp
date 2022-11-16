@@ -22,19 +22,6 @@ Wifi::~Wifi() noexcept {
     delete static_cast<NetworkClient*>(this->client);
 }
 
-static std::function<void()> onConnectCallbackStorage;
-void onConnectCallback(arduino_event_id_t event) {
-    (void) event;
-    if (onConnectCallbackStorage) {
-        onConnectCallbackStorage();
-    }
-}
-
-void Wifi::onConnect(std::function<void()> f) noexcept {
-  onConnectCallbackStorage = std::move(f);
-  ::WiFi.onEvent(onConnectCallback, ARDUINO_EVENT_ETH_GOT_IP);
-}
-
 Wifi::Wifi(Wifi &&other) noexcept: client(other.client) {
     other.client = nullptr;
 }

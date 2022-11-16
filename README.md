@@ -51,7 +51,6 @@ Provides the following functionalities:
 static iop::Wifi wifi;
 static uint8_t wifiCredsWrittenToFlag = 128;
 static std::optional<std::pair<std::array<char, 64>, std::array<char, 32>>> wifiCredentials;
-static bool gotWifiCreds = false;
 
 constexpr static iop::time::milliseconds twoHours = 2 * 3600 * 1000;
 static iop::time::milliseconds waitUntilUseHardcodedCredentials = iop::thisThread.timeRunning() + twoHours;
@@ -59,10 +58,6 @@ static iop::time::milliseconds waitUntilUseHardcodedCredentials = iop::thisThrea
 namespace iop {
     auto setup() noexcept -> void {
         wifi.setup();
-        // We shouldn't make expensive operations here, set a flag to handle later
-        // TODO: iop_hal should do this for the user, allowing for a safer Wifi::onConnect
-        // (that also passes the credentials as parameter)
-        wifi.onConnect([] { gotWifiCreds = true; });
 
         // Raw storage access, storage is just a huge array backed by HDD/SSD/Flash, not RAM
         if (storage.get(0) == wifiCredsWrittenToFlag) {
@@ -77,8 +72,7 @@ namespace iop {
     }
 
     auto loop() noexcept -> void {
-        if (gotWifiCreds) {
-            gotWifiCreds = false;
+        if (iop::Network::isConnected() && !wifiCredentials) {
             const auto [name, password] = wifi.credentials();
             wifiCredentials = std::make_pair(name, password);
 

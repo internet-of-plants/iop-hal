@@ -34,7 +34,6 @@ std::string exec(const char* cmd) {
 namespace iop_hal {
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
-void Wifi::setup() noexcept { HTTPClient::setup(); }
 
 // TODO FIXME: the functions below are buggy
 // TODO: handle failure
@@ -42,22 +41,9 @@ void Wifi::setup() noexcept { HTTPClient::setup(); }
 // This is horrible, we should have a better way, this is just a hack to ensure feature parity between targets
 // -1 unset, 0 false, 1 true
 static auto isConnected = std::atomic<int>(-1);
-StationStatus Wifi::status() const noexcept {
-  const auto isConn = isConnected.load();
-  if (isConn == -1) {
-    isConnected.store(1); // We pretend that we are connected so we can properly check for it and unset on failure
-    iop_hal::HTTPClient http;
-    const auto code = http.begin("https://google.com", [](iop_hal::Session & session) {
-      return session.sendRequest("GET", "");
-    }).code();
-    isConnected.store(code > 0);
-  }
-  return isConnected.load() == 1 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
-}
 
-void Wifi::onConnect(std::function<void()> f) noexcept {
-  IOP_TRACE();
-  std::thread([](std::function<void()> f) {
+void Wifi::setup() noexcept {
+  std::thread([]() {
     auto wifi = Wifi();
     iop_hal::HTTPClient http;
     auto lastConnection = std::chrono::system_clock::now();
@@ -75,12 +61,24 @@ void Wifi::onConnect(std::function<void()> f) noexcept {
       isConnected.store(conn);
       lastConnection = std::chrono::system_clock::now();
 
-      if (!isConn && conn) {
-        f();
-      }
-      std::this_thread::sleep_for(std::chrono::seconds(60));
+      std::this_thread::sleep_for(std::chrono::seconds(10));
     }
-  }, std::move(f)).detach();
+  }).detach();
+
+  HTTPClient::setup();
+}
+
+StationStatus Wifi::status() const noexcept {
+  const auto isConn = isConnected.load();
+  if (isConn == -1) {
+    isConnected.store(1); // We pretend that we are connected so we can properly check for it and unset on failure
+    iop_hal::HTTPClient http;
+    const auto code = http.begin("https://google.com", [](iop_hal::Session & session) {
+      return session.sendRequest("GET", "");
+    }).code();
+    isConnected.store(code > 0);
+  }
+  return isConnected.load() == 1 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {

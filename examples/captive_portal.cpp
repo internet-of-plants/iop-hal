@@ -8,8 +8,6 @@ static iop::Wifi wifi;
 static std::optional<std::pair<iop::HttpServer, iop::CaptivePortal>> server;
 static iop::Storage storage;
 
-static bool gotWifiCreds = false;
-
 static uint8_t wifiCredsWrittenToFlag = 128;
 static std::optional<std::array<char, 64>> ssid;
 static std::optional<std::array<char, 32>> psk;
@@ -32,8 +30,6 @@ namespace iop {
             iop_assert(authToken, IOP_STR("Invalid address when accessing authToken from storage"));
         }
 
-        wifi.onConnect([] { gotWifiCreds = true; });
-
         if (!ssid || !psk) {
             auto http = std::make_option(HttpServer());
             http->begin();
@@ -47,8 +43,7 @@ namespace iop {
     }
 
     auto loop() noexcept -> void {
-        if (gotWifiCreds) {
-            gotWifiCreds = false;
+        if (iop::Nework::isConnected() && (!ssid || !psk)) {
             const auto [name, password] = wifi.credentials();
             ssid = std::make_option(name);
             psk = std::make_option(password);
