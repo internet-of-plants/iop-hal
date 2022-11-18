@@ -4,7 +4,6 @@
 #include "iop-hal/log.hpp"
 
 namespace iop {
-
 /// Represents a panic interface that can be attached to the system
 class PanicHook {
 public:
@@ -16,11 +15,14 @@ public:
   using Entry = void (*) (std::string_view const &, CodePoint const &);
   /// Represents the last step on a panic (that either halts, reboots or waits for somethin - like a binary update from the monitor server)
   using Halt = void (*) (std::string_view const &, CodePoint const &);
+  /// Represents the cleanup function, cleaning all resources before halting (turn water pump off, etc)
+  using Cleanup = void (*) ();
 
   ViewPanic viewPanic;
   StaticPanic staticPanic;
   Entry entry;
   Halt halt;
+  Cleanup cleanup;
 
   /// Prints runtime panic data
   static void defaultViewPanic(std::string_view const &msg, CodePoint const &point) noexcept;
@@ -30,11 +32,12 @@ public:
   static void defaultEntry(std::string_view const &msg, CodePoint const &point) noexcept;
   /// Halts the system, waiting for manual intervention (reboot and serial update)
   static void defaultHalt(std::string_view const &msg, CodePoint const &point) noexcept __attribute__((noreturn));
+  /// Cleans-up resources before halting (turn water pump off, etc)
+  static void defaultCleanup() noexcept {}
 
-  constexpr PanicHook(ViewPanic view, StaticPanic progmem, Entry entry,
-            Halt halt) noexcept
+  constexpr PanicHook(ViewPanic view, StaticPanic progmem, Entry entry, Halt halt, Cleanup cleanup) noexcept
       : viewPanic(std::move(view)), staticPanic(std::move(progmem)),
-        entry(std::move(entry)), halt(std::move(halt)) {}
+        entry(std::move(entry)), halt(std::move(halt)), cleanup(std::move(cleanup)) {}
 };
 
 /// Sets new panic hook. Very useful to support panics that report to

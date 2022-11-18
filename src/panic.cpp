@@ -8,9 +8,10 @@
 static bool isPanicking = false;
 
 constexpr static iop::PanicHook defaultHook(iop::PanicHook::defaultViewPanic,
-                                        iop::PanicHook::defaultStaticPanic,
-                                        iop::PanicHook::defaultEntry,
-                                        iop::PanicHook::defaultHalt);
+                                          iop::PanicHook::defaultStaticPanic,
+                                          iop::PanicHook::defaultEntry,
+                                          iop::PanicHook::defaultHalt,
+                                          iop::PanicHook::defaultCleanup);
 
 static iop::PanicHook hook(defaultHook);
 
@@ -24,6 +25,7 @@ auto panicHandler(std::string_view msg, CodePoint const &point) noexcept -> void
   IOP_TRACE();
   hook.entry(msg, point);
   hook.viewPanic(msg, point);
+  hook.cleanup();
   hook.halt(msg, point);
   iop_hal::thisThread.abort();
 }
@@ -33,6 +35,7 @@ auto panicHandler(StaticString msg, CodePoint const &point) noexcept -> void {
   const auto msg_ = msg.toString();
   hook.entry(msg_, point);
   hook.staticPanic(msg, point);
+  hook.cleanup();
   hook.halt(msg_, point);
   iop_hal::thisThread.abort();
 }

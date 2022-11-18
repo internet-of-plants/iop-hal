@@ -2,13 +2,19 @@
 #define IOP_DRIVER_DEVICE_HPP
 
 #include "iop-hal/string.hpp"
+#include "iop-hal/thread.hpp"
 #include <stdint.h>
 #include <array>
 
 namespace iop_hal {
 /// High level abstraction to manage and monitor device resources
 class Device {
+  iop::time::milliseconds timezone;
 public:
+  auto setTimezone(const int8_t timezone) noexcept {
+    this->timezone = timezone * 3600;
+  }
+
   /// Measures current storage available in the device. Depending on the device it might be flash memory, HDD, SSD, etc.
   auto availableStorage() const noexcept -> uintmax_t;
 

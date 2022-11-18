@@ -84,41 +84,46 @@ StationStatus Wifi::status() const noexcept {
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
   // TODO FIXME: RCE here, this is super dumb, it's just to make everything work and it takes into account ssid and psk are hardcoded
   // Please do not trust user input in this, please
-  return 0 == std::system((std::string("nmcli dev wifi connect ") + std::string(ssid) + " password " + std::string(psk)).c_str());
+  //return 0 == std::system((std::string("nmcli dev wifi connect ") + std::string(ssid) + " password " + std::string(psk)).c_str());
+  (void) ssid;
+  (void) psk;
+  return true;
 }
 
 void Wifi::disconnectFromAccessPoint() const noexcept {
-  auto code = std::system("nmcli radio wifi off");
-  code = std::system("nmcli radio wifi on");
-  (void) code;
+  //auto code = std::system("nmcli radio wifi off");
+  //code = std::system("nmcli radio wifi on");
+  //(void) code;
 }
 
 void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
   // TODO FIXME: RCE here, this is super dumb, it's just to make everything work and it takes into account ssid and psk are hardcoded
   // Please do not trust user input in this, please
-  auto code = std::system((std::string("nmcli dev wifi hotspot ssid ") + std::string(ssid.substr(0, 32)) + " password " + std::string(psk.substr(0, 64)).c_str());
-  (void) code;
+  //auto code = std::system((std::string("nmcli dev wifi hotspot ssid ") + std::string(ssid.substr(0, 32)) + std::string(" password ") + std::string(psk.substr(0, 64))).c_str());
+  //(void) code;
+  (void) ssid;
+  (void) psk;
 }
 
 auto Wifi::disableOurAccessPoint() const noexcept -> void {
-  auto code = std::system("nmcli radio wifi off");
-  code = std::system("nmcli radio wifi on");
-  (void) code;
+  //auto code = std::system("nmcli radio wifi off");
+  //code = std::system("nmcli radio wifi on");
+  //(void) code;
 }
 
 void Wifi::setMode(WiFiMode mode) const noexcept {
-  int code;
+  //int code;
   switch (mode) {
     case WiFiMode::OFF:
-      code = std::system("nmcli radio wifi off");
+      //code = std::system("nmcli radio wifi off");
       break;
     case WiFiMode::STATION:
     case WiFiMode::ACCESS_POINT:
     case WiFiMode::ACCESS_POINT_AND_STATION:
-      code = std::system("nmcli radio wifi on");
+      //code = std::system("nmcli radio wifi on");
       break;
   }
-  (void) code;
+  //(void) code;
 }
 
 // NOOP

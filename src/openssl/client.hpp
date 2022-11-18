@@ -209,7 +209,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
         clientDriverLogger.error(IOP_STR("): "));
         clientDriverLogger.error(static_cast<uint64_t>(errno));
         clientDriverLogger.error(IOP_STR(" - "));
-        clientDriverLogger.errorln(strerror(errno));
+        clientDriverLogger.errorln(std::string_view(strerror(errno)));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
 
@@ -285,7 +285,7 @@ auto Session::sendRequest(const std::string method, const std::string_view data)
         shiftChars(buffer.get(), newlineIndex, size);
         buff = std::string_view(buffer.get(), size);
       }
-      if (!status || *status == iop::NetworkStatus::IO_ERROR) {
+      if (status <= 0) {
         clientDriverLogger.errorln(IOP_STR("No status"));
         return Response(iop::NetworkStatus::IO_ERROR);
       }
@@ -558,7 +558,7 @@ auto HTTPClient::begin(std::string_view uri, std::function<Response(Session&)> f
     auto connection = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
     if (connection < 0) {
       clientDriverLogger.error(IOP_STR("Unable to connect: "));
-      clientDriverLogger.errorln(static_cast<uint64_t>(connection));
+      clientDriverLogger.errorln(static_cast<int64_t>(connection));
       return iop_hal::Response(iop::NetworkStatus::IO_ERROR);
     }
   }

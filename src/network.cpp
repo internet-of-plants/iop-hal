@@ -115,6 +115,11 @@ auto prepareSession(Network  &network, iop_hal::Session &session, const std::opt
 auto beforeConnect(Network & network, StaticString path, const std::optional<std::string_view> &token, const std::optional<std::string_view> &data, iop::StaticString method) noexcept -> void {
   Network::setup();
 
+  if (token) {
+    network.logger().debug(IOP_STR("Authenticated "));
+  } else {
+    network.logger().debug(IOP_STR("Unauthenticated "));
+  }
   network.logger().debug(method);
   network.logger().debug(IOP_STR(" to "));
   network.logger().debug(network.uri());
@@ -179,7 +184,7 @@ auto processResponse(Network & network, iop_hal::Response & response) noexcept -
   return iop_hal::Response(response.code());
 }
 
-auto generateRequestProcessor(Network * network, const StaticString path, const std::optional<std::string_view> &token, const std::optional<std::string_view> &data, const StaticString method) noexcept -> std::function<iop_hal::Response (iop_hal::Session &)> {
+auto generateRequestProcessor(Network * network, const std::optional<std::string_view> &token, const std::optional<std::string_view> &data, const StaticString method) noexcept -> std::function<iop_hal::Response (iop_hal::Session &)> {
   const auto func = [network, token, data, method](iop_hal::Session & session) {
     prepareSession(*network, session, token, data);
     auto response = session.sendRequest(method.toString(), data.value_or(std::string_view()));
@@ -196,7 +201,7 @@ auto Network::httpRequest(const HttpMethod method_,
   IOP_TRACE();
   const auto method = methodToString(method_);
   beforeConnect(*this, path, token, data, method);
-  const auto func = generateRequestProcessor(this, path, token, data, method);
+  const auto func = generateRequestProcessor(this, token, data, method);
   return http.begin(this->endpoint(path), func);
 }
 

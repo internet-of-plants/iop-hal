@@ -62,23 +62,33 @@ void HttpServer::begin() noexcept {
   this->close();
 
   int fd = 0;
-  if ((fd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
-    logger().errorln(IOP_STR("Unable to open socket"));
-    return;
-  }
+  if (!this->maybeFD) {
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
+      logger().errorln(IOP_STR("Unable to open socket"));
+      return;
+    }
 
-  int flags = fcntl(fd, F_GETFL, 0);
-  if (flags == -1) {
-    logger().error(IOP_STR("fnctl get failed: "));
-    logger().errorln(static_cast<uint64_t>(flags));
-    return;
-  }
-  if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) != 0) {
-    logger().errorln(IOP_STR("fnctl set failed"));
-    return;
-  }
+    const char reuse = 1;
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0) {
+      logger().errorln(IOP_STR("Unable to set SO_REUSEPORT to socket"));
+      //return;
+    }
 
-  this->maybeFD = fd;
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
+      logger().error(IOP_STR("fnctl get failed: "));
+      logger().errorln(static_cast<uint64_t>(flags));
+      return;
+    }
+    if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) != 0) {
+      logger().errorln(IOP_STR("fnctl set failed"));
+      return;
+    }
+
+    this->maybeFD = fd;
+  } else {
+    fd = *this->maybeFD;
+  }
 
   // Linux boilerplate
   sockaddr_in addr;
@@ -127,7 +137,7 @@ void HttpServer::handleClient() noexcept {
       logger().error(IOP_STR("Error accepting connection ("));
       logger().error(static_cast<uint64_t>(errno));
       logger().error(IOP_STR("): "));
-      logger().errorln(strerror(errno));
+      logger().errorln(std::string_view(strerror(errno)));
     }
     this->isHandlingRequest = false;
     return;
@@ -159,7 +169,7 @@ void HttpServer::handleClient() noexcept {
         logger().error(IOP_STR("): "));
         logger().error(static_cast<uint64_t>(errno));
         logger().error(IOP_STR(" - "));
-        logger().errorln(strerror(errno));
+        logger().errorln(std::string_view(strerror(errno)));
         conn.reset();
         this->isHandlingRequest = false;
         return;
@@ -269,8 +279,8 @@ void HttpServer::close() noexcept {
     this->address = nullptr;
   }
 
-  if (this->maybeFD) ::close(*this->maybeFD);
-  this->maybeFD = std::nullopt;
+  //if (this->maybeFD) ::close(*this->maybeFD);
+  //this->maybeFD = std::nullopt;
 }
 
 void HttpServer::on(iop::StaticString uri, HttpServer::Callback handler) noexcept {
@@ -392,7 +402,7 @@ void HttpConnection::sendHeader(const iop::StaticString name, const iop::StaticS
 void HttpConnection::sendData(iop::StaticString content) const noexcept {
   IOP_TRACE();
   logger().debug(IOP_STR("Send Content ("));
-  logger().debug(static_cast<uint64_t>std::to_string(content.length()));
+  logger().debug(content.length());
   logger().debug(IOP_STR("): "));
   logger().debugln(content);
   iop_assert(this->currentClient, IOP_STR("No active client"));

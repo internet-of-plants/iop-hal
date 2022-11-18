@@ -8,6 +8,7 @@
 namespace iop {
 namespace time {
 using milliseconds = uintmax_t;
+using seconds = uint32_t;
 }
 }
 
