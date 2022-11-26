@@ -57,9 +57,17 @@ HttpServer::HttpServer(const uint32_t port) noexcept: port(port) {
     (void) logger;
   };
 }
+// We keep the server open because linux doesn't deal well with reuse and we close the server between iop credentials tests because some platforms depend on it
 void HttpServer::begin() noexcept {
   IOP_TRACE();
   this->close();
+
+  // Linux boilerplate
+  sockaddr_in addr;
+  addr.sin_family = AF_INET;
+  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.sin_port = htons(static_cast<uint16_t>(this->port));
+  memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
 
   int fd = 0;
   if (!this->maybeFD) {
@@ -84,29 +92,19 @@ void HttpServer::begin() noexcept {
       logger().errorln(IOP_STR("fnctl set failed"));
       return;
     }
-
     this->maybeFD = fd;
-  } else {
-    fd = *this->maybeFD;
+    
+    // Is this UB? (posix depends on casting struct into another one, but that's technically not allowed in C++)
+    if (bind(fd, (struct sockaddr* )&addr, sizeof(addr)) < 0) {
+      iop_panic(std::string("Unable to bind socket (") + std::to_string(errno) + "): " + strerror(errno));
+      return;
+    }
+    if (listen(fd, 100) < 0) {
+      logger().errorln(IOP_STR("Unable to listen socket"));
+      return;
+    }
   }
 
-  // Linux boilerplate
-  sockaddr_in addr;
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
-  addr.sin_port = htons(static_cast<uint16_t>(this->port));
-  memset(addr.sin_zero, '\0', sizeof(addr.sin_zero));
-
-  // Is this UB?
-  if (bind(fd, (struct sockaddr* )&addr, sizeof(addr)) < 0) {
-    iop_panic(std::string("Unable to bind socket (") + std::to_string(errno) + "): " + strerror(errno));
-    return;
-  }
-
-  if (listen(fd, 100) < 0) {
-    logger().errorln(IOP_STR("Unable to listen socket"));
-    return;
-  }
   logger().info(IOP_STR("Listening to port "));
   logger().infoln(static_cast<uint64_t>(this->port));
 
