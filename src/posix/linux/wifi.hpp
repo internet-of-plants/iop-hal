@@ -31,6 +31,8 @@ std::string exec(const char* cmd) {
 }
 */
 
+#include <iostream>
+
 namespace iop_hal {
 Wifi::Wifi() noexcept {}
 Wifi::~Wifi() noexcept {}
@@ -38,47 +40,21 @@ Wifi::~Wifi() noexcept {}
 // TODO FIXME: the functions below are buggy
 // TODO: handle failure
 
-// This is horrible, we should have a better way, this is just a hack to ensure feature parity between targets
-// -1 unset, 0 false, 1 true
-static auto isConnected = std::atomic<int>(-1);
-
 void Wifi::setup() noexcept {
-  std::thread([]() {
-    auto wifi = Wifi();
-    iop_hal::HTTPClient http;
-    auto lastConnection = std::chrono::system_clock::now();
-
-    while (true) {
-      const auto isConn = isConnected.load() == 1;
-      if (isConn) {
-        std::this_thread::sleep_for(std::chrono::seconds(600));
-      }
-
-      const auto conn = http.begin("https://google.com", [](iop_hal::Session & session) {
-        return session.sendRequest("GET", "");
-      }).code() > 0;
-
-      isConnected.store(conn);
-      lastConnection = std::chrono::system_clock::now();
-
-      std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
-  }).detach();
-
   HTTPClient::setup();
 }
 
 StationStatus Wifi::status() const noexcept {
-  const auto isConn = isConnected.load();
-  if (isConn == -1) {
-    isConnected.store(1); // We pretend that we are connected so we can properly check for it and unset on failure
-    iop_hal::HTTPClient http;
-    const auto code = http.begin("https://google.com", [](iop_hal::Session & session) {
-      return session.sendRequest("GET", "");
-    }).code();
-    isConnected.store(code > 0);
-  }
-  return isConnected.load() == 1 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
+  static auto running = false;
+  if (running) return StationStatus::GOT_IP;
+  running = true;
+
+  iop_hal::HTTPClient http;
+  const auto code = http.begin("https://google.com", [](iop_hal::Session & session) {
+    return session.sendRequest("GET", "");
+  }).code();
+  if (code <= 0) std::cout << code << std::endl;
+  return code > 0 ? StationStatus::GOT_IP : StationStatus::CONNECT_FAIL;
 }
 
 bool Wifi::connectToAccessPoint(std::string_view ssid, std::string_view psk) const noexcept {
