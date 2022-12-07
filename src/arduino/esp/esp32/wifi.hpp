@@ -2,7 +2,7 @@
 #include "iop-hal/panic.hpp"
 #include "iop-hal/thread.hpp"
 
-#include "esp/esp32/generated/certificates.hpp"
+#include "arduino/esp/esp32/generated/certificates.hpp"
 
 #include "WiFi.h"
 
