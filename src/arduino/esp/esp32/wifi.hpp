@@ -126,7 +126,7 @@ void Wifi::enableOurAccessPoint(std::string_view ssid, std::string_view psk) con
     ssidStr.concat(ssid.begin(), std::min(ssid.length(), static_cast<size_t>(31)));
     String pskStr;
     pskStr.concat(psk.begin(), std::min(psk.length(), static_cast<size_t>(63)));
-    ::WiFi.softAP(ssidStr, pskStr);
+    ::WiFi.softAP(ssidStr.c_str(), pskStr.c_str());
 }
 
 auto Wifi::disableOurAccessPoint() const noexcept -> void {
