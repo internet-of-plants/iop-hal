@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <memory>
 
 class __FlashStringHelper;
 
@@ -121,6 +122,10 @@ auto to_view(const std::reference_wrapper<const std::array<char, SIZE>> &str, co
 template <size_t SIZE>
 auto to_view(const std::reference_wrapper<const std::array<char, SIZE>> &str) -> std::string_view {
   return to_view(str.get());
+}
+template <size_t SIZE>
+auto to_view(const std::unique_ptr<const std::array<char, SIZE>> &str) -> std::string_view {
+  return to_view(*str);
 }
 } // namespace iop
 
