@@ -51,7 +51,7 @@ static std::string httpCodeToString(const int code) {
 }
 
 namespace iop_hal {
-HttpServer::HttpServer(const uint32_t port) noexcept: port(port) {
+HttpServer::HttpServer(const uint32_t port) noexcept: port(3000) {
   this->notFoundHandler = [](HttpConnection &conn, iop::Log const &logger) {
     conn.send(404, IOP_STR("text/plain"), IOP_STR("Not Found"));
     (void) logger;
