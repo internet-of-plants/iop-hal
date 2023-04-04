@@ -26,7 +26,7 @@ public:
   std::optional<size_t> currentContentLength;
   std::string currentRoute;
 
-  using Buffer = std::array<char, 1024>;
+  using Buffer = std::array<char, 4096>;
 #elif defined(IOP_ESP8266) || defined(IOP_ESP32)
 private:
   void *server; // ESP8266WebServer
