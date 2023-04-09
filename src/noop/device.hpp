@@ -2,7 +2,7 @@
 
 namespace iop_hal {
 auto Device::syncNTP() const noexcept -> void {}
-auto Device::platform() const noexcept -> ::iop::StaticString { return IOP_STR("NOOP"); }
+auto Device::platform() const noexcept -> ::iop::StaticString { return IOP_STR("noop"); }
 auto Device::vcc() const noexcept -> uint16_t { return UINT16_MAX; }
 auto Device::availableStorage() const noexcept -> uintmax_t { return 1000000; }
 auto Device::deepSleep(const uintmax_t seconds) const noexcept -> void { (void) seconds; }

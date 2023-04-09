@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 namespace iop_hal {
-auto Device::platform() const noexcept -> iop::StaticString { return IOP_STR("LINUX"); }
+auto Device::platform() const noexcept -> iop::StaticString { return IOP_STR("linux"); }
 
 iop::MacAddress & Device::macAddress() const noexcept {
   static iop::MacAddress mac;
