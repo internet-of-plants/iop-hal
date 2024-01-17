@@ -44,11 +44,11 @@ def preBuildCertificates(env):
         env.Execute("$PYTHONEXE -m pip install asn1crypto==1.4.0")
         try:
             from asn1crypto.x509 import Certificate
-        except Exception:
+        except Exception as e:
             if path.exists(destination):
-                print("Unable to find or install asn1crypto python library, using cached certificates")
+                print("Unable to find or install asn1crypto python library, using cached certificates", e)
             else:
-                raise Exception("Unable to find or install asn1crypto python library, and no certificates are available locally")
+                raise Exception(f"Unable to find or install asn1crypto python library, and no certificates are available locally: {e}")
 
     # check if openssl is available
     if which('openssl') is None and not path.isfile('./openssl') and not path.isfile('./openssl.exe'):
@@ -62,11 +62,11 @@ def preBuildCertificates(env):
     pems = []
     try:
         response = urlopen(mozurl)
-    except Exception:
+    except Exception as e:
         if path.exists(destination):
-            print("Connection failed, using cached certificates")
+            print("Connection failed, using cached certificates", e)
         else:
-            raise Exception("Connection failed, unable to get certificates and no cached version is available")
+            raise Exception(f"Connection failed, unable to get certificates and no cached version is available: {e}")
     csvData = response.read()
     csvHash = hashlib.sha256(csvData).hexdigest()
 
