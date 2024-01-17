@@ -17,6 +17,7 @@ iop::MacAddress & Device::macAddress() const noexcept {
   if (cached)
     return mac;
 
+#ifndef NO_MAC_ADDRESS
   struct ifreq ifr;
   ifr.ifr_addr.sa_family = AF_INET;
   strncpy(ifr.ifr_name, "eth0", IFNAMSIZ - 1);
@@ -32,6 +33,7 @@ iop::MacAddress & Device::macAddress() const noexcept {
     sprintf(mac.data() + (i * 3), "%02X", bin[i]);
     if (i < 5) sprintf(mac.data() + (i * 3) + 2, ":");
   }
+#endif
   cached = true;
   return mac;
 }
