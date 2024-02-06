@@ -194,14 +194,6 @@ public:
     this->updateState();
     this->log(LogLevel::TRACE, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto trace(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto trace(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
-  }
   auto trace(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
@@ -249,14 +241,6 @@ public:
   auto traceln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::TRACE, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto traceln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto traceln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::TRACE, std::to_string(msg), state, IOP_STR(""));
   }
   auto traceln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
@@ -307,14 +291,6 @@ public:
     this->updateState();
     this->log(LogLevel::DEBUG, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto debug(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto debug(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
-  }
   auto debug(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
@@ -362,14 +338,6 @@ public:
   auto debugln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::DEBUG, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto debugln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto debugln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::DEBUG, std::to_string(msg), state, IOP_STR(""));
   }
   auto debugln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
@@ -420,14 +388,6 @@ public:
     this->updateState();
     this->log(LogLevel::INFO, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto info(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto info(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
-  }
   auto info(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR(""));
@@ -475,14 +435,6 @@ public:
   auto infoln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::INFO, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto infoln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
-  }
-  auto infoln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::INFO, std::to_string(msg), state, IOP_STR("\n"));
   }
   auto infoln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
@@ -533,14 +485,6 @@ public:
     this->updateState();
     this->log(LogLevel::WARN, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto warn(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto warn(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
-  }
   auto warn(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR(""));
@@ -588,14 +532,6 @@ public:
   auto warnln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::WARN, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto warnln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
-  }
-  auto warnln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::WARN, std::to_string(msg), state, IOP_STR("\n"));
   }
   auto warnln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
@@ -646,14 +582,6 @@ public:
     this->updateState();
     this->log(LogLevel::ERROR, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto error(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto error(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
-  }
   auto error(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR(""));
@@ -701,14 +629,6 @@ public:
   auto errorln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::ERROR, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto errorln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
-  }
-  auto errorln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::ERROR, std::to_string(msg), state, IOP_STR("\n"));
   }
   auto errorln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
@@ -759,14 +679,6 @@ public:
     this->updateState();
     this->log(LogLevel::CRIT, iop::to_view(msg), state, IOP_STR(""));
   }
-  auto crit(const size_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
-  }
-  auto crit(const ssize_t msg) noexcept -> void {
-    this->updateState();
-    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
-  }
   auto crit(const uint8_t msg) noexcept -> void {
     this->updateState();
     this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR(""));
@@ -814,14 +726,6 @@ public:
   auto critln(const CowString msg) noexcept -> void {
     this->finalizeState();
     this->log(LogLevel::CRIT, iop::to_view(msg), state, IOP_STR("\n"));
-  }
-  auto critln(const size_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
-  }
-  auto critln(const ssize_t msg) noexcept -> void {
-    this->finalizeState();
-    this->log(LogLevel::CRIT, std::to_string(msg), state, IOP_STR("\n"));
   }
   auto critln(const uint8_t msg) noexcept -> void {
     this->finalizeState();
