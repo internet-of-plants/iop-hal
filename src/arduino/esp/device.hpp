@@ -14,7 +14,7 @@
 namespace iop_hal {
 auto Device::syncNTP() const noexcept -> void {
   // TODO FIXME: weak link, hijacking NTP sync can mean expired certs will be validated
-  configTime(this->timezone, 0, "pool.ntp.org", "time.nist.gov");
+  configTime(this->timezone * 60 * 60, 0, "pool.ntp.org", "time.nist.gov");
 }
 auto Device::availableStorage() const noexcept -> uintmax_t {
     return ESP.getFreeSketchSpace();
