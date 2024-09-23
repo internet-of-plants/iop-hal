@@ -25,8 +25,7 @@ struct Moment {
         return this->hour == other.hour && this->minute == other.hour && this->second == other.second;
     }
     auto operator< (const Moment & other) const noexcept -> bool {
-        return (this->hour >= 12 && other.hour < 12)
-            || this->hour < other.hour
+        return this->hour < other.hour
             || (this->hour == other.hour && this->minute < other.minute)
             || (this->hour == other.hour && this->minute == other.minute && this->second < other.second);
     }
