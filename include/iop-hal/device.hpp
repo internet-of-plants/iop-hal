@@ -33,6 +33,9 @@ struct Moment {
     auto operator> (const Moment & other) const noexcept -> bool { return other < *this; }
     auto operator<=(const Moment & other) const noexcept -> bool { return !(*this > other); }
     auto operator>=(const Moment & other) const noexcept -> bool { return !(*this < other); }
+    auto setSeconds(uint8_t second) const noexcept -> void {
+      this->second = second;
+    }
 };
 
 /// High level abstraction to manage and monitor device resources
