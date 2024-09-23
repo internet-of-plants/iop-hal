@@ -5,8 +5,36 @@
 #include "iop-hal/thread.hpp"
 #include <stdint.h>
 #include <array>
+#include <time.h>
 
 namespace iop_hal {
+struct Moment {
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+
+    Moment(uint8_t hour, uint8_t minute, uint8_t second) noexcept: hour(hour), minute(minute), second(second) {}
+
+    static auto now() noexcept -> Moment {
+      const auto rawtime = time(nullptr);
+      const auto *time = localtime(&rawtime);
+      return Moment(static_cast<uint8_t>(time->tm_hour), static_cast<uint8_t>(time->tm_min), static_cast<uint8_t>(time->tm_sec));
+    }
+
+    auto operator==(const Moment & other) const noexcept -> bool {
+        return this->hour == other.hour && this->minute == other.hour && this->second == other.second;
+    }
+    auto operator< (const Moment & other) const noexcept -> bool {
+        return (this->hour >= 12 && other.hour < 12)
+            || this->hour < other.hour
+            || (this->hour == other.hour && this->minute < other.minute)
+            || (this->hour == other.hour && this->minute == other.minute && this->second < other.second);
+    }
+    auto operator> (const Moment & other) const noexcept -> bool { return other < *this; }
+    auto operator<=(const Moment & other) const noexcept -> bool { return !(*this > other); }
+    auto operator>=(const Moment & other) const noexcept -> bool { return !(*this < other); }
+};
+
 /// High level abstraction to manage and monitor device resources
 class Device {
   iop::time::milliseconds timezone;
@@ -39,8 +67,19 @@ public:
   /// Note: network.cpp might be a more appropriate place for this
   /// TODO: report errors, check for network, etc
   auto syncNTP() const noexcept -> void;
+
+  auto now() const noexcept -> Moment {
+    return Moment::now();
+  }
 };
 extern Device device;
 }
+
+template<>
+struct std::hash<iop_hal::Moment> {
+    std::size_t operator()(const iop_hal::Moment & moment) const noexcept {
+        return static_cast<size_t>(moment.hour) ^ (static_cast<size_t>(moment.minute) << 1) ^ (static_cast<size_t>(moment.second) << 2);
+    }
+};
 
 #endif
